@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="true">
+    <meta name="theme-color" content="#ff69b4">
+    <title>Admin Login - GloHub</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1 class="auth-logo"style="font-family: 'Brush Script MT', cursive; font-size: 45px; color:#8e0038;">GloHub</h1>
+            <p class="auth-title">Welcome Back, Queen!</p>
+            <p class="auth-subtitle">Enter your admin code to access your dashboard</p>
+            
+            <form id="adminLoginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="adminCode">Admin Code</label>
+                    <input 
+                        type="text" 
+                        id="adminCode" 
+                        placeholder="Enter your admin code" 
+                        required
+                        autocomplete="off">
+                </div>
+                
+                <button type="submit" class="btn-large">Login</button>
+                
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Don't have an admin code yet?</p>
+                <a href="index.html#purchase" class="link-primary">Purchase Access - KES 649</a>
+            </div>
+            
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+    </div>
+
+    <script src="supabase.js"></script>
+    <script>
+        const form = document.getElementById('adminLoginForm');
+        const errorMsg = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = document.getElementById('adminCode').value.trim();
+            
+            try {
+                const { data, error } = await supabase
+                    .from('clients')
+                    .select('*')
+                    .eq('admin_code', code)
+                    .single();
+
+                if (error || !data) {
+                    showError('Invalid admin code. Please check and try again.');
+                    return;
+                }
+
+                // Store admin session
+                sessionStorage.setItem('adminCode', code);
+                sessionStorage.setItem('clientId', data.id);
+                
+                window.location.href = 'admin-dashboard.html';
+            } catch (err) {
+                showError('Login failed. Please try again.');
+            }
+        });
+
+        function showError(message) {
+            errorMsg.textContent = message;
+            errorMsg.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

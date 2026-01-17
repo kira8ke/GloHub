@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="true">
+    <meta name="theme-color" content="#ff69b4">
+    <title>Join Game - GalentineHub</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="join-page">
+    <div class="join-container">
+        <div class="join-card">
+            <h1 class="join-logo"style="font-family: 'Brush Script MT', cursive; font-size: 45px; color:#8e0038;">GloHub</h1>
+            <p class="join-title">Join the Party!</p>
+            
+            <form id="joinForm" class="join-form">
+                <div class="form-group">
+                    <label for="joinCode">Game Code</label>
+                    <input 
+                        type="text" 
+                        id="joinCode" 
+                        placeholder="Enter your game code" 
+                        required
+                        maxlength="6"
+                        style="text-transform: uppercase;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Your Name</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        placeholder="What should we call you?" 
+                        required
+                        maxlength="20">
+                </div>
+                
+                <button type="submit" class="btn-large">Join Game!</button>
+                
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+            </form>
+            
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+    </div>
+
+    <script src="supabase.js"></script>
+    <script>
+        const form = document.getElementById('joinForm');
+        const errorMsg = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const code = document.getElementById('joinCode').value.trim().toUpperCase();
+            const username = document.getElementById('username').value.trim();
+            
+            try {
+                // Check if session exists
+                const { data: session, error } = await supabase
+                    .from('sessions')
+                    .select('*')
+                    .eq('join_code', code)
+                    .single();
+
+                if (error || !session) {
+                    showError('Invalid game code. Please check and try again.');
+                    return;
+                }
+
+                // Store session info
+                sessionStorage.setItem('sessionId', session.id);
+                sessionStorage.setItem('joinCode', code);
+                sessionStorage.setItem('username', username);
+                
+                // Redirect to avatar customizer
+                window.location.href = 'avatar-customizer.html';
+                
+            } catch (err) {
+                showError('Failed to join game. Please try again.');
+            }
+        });
+
+        function showError(message) {
+            errorMsg.textContent = message;
+            errorMsg.style.display = 'block';
+        }
+
+        // Auto-uppercase game code
+        document.getElementById('joinCode').addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase();
+        });
+    </script>
+</body>
+</html>

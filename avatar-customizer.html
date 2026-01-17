@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="true">
+    <meta name="theme-color" content="#ff69b4">
+    <title>Create Your Avatar - GalentineHub</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="avatar-page">
+    <div class="avatar-container">
+        <h1 class="avatar-title">Create Your Cute Avatar!</h1>
+        <p class="avatar-subtitle">Let's make you look absolutely gorgeous!</p>
+        
+       <div class="avatar-creator">
+    <div class="avatar-preview" id="avatarPreview">
+        <!-- Avatar will be rendered here -->
+    </div>
+    
+    <div class="avatar-options">
+        <!-- Horizontal tabs -->
+        <div class="avatar-options-tabs">
+            <button class="option-tab active" data-option="vibe"> Vibe</button>
+            <button class="option-tab" data-option="hairstyle"> Hairstyle</button>
+            <button class="option-tab" data-option="skin"> Skin Tone</button>
+            <button class="option-tab" data-option="outfit"> Outfit</button>
+            <button class="option-tab" data-option="accessories"> Accessories</button>
+        </div>
+
+        <!-- Content sections -->
+        <div class="option-content active" id="content-vibe">
+            <div class="option-group">
+                <h3>Choose Your Vibe</h3>
+                <div class="preset-grid" id="presetGrid">
+                    <button class="preset-btn active" data-preset="cute-pink">
+                        <div class="preset-preview" style="background: linear-gradient(135deg, #ff69b4, #ffb6d9);"></div>
+                        <span>Cute Pink</span>
+                    </button>
+                    <button class="preset-btn" data-preset="queen">
+                        <div class="preset-preview" style="background: linear-gradient(135deg, #ffd700, #fff4cc);"></div>
+                        <span>Queen</span>
+                    </button>
+                    <button class="preset-btn" data-preset="girly-purple">
+                        <div class="preset-preview" style="background: linear-gradient(135deg, #da70d6, #f0d6f0);"></div>
+                        <span>Purple Dream</span>
+                    </button>
+                    <button class="preset-btn" data-preset="sweet-peach">
+                        <div class="preset-preview" style="background: linear-gradient(135deg, #ffb3ba, #ffe5e7);"></div>
+                        <span>Sweet Peach</span>
+                    </button>
+                    <button class="preset-btn" data-preset="mint-fresh">
+                        <div class="preset-preview" style="background: linear-gradient(135deg, #98fb98, #e0ffe0);"></div>
+                        <span>Mint Fresh</span>
+                    </button>
+                    <button class="preset-btn" data-preset="sky-blue">
+                        <div class="preset-preview" style="background: linear-gradient(135deg, #87ceeb, #e0f6ff);"></div>
+                        <span>Sky Blue</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-content" id="content-hairstyle">
+            <div class="option-group">
+                <h3>Hairstyle</h3>
+                <select id="hairstyle" class="custom-select">
+                    <option value="long-wavy">Long & Wavy</option>
+                    <option value="short-bob">Short Bob</option>
+                    <option value="ponytail">High Ponytail</option>
+                    <option value="braids">Braids</option>
+                    <option value="curly">Curly</option>
+                    <option value="bun">Messy Bun</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="option-content" id="content-skin">
+            <div class="option-group">
+                <h3>Skin Tone</h3>
+                <div class="color-grid">
+                    <button class="color-btn active" data-color="#ffd6cc" style="background: #ffd6cc;"></button>
+                    <button class="color-btn" data-color="#f4c2a5" style="background: #f4c2a5;"></button>
+                    <button class="color-btn" data-color="#d9a574" style="background: #d9a574;"></button>
+                    <button class="color-btn" data-color="#c68553" style="background: #c68553;"></button>
+                    <button class="color-btn" data-color="#8d5524" style="background: #8d5524;"></button>
+                    <button class="color-btn" data-color="#5c3a21" style="background: #5c3a21;"></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-content" id="content-outfit">
+            <div class="option-group">
+                <h3>Outfit</h3>
+                <select id="outfit" class="custom-select">
+                    <option value="dress">Cute Dress</option>
+                    <option value="casual">Casual Chic</option>
+                    <option value="glam">Glam Party</option>
+                    <option value="sporty">Sporty Cute</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="option-content" id="content-accessories">
+            <div class="option-group">
+                <h3>Accessories</h3>
+                <div class="accessories-grid">
+                    <label class="accessory-checkbox">
+                        <input type="checkbox" value="crown" class="accessory">
+                        <span> Crown</span>
+                    </label>
+                    <label class="accessory-checkbox">
+                        <input type="checkbox" value="glasses" class="accessory">
+                        <span> Glasses</span>
+                    </label>
+                    <label class="accessory-checkbox">
+                        <input type="checkbox" value="earrings" class="accessory">
+                        <span> Earrings</span>
+                    </label>
+                    <label class="accessory-checkbox">
+                        <input type="checkbox" value="necklace" class="accessory">
+                        <span> Necklace</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="avatar-message" id="avatarMessage"></div>
+        
+        <button class="btn-large" onclick="saveAvatar()">I'm Ready! Let's Go!</button>
+    </div>
+
+    <script src="supabase.js"></script>
+    <script src="avatar.js"></script>
+</body>
+</html>
