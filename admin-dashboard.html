@@ -28,120 +28,173 @@
 
         <main class="dashboard-content">
             <!-- Overview Tab -->
-            <div id="overview" class="tab-content active">
-                <h2>Dashboard Overview</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalSessions">0</div>
-                        <div class="stat-label">Total Game Sessions</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalPlayers">0</div>
-                        <div class="stat-label">Total Players</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalQuestions">0</div>
-                        <div class="stat-label">Quiz Questions</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="activeSessions">0</div>
-                        <div class="stat-label">Active Sessions</div>
-                    </div>
+          <div id="overview" class="tab-content active">
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            <h2>Dashboard Overview</h2>
+            <p>Welcome back! Here's what's happening with your platform</p>
+        </div>
+        
+        <div class="dashboard-card-content">
+            <div class="stats-grid">
+                <div class="stat-card animate-on-scroll stagger-1" data-animation="zoom-in">
+                    <div class="stat-value" id="totalSessions">0</div>
+                    <div class="stat-label">Total Game Sessions</div>
                 </div>
-                
-                <div class="quick-actions">
-                    <h3>Quick Actions</h3>
-                    <button class="btn-primary" onclick="switchTab('sessions')">Create New Game</button>
-                    <button class="btn-primary" onclick="switchTab('questions')">Add Questions</button>
-                    <button class="btn-primary" onclick="switchTab('theme')">Customize Theme</button>
+                <div class="stat-card animate-on-scroll stagger-2" data-animation="zoom-in">
+                    <div class="stat-value" id="totalPlayers">0</div>
+                    <div class="stat-label">Total Players</div>
+                </div>
+                <div class="stat-card animate-on-scroll stagger-3" data-animation="zoom-in">
+                    <div class="stat-value" id="totalQuestions">0</div>
+                    <div class="stat-label">Quiz Questions</div>
+                </div>
+                <div class="stat-card animate-on-scroll stagger-4" data-animation="zoom-in">
+                    <div class="stat-value" id="activeSessions">0</div>
+                    <div class="stat-label">Active Sessions</div>
                 </div>
             </div>
+            
+            <div class="quick-actions" style="margin-top: 30px;">
+                <h3>Quick Actions</h3>
+                <button class="btn-primary" onclick="switchTab('sessions')">Create New Game</button>
+                <button class="btn-primary" onclick="switchTab('questions')">Add Questions</button>
+                <button class="btn-primary" onclick="switchTab('theme')">Customize Theme</button>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- Theme Tab -->
-            <div id="theme" class="tab-content">
-                <h2>Customize Your Theme</h2>
-                <form id="themeForm" class="theme-form">
-                    <div class="form-group">
-                        <label>Primary Color</label>
-                        <input type="color" id="primaryColor" value="#ff69b4">
-                    </div>
-                    <div class="form-group">
-                        <label>Secondary Color</label>
-                        <input type="color" id="secondaryColor" value="#ffb6d9">
-                    </div>
-                    <div class="form-group">
-                        <label>Accent Color</label>
-                        <input type="color" id="accentColor" value="#ff1493">
-                    </div>
-                    <button type="submit" class="btn-primary">Save Theme</button>
-                </form>
-            </div>
+           <div id="theme" class="tab-content">
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            <h2>Customize Your Theme</h2>
+            <p>Make your platform uniquely yours with custom colors</p>
+        </div>
+        
+        <div class="dashboard-card-content">
+            <form id="themeForm" class="theme-form">
+                <div class="form-group">
+                    <label>Primary Color</label>
+                    <input type="color" id="primaryColor" value="#ff69b4">
+                </div>
+                <div class="form-group">
+                    <label>Secondary Color</label>
+                    <input type="color" id="secondaryColor" value="#ffb6d9">
+                </div>
+                <div class="form-group">
+                    <label>Accent Color</label>
+                    <input type="color" id="accentColor" value="#ff1493">
+                </div>
+                <button type="submit" class="btn-primary">Save Theme</button>
+            </form>
+        </div>
+    </div>
+</div>
 
             <!-- Questions Tab -->
-            <div id="questions" class="tab-content">
-                <div class="tab-header">
-                    <h2>Manage Quiz Questions</h2>
-                    <button class="btn-primary" onclick="showAddQuestion()">+ Add New Question</button>
-                </div>
-                
-                <div id="addQuestionForm" class="question-form" style="display: none;">
-                    <h3>New Question</h3>
-                    <form id="questionForm">
-                        <div class="form-group">
-                            <label>Question Text</label>
-                            <input type="text" id="questionText" placeholder="What's your question?" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Option 1</label>
-                            <input type="text" id="option1" placeholder="First option" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Option 2</label>
-                            <input type="text" id="option2" placeholder="Second option" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Option 3</label>
-                            <input type="text" id="option3" placeholder="Third option" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Option 4</label>
-                            <input type="text" id="option4" placeholder="Fourth option" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Correct Answer (1-4)</label>
-                            <select id="correctAnswer" required>
-                                <option value="1">Option 1</option>
-                                <option value="2">Option 2</option>
-                                <option value="3">Option 3</option>
-                                <option value="4">Option 4</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn-primary">Save Question</button>
-                        <button type="button" class="btn-secondary" onclick="hideAddQuestion()">Cancel</button>
-                    </form>
-                </div>
-                
-                <div id="questionsList" class="questions-list"></div>
-            </div>
-
-            <!-- Sessions Tab -->
-         <div id="sessions" class="tab-content">
+          <div id="questions" class="tab-content">
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            <h2>Manage Quiz Questions</h2>
+            <p>Create engaging questions for your quiz games</p>
+        </div>
+        
+        <div class="dashboard-card-content">
             <div class="tab-header">
-                <h2>Game Sessions</h2>
-                <button class="btn-primary" onclick="createNewSession()">+ Create New Session</button>
+                <h3 style="margin: 0;">Your Questions</h3>
+                <button class="btn-primary" onclick="showAddQuestion()">+ Add New Question</button>
             </div>
-                <div id="sessionsList" class="sessions-list"></div>
+            
+            <div id="addQuestionForm" class="question-form" style="display: none;">
+                <h3>New Question</h3>
+                <form id="questionForm">
+                    <div class="form-group">
+                        <label>Question Text</label>
+                        <input type="text" id="questionText" placeholder="What's your question?" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option 1</label>
+                        <input type="text" id="option1" placeholder="First option" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option 2</label>
+                        <input type="text" id="option2" placeholder="Second option" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option 3</label>
+                        <input type="text" id="option3" placeholder="Third option" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option 4</label>
+                        <input type="text" id="option4" placeholder="Fourth option" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Correct Answer (1-4)</label>
+                        <select id="correctAnswer" required>
+                            <option value="1">Option 1</option>
+                            <option value="2">Option 2</option>
+                            <option value="3">Option 3</option>
+                            <option value="4">Option 4</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">Save Question</button>
+                    <button type="button" class="btn-secondary" onclick="hideAddQuestion()">Cancel</button>
+                </form>
             </div>
-
-            <!-- Players Tab -->
-            <div id="players" class="tab-content">
-                <h2>Manage Players</h2>
-                <div id="playersList" class="players-list"></div>
-            </div>
-        </main>
+            
+            <div id="questionsList" class="questions-list"></div>
+        </div>
     </div>
+</div>
+
+        <!-- Sessions Tab -->
+<div id="sessions" class="tab-content">
+    <div class="sessions-hero">
+        <!-- Cards Container -->
+        <div class="sessions-cards-wrapper">
+            <button class="nav-arrow nav-arrow-left" id="prevCard" aria-label="Previous card">
+                ‹
+            </button>
+            
+            <div class="sessions-cards-container" id="sessionsCardsContainer">
+                <!-- Cards will be dynamically inserted here -->
+            </div>
+            
+            <button class="nav-arrow nav-arrow-right" id="nextCard" aria-label="Next card">
+                ›
+            </button>
+        </div>
+
+        <div id="players" class="tab-content">
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            <h2>Player Management</h2>
+            <p>View and manage all players who have joined your games</p>
+        </div>
+        
+        <div class="dashboard-card-content">
+            <div id="playersList" class="players-list"></div>
+        </div>
+    </div>
+</div>
+        
+        <!-- Heading -->
+        <div class="sessions-heading">
+            <h2>Get the party started with Invites</h2>
+            <p>Create events and invite your friends to join the fun</p>
+        </div>
+        
+        <!-- Create Button -->
+        <button class="btn-create-event" onclick="createNewSession()">Create an Event</button>
+          <!-- Sessions List (existing sessions) -->
+    <div id="sessionsList" class="sessions-list"></div>
+    </div>
+</div>
 
     <script src="supabase.js"></script>
     <script src="admin.js"></script>
+    <script src="animations.js"></script>
 </body>
 </html>

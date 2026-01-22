@@ -145,6 +145,17 @@ async function selectAnswer(selectedIndex) {
     
     if (isCorrect) {
         playerScore += 100;
+
+         // ADD CELEBRATION EFFECT
+        if (window.gameAnimations) {
+            window.gameAnimations.celebrateWithConfetti();
+        }
+    } else {
+        // ADD SHAKE EFFECT FOR WRONG ANSWER
+        const feedback = document.getElementById('answerFeedback');
+        if (window.gameAnimations && feedback) {
+            window.gameAnimations.shakeElement(feedback);
+        }
     }
     
     // Visual feedback

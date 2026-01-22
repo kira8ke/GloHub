@@ -12,59 +12,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup navigation
     setupNavigation();
     
-    // Setup mobile menu toggle
-    setupMobileMenu();
-    
     // Load dashboard data
     await loadDashboardData();
+
+    // Initialize session cards navigation
+    initializeSessionCards();
     
     // Setup forms
     setupThemeForm();
     setupQuestionForm();
 });
 
-function setupMobileMenu() {
-    // Add hamburger menu for mobile
-    const sidebar = document.querySelector('.sidebar');
-    if (!sidebar) return;
-    
-    // Create menu toggle button if it doesn't exist
-    const dashboardContent = document.querySelector('.dashboard-content');
-    if (dashboardContent && !document.querySelector('.mobile-menu-toggle')) {
-        const toggle = document.createElement('button');
-        toggle.className = 'mobile-menu-toggle';
-        toggle.innerHTML = '☰';
-        toggle.setAttribute('aria-label', 'Toggle menu');
-        toggle.style.cssText = 'display: none; position: fixed; top: 10px; left: 10px; z-index: 1001; background: none; border: none; font-size: 28px; cursor: pointer; color: var(--primary);';
-        document.body.appendChild(toggle);
-        
-        toggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-        });
-        
-        // Hide menu when clicking content
-        document.addEventListener('click', (e) => {
-            if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
-                sidebar.classList.remove('active');
-            }
-        });
-        
-        // Show/hide toggle based on screen size
-        window.addEventListener('resize', () => {
-            if (window.innerWidth <= 768) {
-                toggle.style.display = 'block';
-            } else {
-                toggle.style.display = 'none';
-                sidebar.classList.remove('active');
-            }
-        });
-        
-        // Initial check
-        if (window.innerWidth <= 768) {
-            toggle.style.display = 'block';
-        }
-    }
-}
+
 
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
@@ -361,6 +320,130 @@ async function loadSessions() {
         }
         
         list.innerHTML = sessions.map(s => `
+            <div class="session-item">
+                <div>
+                    <strong>Join Code: ${s.join_code}</strong>
+                    <div style="font-size: 14px; color: #666;">
+                        Created: ${formatDate(s.created_at)} at ${formatTime(s.created_at)}
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="deleteSession('${s.id}')">Delete</button>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading sessions:', error);
+    }
+}
+
+// Initialize session cards with navigation
+function initializeSessionCards() {
+    const container = document.getElementById('sessionsCardsContainer');
+    const prevBtn = document.getElementById('prevCard');
+    const nextBtn = document.getElementById('nextCard');
+    
+    if (!container || !prevBtn || !nextBtn) return;
+    
+    // Navigation handlers
+    prevBtn.addEventListener('click', () => {
+        const scrollAmount = container.offsetWidth * 0.8;
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        const scrollAmount = container.offsetWidth * 0.8;
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    });
+    
+    // Update button states
+    function updateNavButtons() {
+        const isAtStart = container.scrollLeft <= 10;
+        const isAtEnd = container.scrollLeft >= container.scrollWidth - container.offsetWidth - 10;
+        
+        prevBtn.disabled = isAtStart;
+        nextBtn.disabled = isAtEnd;
+    }
+    
+    container.addEventListener('scroll', updateNavButtons);
+    updateNavButtons();
+    
+    // Touch swipe support
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    container.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+    
+    container.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    });
+    
+    function handleSwipe() {
+        if (touchStartX - touchEndX > 50) {
+            // Swipe left
+            nextBtn.click();
+        }
+        if (touchEndX - touchStartX > 50) {
+            // Swipe right
+            prevBtn.click();
+        }
+    }
+}
+
+// Modified loadSessions function
+async function loadSessions() {
+    try {
+        const { data: sessions } = await supabase
+            .from('sessions')
+            .select('*')
+            .eq('client_id', currentClientId)
+            .order('created_at', { ascending: false });
+        
+        // Populate cards container
+        const cardsContainer = document.getElementById('sessionsCardsContainer');
+        if (cardsContainer) {
+            if (!sessions || sessions.length === 0) {
+                cardsContainer.innerHTML = `
+                    <div class="session-card" style="flex: 0 0 100%; min-height: 400px; display: flex; align-items: center; justify-content: center;">
+                        <p style="text-align: center; color: #666;">No events yet. Create your first one!</p>
+                    </div>
+                `;
+            } else {
+                // Display up to 6 most recent sessions as cards
+                const recentSessions = sessions.slice(0, 6);
+                cardsContainer.innerHTML = recentSessions.map((s, index) => `
+                    <div class="session-card" style="position: relative;">
+                        <span class="session-card-badge">Active</span>
+                        <img src="https://images.unsplash.com/photo-${1517457373958 + index * 1000}-3f3c69d1d4a4?w=400&h=600&fit=crop" 
+                             alt="Event ${index + 1}" 
+                             class="session-card-image"
+                             onerror="this.src='https://via.placeholder.com/400x600/ffb6d9/ffffff?text=Event+${index + 1}'">
+                        <div class="session-card-content">
+                            <div class="session-card-title">Event ${s.join_code}</div>
+                            <div class="session-card-meta">
+                                <span>${formatDate(s.created_at)}</span>
+                                <span>${formatTime(s.created_at)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Initialize navigation after cards are loaded
+            setTimeout(initializeSessionCards, 100);
+        }
+        
+        // Populate sessions list (existing functionality)
+        const list = document.getElementById('sessionsList');
+        if (!sessions || sessions.length === 0) {
+            list.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No sessions yet.</p>';
+            return;
+        }
+        
+        list.innerHTML = '<h3 style="margin: 40px 0 20px; color: var(--primary);">All Sessions</h3>' +
+            sessions.map(s => `
             <div class="session-item">
                 <div>
                     <strong>Join Code: ${s.join_code}</strong>
