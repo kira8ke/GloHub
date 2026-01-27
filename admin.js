@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup forms
     setupThemeForm();
     setupQuestionForm();
+    setupAdminJoinGame();
 });
 
 
@@ -548,4 +549,55 @@ async function deletePlayer(playerId) {
 function logout() {
     sessionStorage.clear();
     window.location.href = 'index.html';
+}
+
+function setupAdminJoinGame() {
+    const form = document.getElementById('adminJoinForm');
+    if (!form) return;
+    
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const code = document.getElementById('adminJoinCode').value.trim().toUpperCase();
+        const username = document.getElementById('adminUsername').value.trim();
+        const errorDiv = document.getElementById('adminJoinError');
+        
+        try {
+            // Check if session exists
+            const { data: session, error } = await supabase
+                .from('sessions')
+                .select('*')
+                .eq('join_code', code)
+                .single();
+
+            if (error || !session) {
+                errorDiv.textContent = 'Invalid game code. Please check and try again.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Store session info for admin
+            sessionStorage.setItem('sessionId', session.id);
+            sessionStorage.setItem('joinCode', code);
+            sessionStorage.setItem('username', username);
+            sessionStorage.setItem('isAdminPlayer', 'true');
+            
+            // Redirect to avatar customizer
+            window.location.href = 'avatar-customizer.html';
+            
+        } catch (err) {
+            console.error('Admin join error:', err);
+            errorDiv.textContent = 'Failed to join game. Please try again.';
+            errorDiv.style.display = 'block';
+        }
+    });
+    
+    // Auto-uppercase game code
+    const codeInput = document.getElementById('adminJoinCode');
+    if (codeInput) {
+        codeInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase();
+            document.getElementById('adminJoinError').style.display = 'none';
+        });
+    }
 }

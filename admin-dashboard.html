@@ -19,6 +19,7 @@
         <button class="nav-item" data-tab="questions">Questions</button>
         <button class="nav-item" data-tab="sessions">Game Sessions</button>
         <button class="nav-item" data-tab="players">Players</button>
+        <button class="nav-item" data-tab="join-game">Join Game</button>
         <button class="nav-item nav-theme" data-tab="theme"> Theme</button>
         <!-- Spacer to push theme to bottom -->
         <div class="nav-spacer"></div>
@@ -60,6 +61,7 @@
                 <button class="btn-primary" onclick="switchTab('sessions')">Create New Game</button>
                 <button class="btn-primary" onclick="switchTab('questions')">Add Questions</button>
                 <button class="btn-primary" onclick="switchTab('theme')">Customize Theme</button>
+                <button class="btn-primary" onclick="switchTab('join-game')">Join as Player</button>
             </div>
         </div>
     </div>
@@ -190,6 +192,40 @@
         
         <div class="dashboard-card-content">
             <div id="playersList" class="players-list"></div>
+        </div>
+    </div>
+</div>
+
+        <!-- Join Game Tab (Admin) -->
+        <div id="join-game" class="tab-content">
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            <h2>Join as Player</h2>
+            <p>Experience your game as a player to test it out</p>
+        </div>
+        
+        <div class="dashboard-card-content">
+            <form id="adminJoinForm" class="form-group" style="max-width: 500px; margin: 0 auto;">
+                <label for="adminJoinCode">Game Code</label>
+                <input 
+                    type="text" 
+                    id="adminJoinCode" 
+                    placeholder="Enter game code" 
+                    required
+                    maxlength="6"
+                    style="text-transform: uppercase;">
+                
+                <label for="adminUsername" style="margin-top: 15px;">Player Name</label>
+                <input 
+                    type="text" 
+                    id="adminUsername" 
+                    placeholder="Your test player name" 
+                    required
+                    maxlength="20">
+                
+                <button type="submit" class="btn-primary" style="margin-top: 20px; width: 100%;">Join as Player</button>
+                <div id="adminJoinError" class="error-message" style="display: none; margin-top: 15px; color: #f44336;"></div>
+            </form>
         </div>
     </div>
 </div>

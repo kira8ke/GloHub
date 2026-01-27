@@ -2,219 +2,406 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="apple-mobile-web-app-capable" content="true">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ff69b4">
-    <title>GloHub- The Ultimate Girls' Quiz Party Platform</title>
+    <title>GloHub - Where We Keep It Fun and Cute</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Hero section with blurred background */
-        .hero {
-            position: relative;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('assets/landing\ page\ background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            z-index: -2;
-            }
-        .hero::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 182, 217, 0.3);
-            z-index: -1;
-          }
-
-          .hero .container {
-              position: relative;
-              z-index: 1;
-          }
-</style>
 </head>
-<body class="landing-page">
-   <header class="header">
-    <div class="container">
-        <h1 class="logo">GloHub</h1>
-        <button class="menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
-            ☰
-        </button>
-        <nav id="mobileNav">
-            <a href="#features" onclick="closeMobileMenu()">Features</a>
-            <a href="#how-it-works" onclick="closeMobileMenu()">How It Works</a>
-            <a href="admin-login.html" class="btn-secondary">Admin Login</a>
-            <a href="join-game.html" class="btn-primary">Join Game</a>
-        </nav>
-    </div>
-</header>
-<div class="menu-overlay" id="menuOverlay" onclick="closeMobileMenu()"></div>
-<section class="hero">
-    <div class="container">
-       <div class="hero-image">
-            <div class="placeholder-image">
-                <img src="assets/glohub.jpg" alt="Cute doll-like trio" />
+<body>
+    <!-- Mouse Follower -->
+    <div class="mouse-follower" id="mouseFollower"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">GloHub</h1>
+            <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <nav id="mobileNav">
+                <a href="#features" onclick="closeMobileMenu()">Features</a>
+                <a href="#how-it-works" onclick="closeMobileMenu()">How It Works</a>
+                <a href="#games" onclick="closeMobileMenu()">Our Games</a>
+            </nav>
+        </div>
+    </header>
+    <div class="menu-overlay" id="menuOverlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Enhanced Hero Section with Pulsating Hearts -->
+    <section class="hero-enhanced">
+        <!-- Pulsating Hearts SVG -->
+        <div class="hearts-container" id="heartsContainer"></div>
+
+        <div class="container">
+            <div class="hero-content-enhanced">
+                <h1 class="hero-main-headline">
+                    Being feminine doesn't have to be boring
+                </h1>
+                <h2 class="hero-supporting">
+                    Welcome to GloHub
+                </h2>
+                <p class="hero-tagline">
+                    Your go-to hub for girly games, quizzes, and squad challenges.
+                </p>
+                <button class="btn-explore" onclick="scrollToFeatures()">
+                    <span style="position: relative; z-index: 1;">Explore the Fun →</span>
+                </button>
             </div>
         </div>
-        <div class="hero-content" style="background-image: url('path/to/your-image.jpg'); background-size: cover; background-position: center;">
-            <h2 class="hero-title">Galentines 2.0!</h2>
-            <p class="hero-subtitle">Fun quizzes, cute avatars, and the best girls' night in!</p>
-            <button class="btn-large" onclick="scrollToPurchase()">Get Started</button>
-        </div>
-      
+    </section>
+
+    <!-- Wavy Transition -->
+    <div class="wave-transition">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <path d="M0,64 C320,20 420,100 740,64 C1060,28 1120,108 1440,64 L1440,120 L0,120 Z" fill="#ffffff"></path>
+        </svg>
     </div>
-</section>
-<section id="features" class="features">
-  <div class="container">
-    <h2 class="section-title animate-on-scroll" data-animation="slide-in-down">
-      Why Girls Love 
-      <span style="font-family: 'Brush Script MT', cursive; font-size: clamp(2rem, 4vw, 3rem); color:#8e0038;">GloHub</span>
-    </h2>
+
+    <!-- Flagship Product Section - Galentine's Game -->
+    <section id="flagship" class="flagship-section">
+        <div class="container">
+            <div class="flagship-badge">
+                <span>The Product That Started It All</span>
+            </div>
+            <div class="flagship-card">
+            <div class="flagship-content">
+                <div class="flagship-visual">
+                    <div class="flagship-glow"></div>
+                    <img src="assets/funquizes.jpg" alt="Galentine's Game" class="flagship-image">
+                </div>
+                <div class="flagship-info">
+                    <h2 class="flagship-title">Galentine's Game</h2>
+                    <p class="flagship-tagline">The Ultimate Girls' Night Experience</p>
+                    <p class="flagship-description">
+                        <p class="flagship-description">
+                             Galentine’s Day plans? Girls’ night in? Just because? This is the ultimate 3‑in‑1 game made for besties! 
+                              Play quizzes, swap laughs, and dive into challenges that turn every moment into memories you’ll be reminiscing about for years.
+                        </p>
+
+                    <div class="flagship-features">
+                        <div class="flagship-feature">
+                            <span class="about-icon"></span>
+                            <span>Unlimited Custom Quizzes</span>
+                        </div>
+                        <div class="flagship-feature">
+                            <span class="about-icon"></span>
+                            <span>Play with Your Whole Squad</span>
+                        </div>
+                        <div class="flagship-feature">
+                            <span class="about-icon"></span>
+                            <span>Live Leaderboards & Scores</span>
+                        </div>
+                    </div>
+                    <button class="btn-flagship" onclick="window.location.href='galentines-game.html'">
+                        Play Now
+                        
+                    </button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wavy Transition -->
+    <div class="wave-transition">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <path d="M0,64 C320,20 420,100 740,64 C1060,28 1120,108 1440,64 L1440,120 L0,120 Z" fill="#ffffff"></path>
+        </svg>
+    </div>
+
+    <!-- 3D Carousel Section - Why Girls Love GloHub -->
+    <section id="features" class="carousel-3d-section">
+        <div class="container">
+            <h2 class="section-title">
+                Why Girls Love 
+                <span style="font-family: 'Brush Script MT', cursive; color:#8e0038;">GloHub</span>
+            </h2>
+        </div>
+
+        <div class="carousel-3d-wrapper">
+            <button class="carousel-3d-nav prev" onclick="rotateCarousel(-1)">❮</button>
+            
+            <div class="carousel-3d-container" id="carousel3D">
+                <div class="carousel-3d-item active" data-index="0">
+                    <div class="carousel-card-3d">
+                        <img src="assets/avatarcreator.jpeg" alt="Cute Avatar Creator">
+                        <div class="card-content">
+                            <h3>Cute Avatar Creator</h3>
+                            <p>Pick from 12 adorable Bratz-style dolls and customize your vibe!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-3d-item" data-index="1">
+                    <div class="carousel-card-3d">
+                        <img src="assets/funquizes.jpg" alt="Fun Quiz Games">
+                        <div class="card-content">
+                            <h3>Fun Quiz Games</h3>
+                            <p>Create custom quizzes just like Kahoot - perfect for parties!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-3d-item" data-index="2">
+                    <div class="carousel-card-3d">
+                        <img src="assets/spinwheel.jpeg" alt="Spin-to-Win Wheel">
+                        <div class="card-content">
+                            <h3>Spin-to-Win Wheel</h3>
+                            <p>Truth or dare, affirmations, challenges - all in one!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-3d-item" data-index="3">
+                    <div class="carousel-card-3d">
+                        <img src="assets/roomcode.jpeg" alt="Easy Room Codes">
+                        <div class="card-content">
+                            <h3>Easy Room Codes</h3>
+                            <p>Generate simple codes so your girls can join instantly!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="carousel-3d-nav next" onclick="rotateCarousel(1)">❯</button>
+        </div>
+
+        <div class="carousel-indicators">
+            <span class="indicator active" onclick="goToSlide(0)"></span>
+            <span class="indicator" onclick="goToSlide(1)"></span>
+            <span class="indicator" onclick="goToSlide(2)"></span>
+            <span class="indicator" onclick="goToSlide(3)"></span>
+        </div>
+    </section>
+
+<!-- Wavy Transition -->
+    <div class="wave-transition">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <path d="M0,64 C320,20 420,100 740,64 C1060,28 1120,108 1440,64 L1440,120 L0,120 Z" fill="#ffffff"></path>
+        </svg>
+    </div>
+
+    <!-- Flow-Based How It Works -->
+    <section id="how-it-works" class="how-it-works-flow">
+        <div class="container">
+            <h2 class="section-title">Your Journey to Fun</h2>
+            <p class="section-subtitle">Four simple steps to the best girls' night ever!</p>
+            
+            <div class="flow-path">
+                <div class="flow-step" data-step="1">
+                    <div class="flow-icon">🎮</div>
+                    <div class="flow-content">
+                        <h3>Pick Your Game</h3>
+                        <p>Choose from Galentine's Game, Spin-to-Win, or explore our upcoming releases!</p>
+                    </div>
+                    <div class="flow-connector"></div>
+                </div>
+
+                <div class="flow-step" data-step="2">
+                    <div class="flow-icon">📖</div>
+                    <div class="flow-content">
+                        <h3>Learn How to Play</h3>
+                        <p>Quick, easy-to-follow instructions. You'll be a pro in minutes!</p>
+                    </div>
+                    <div class="flow-connector"></div>
+                </div>
+
+                <div class="flow-step" data-step="3">
+                    <div class="flow-icon">💳</div>
+                    <div class="flow-content">
+                        <h3>One-Time Purchase</h3>
+                        <p>Lifetime access. No subscriptions, no hidden fees!</p>
+                    </div>
+                    <div class="flow-connector"></div>
+                </div>
+
+                <div class="flow-step" data-step="4">
+                    <div class="flow-icon">🎉</div>
+                    <div class="flow-content">
+                        <h3>Play & Enjoy!</h3>
+                        <p>Share the room code with your girls and let the fun begin!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wavy Transition -->
+    <div class="wave-transition">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <path d="M0,64 C320,20 420,100 740,64 C1060,28 1120,108 1440,64 L1440,120 L0,120 Z" fill="#ffffff"></path>
+        </svg>
+    </div>
+
+    <!-- Games Section (Replaces Pricing) -->
+    <section id="games" class="games-section">
+        <div class="container">
+            <h2 class="section-title">Our Games Collection</h2>
+            <p class="section-subtitle">More ways to have fun with your squad!</p>
+            
+            <div class="games-grid">
+                <!-- Galentine's Game - Clickable -->
+                <div class="game-card clickable" onclick="window.location.href='galentines-game.html'">
+                    <div class="game-image-wrapper">
+                        <img src="assets/funquizes.jpg" alt="Galentine's Game" class="game-image">
+                        <div class="game-badge available">Available Now</div>
+                    </div>
+                    <div class="game-info">
+                        <h3>Galentine's Game</h3>
+                        <p>Custom quizzes that bring the party to life! Perfect for your February Twist</p>
+                        <button class="game-btn">Play Now →</button>
+                    </div>
+                </div>
+
+                <!-- Upcoming Game 1 - Blurred -->
+                <div class="game-card upcoming">
+                    <div class="game-image-wrapper blurred">
+                        <img src="assets/spinwheel.jpeg" alt="Mystery Game" class="game-image">
+                        <div class="game-badge coming-soon">Coming Soon</div>
+                        <div class="blur-overlay">
+                            <p class="preview-text">🎯 Challenges & Dares<br>✨ Interactive Experiences<br>💕 Squad Bonding</p>
+                        </div>
+                    </div>
+                    <div class="game-info">
+                        <h3>Truth or Dare Deluxe</h3>
+                        <p>Spice up your night with curated challenges and hilarious dares!</p>
+                    </div>
+                </div>
+
+                <!-- Upcoming Game 2 - Blurred -->
+                <div class="game-card upcoming">
+                    <div class="game-image-wrapper blurred">
+                        <img src="assets/avatarcreator.jpeg" alt="Mystery Game" class="game-image">
+                        <div class="game-badge coming-soon">Coming Soon</div>
+                        <div class="blur-overlay">
+                            <p class="preview-text">🎨 Creative Fun<br>🌟 Self-Expression<br>👯 Share Your Style</p>
+                        </div>
+                    </div>
+                    <div class="game-info">
+                        <h3>Vibe Check Creator</h3>
+                        <p>Create and share your perfect aesthetic with interactive mood boards!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wavy Transition -->
+    <div class="wave-transition">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <path d="M0,64 C320,20 420,100 740,64 C1060,28 1120,108 1440,64 L1440,120 L0,120 Z" fill="#ffffff"></path>
+        </svg>
+    </div>
     
-<div class="features-grid">
-  <div class="feature-card animate-on-scroll" data-animation="slide-in-left">
-    <div class="feature-image">
-      <img src="https://via.placeholder.com/300x180" alt="Customize Everything" />
-    </div>
-    <div class="feature-content">
-      <h3>Customize Everything</h3>
-      <p>Choose your colors, create your own questions, and make it totally yours!</p>
-    </div>
-  </div>
+    <!-- Reviews Section -->
+    <section class="reviews-section">
+        <div class="container">
+            <h2 class="section-title">What Girls Are Saying</h2>
+            <p class="section-subtitle">Real vibes from real friends!</p>
+            
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="review-text">"We used this for my sister's bridal shower and everyone was OBSESSED! The quiz game had us all in tears from laughing. 10/10 would recommend!"</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">💕</div>
+                        <div class="reviewer-info">
+                            <p class="reviewer-name">Sarah M.</p>
+                            <p class="reviewer-tag">Bridal Party Host</p>
+                        </div>
+                    </div>
+                </div>
 
-  <div class="feature-card animate-on-scroll" data-animation="slide-in-down">
-    <div class="feature-image">
-      <img src="assets/avatarcreator.jpeg" alt="Cute Avatar Creator" />
-    </div>
-    <div class="feature-content">
-      <h3>Cute Avatar Creator</h3>
-      <p>Let your girls design adorable avatars with different hairstyles, outfits, and accessories!</p>
-    </div>
-  </div>
+                <div class="review-card">
+                    <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="review-text">"The avatar creator is SO cute! My girls and I spent an hour just customizing our dolls before we even started playing. Worth every shilling!"</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">✨</div>
+                        <div class="reviewer-info">
+                            <p class="reviewer-name">Priya K.</p>
+                            <p class="reviewer-tag">Squad Leader</p>
+                        </div>
+                    </div>
+                </div>
 
-  <div class="feature-card animate-on-scroll" data-animation="slide-in-right">
-    <div class="feature-image">
-      <img src="assets/funquizes.jpg" alt="Fun Quiz Games" />
-    </div>
-    <div class="feature-content">
-      <h3>Fun Quiz Games</h3>
-      <p>Create custom quizzes just like Kahoot - perfect for ice breakers and parties!</p>
-    </div>
-  </div>
-
-  <div class="feature-card animate-on-scroll" data-animation="slide-in-left">
-    <div class="feature-image">
-      <img src="assets/spinwheel.jpeg" alt="Spin-to-Win Wheel" />
-    </div>
-    <div class="feature-content">
-      <h3>Spin-to-Win Wheel</h3>
-      <p>Truth or dare, affirmations, fun challenges - all in a cute spinning wheel!</p>
-    </div>
-  </div>
-
-  <div class="feature-card animate-on-scroll" data-animation="slide-in-up">
-    <div class="feature-image">
-      <img src="https://via.placeholder.com/300x180" alt="Admin Dashboard" />
-    </div>
-    <div class="feature-content">
-      <h3>Admin Dashboard</h3>
-      <p>Manage everything from one place - questions, players, themes, and more!</p>
-    </div>
-  </div>
-
-  <div class="feature-card animate-on-scroll" data-animation="slide-in-right">
-    <div class="feature-image">
-      <img src="assets/roomcode.jpeg" alt="Easy Room Codes" />
-    </div>
-    <div class="feature-content">
-      <h3>Easy Room Codes</h3>
-      <p>Generate simple join codes so your girls can hop in instantly!</p>
-    </div>
-  </div>
-</div>
-  </div>
-</section>
-<section id="how-it-works" class="how-it-works">
-    <div class="container">
-        <h2 class="section-title animate-on-scroll" data-animation="zoom-in">How It Works</h2>
-        <div class="steps">
-            <div class="step animate-on-scroll " data-animation="flip-in">
-                <div class="step-number">1</div>
-                <h3>Purchase Access</h3>
-                <p>Pay KES 649 once and get your unique admin code by email</p>
-            </div>
-            <div class="step animate-on-scroll " data-animation="flip-in">
-                <div class="step-number">2</div>
-                <h3>Set Up Your Hub</h3>
-                <p>Login with your admin code, customize your theme, and add quiz questions</p>
-            </div>
-            <div class="step animate-on-scroll " data-animation="flip-in">
-                <div class="step-number">3</div>
-                <h3>Create a Game Room</h3>
-                <p>Generate a join code and share it with your friends</p>
-            </div>
-            <div class="step animate-on-scroll " data-animation="flip-in">
-                <div class="step-number">4</div>
-                <h3>Play & Have Fun!</h3>
-                <p>Your girls join, create avatars, and play together - so much fun!</p>
+                <div class="review-card">
+                    <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="review-text">"Finally! A party game that's not cringey and actually made for us. The vibe is immaculate and setup was so easy. We play every weekend now!"</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">🌸</div>
+                        <div class="reviewer-info">
+                            <p class="reviewer-name">Aisha N.</p>
+                            <p class="reviewer-tag">Weekend Warrior</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section id="purchase" class="purchase">
-    <div class="container">
-        <div class="purchase-card animate-on-scroll glow-animation" data-animation="bounce-in">
-            <h2>Ready to Host Your Own Quiz Party?</h2>
-            <div class="price">
-                <span class="currency">KES</span>
-                <span class="amount">999</span>
+    <!-- Wavy Transition -->
+    <div class="wave-transition">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <path d="M0,64 C320,20 420,100 740,64 C1060,28 1120,108 1440,64 L1440,120 L0,120 Z" fill="#ffffff"></path>
+        </svg>
+    </div>
+
+    <!-- About / Why GloHub Exists -->
+    <section class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-visual">
+                        <img src="assets/GirlsPic.jpg" alt="Girls forming heart" class="about-image" />
+                </div>
+                <div class="about-text">
+                    <h2 class="about-title">Why GloHub Exists</h2>
+                    <div class="about-highlight">
+                        <p class="highlight-text">For the girls who love being girly and having fun</p>
+                    </div>
+                    <p class="about-description">
+                        We created GloHub because we noticed something: there weren't enough spaces online that celebrated femininity while also being genuinely fun and empowering. Too many "girls' apps" felt either too serious or too childish.
+                    </p>
+                    <p class="about-description">
+                        GloHub is different. We're here for the ladies who want to rock  AND be powerful. Who love cute aesthetics AND meaningful connections. Who want to have fun with their friends without compromising on quality or authenticity.
+                    </p>
+                    <div class="about-features">
+                        <div class="about-feature">
+                            <span class="about-icon"></span>
+                            <div>
+                                <h4>Unapologetically Feminine</h4>
+                                <p>Pink, cute, and proud of it!</p>
+                            </div>
+                        </div>
+                        <div class="about-feature">
+                            <span class="about-icon"></span>
+                            <div>
+                                <h4>Genuinely Empowering</h4>
+                                <p>Built by women, for women</p>
+                            </div>
+                        </div>
+                        <div class="about-feature">
+                            <span class="about-icon"></span>
+                            <div>
+                                <h4>Always Evolving</h4>
+                                <p>New games and features coming soon</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <ul class="purchase-features">
-                <li>Lifetime access to your admin dashboard</li>
-                <li>Unlimited quiz games</li>
-                <li>Full customization control</li>
-                <li>Unlimited players</li>
-                <li>All built-in games included</li>
-                <li>Analytics & insights</li>
-            </ul>
-            <form id="purchaseForm" class="purchase-form">
-                <input type="email" id="purchaseEmail" placeholder="Enter your email" required>
-                <button type="submit" class="btn-large">Buy Now</button>
-            </form>
-            <p class="purchase-note">You'll receive your admin code by email instantly after payment!</p>
         </div>
-    </div>
-</section>
+    </section>
 
-<footer class="footer">
-    <div class="container">
-        <p>Made with love for all the amazing girls out there</p>
-        <p>&copy; 2026 GloHub. All rights reserved.</p>
-        <a href="super-admin.html" class="super-admin-link">Super Admin</a>
-    </div>
-</footer>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Made with love for all the amazing girls out there</p>
+            <p>&copy; 2026 GloHub. All rights reserved.</p>
+        </div>
+    </footer>
 
-<script src="supabase.js"></script>
-<script src="client.js"></script>
-<script src="animations.js"></script>
-<script>
-    function scrollToPurchase() {
-        document.getElementById('purchase').scrollIntoView({ behavior: 'smooth' });
-    }
-</script>
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" onclick="scrollToTop()">
+        <span>↑</span>
+    </button>
+
+    <script src="supabase.js"></script>
+    <script src="client.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
