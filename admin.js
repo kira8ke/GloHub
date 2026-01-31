@@ -1,39 +1,63 @@
-// Admin Dashboard Logic with Super Admin Support
+// Admin Dashboard Logic with Super Admin Support & Game Control
 
 let currentClientId = null;
 let currentTheme = {};
+let currentGameSession = null;
+
+// Utility to prefer sessionStorage, then localStorage
+function getStoredItem(key) {
+    try {
+        return sessionStorage.getItem(key) || localStorage.getItem(key) || null;
+    } catch (e) {
+        // If storage access is blocked, return null
+        console.warn('Storage access failed for', key, e);
+        return null;
+    }
+}
+let playerCheckInterval = null;
+let gameDurationInterval = null;
+let gameStartTime = null;
 
 // ==========================================
 // SUPER ADMIN FUNCTIONS
 // ==========================================
 function isSuperAdmin() {
-    return sessionStorage.getItem('isSuperAdmin') === 'true';
+    return getStoredItem('isSuperAdmin') === 'true';
 }
 
 function getSuperAdminInfo() {
     return {
         isSuperAdmin: isSuperAdmin(),
-        superAdminCode: sessionStorage.getItem('superAdminCode'),
-        superAdminId: sessionStorage.getItem('superAdminId'),
-        superAdminName: sessionStorage.getItem('superAdminName') || 'Super Admin'
+        superAdminCode: getStoredItem('superAdminCode'),
+        superAdminId: getStoredItem('superAdminId'),
+        superAdminName: getStoredItem('superAdminName') || 'Super Admin'
     };
 }
 
 // ==========================================
-// AUTHENTICATION CHECK (Enhanced for Super Admin)
+// AUTHENTICATION CHECK
 // ==========================================
 function checkAuth() {
+    console.log('🔍 Checking authentication...');
+    
     // Check if super admin
-    if (isSuperAdmin()) {
-        const superAdminCode = sessionStorage.getItem('superAdminCode');
-        const superAdminId = sessionStorage.getItem('superAdminId');
+    const isSuperAdminFlag = getStoredItem('isSuperAdmin');
+    console.log('Is Super Admin?', isSuperAdminFlag);
+    
+    if (isSuperAdminFlag === 'true') {
+        const superAdminCode = getStoredItem('superAdminCode');
+        const superAdminId = getStoredItem('superAdminId');
+        
+        console.log('Super Admin Code:', superAdminCode);
+        console.log('Super Admin ID:', superAdminId);
         
         if (!superAdminCode || !superAdminId) {
+            console.error('❌ Super admin credentials missing, redirecting to login');
             window.location.href = 'admin-login.html';
             return null;
         }
         
-        console.log('✅ Super Admin authenticated:', getSuperAdminInfo());
+        console.log('✅ Super Admin authenticated');
         
         return {
             adminCode: superAdminCode,
@@ -43,15 +67,20 @@ function checkAuth() {
         };
     }
     
-    // Check for regular admin code in sessionStorage
-    const adminCode = sessionStorage.getItem('adminCode');
-    const clientId = sessionStorage.getItem('clientId');
+    // Check for regular admin code in sessionStorage or localStorage
+    const adminCode = getStoredItem('adminCode');
+    const clientId = getStoredItem('clientId');
+    
+    console.log('Admin Code:', adminCode);
+    console.log('Client ID:', clientId);
     
     if (!adminCode || !clientId) {
-        // No session found, redirect to login
+        console.error('❌ Admin credentials missing, redirecting to login');
         window.location.href = 'admin-login.html';
         return null;
     }
+    
+    console.log('✅ Regular admin authenticated');
     
     return {
         adminCode: adminCode,
@@ -89,8 +118,13 @@ function formatTime(dateString) {
     });
 }
 
+function formatDuration(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
 function showNotification(message, type = 'success') {
-    // Create notification element
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
@@ -100,7 +134,7 @@ function showNotification(message, type = 'success') {
     
     notification.style.cssText = `
         position: fixed;
-        top: 20px;
+        top: 80px;
         right: 20px;
         padding: 15px 25px;
         background: ${bgColor};
@@ -114,42 +148,61 @@ function showNotification(message, type = 'success') {
     
     document.body.appendChild(notification);
     
-    // Remove after 3 seconds
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// Add these CSS animations to your styles
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
+// ==========================================
+// MAIN INITIALIZATION
+// ==========================================
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 Dashboard initializing...');
+    
+    const auth = checkAuth();
+    if (!auth) {
+        console.error('❌ Authentication failed, stopping initialization');
+        return;
     }
     
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
+    console.log('✅ Authentication successful:', auth);
+    
+    currentClientId = auth.clientId;
+    console.log('📝 Current Client ID:', currentClientId);
+    
+    if (isSuperAdmin()) {
+        console.log('👑 Super Admin detected');
+        showSuperAdminBadge();
     }
     
-    /* Super Admin Badge */
-    .super-admin-badge {
+    console.log('🔧 Setting up navigation...');
+    setupNavigation();
+    
+    console.log('📊 Loading dashboard data...');
+    await loadDashboardData();
+    
+    console.log('🎴 Initializing session cards...');
+    initializeSessionCards();
+    
+    console.log('🎨 Setting up forms...');
+    setupThemeForm();
+    setupQuestionForm();
+    setupAdminJoinGame();
+    
+    console.log('🎮 Loading game control data...');
+    await loadActiveSessionsForControl();
+    
+    console.log('✅ Dashboard initialization complete!');
+});
+
+function showSuperAdminBadge() {
+    const badge = document.createElement('div');
+    badge.className = 'super-admin-badge';
+    badge.innerHTML = '👑 SUPER ADMIN MODE';
+    badge.style.cssText = `
         position: fixed;
-        top: 80px;
+        top: 20px;
         right: 20px;
         background: linear-gradient(135deg, gold, #ffd700);
         color: #000;
@@ -160,72 +213,30 @@ style.textContent = `
         box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
         z-index: 9999;
         animation: superAdminPulse 2s ease-in-out infinite;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    @keyframes superAdminPulse {
-        0%, 100% {
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
-            transform: scale(1);
-        }
-        50% {
-            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.8);
-            transform: scale(1.05);
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// ==========================================
-// MAIN INITIALIZATION
-// ==========================================
-document.addEventListener('DOMContentLoaded', async () => {
-    const auth = checkAuth();
-    if (!auth) return;
-    
-    currentClientId = auth.clientId;
-    
-    // Show super admin badge if applicable
-    if (isSuperAdmin()) {
-        showSuperAdminBadge();
-    }
-    
-    // Setup navigation
-    setupNavigation();
-    
-    // Load dashboard data
-    await loadDashboardData();
-
-    // Initialize session cards navigation
-    initializeSessionCards();
-    
-    // Setup forms
-    setupThemeForm();
-    setupQuestionForm();
-    setupAdminJoinGame();
-});
-
-function showSuperAdminBadge() {
-    const badge = document.createElement('div');
-    badge.className = 'super-admin-badge';
-    badge.innerHTML = '👑 SUPER ADMIN MODE';
+    `;
     document.body.appendChild(badge);
 }
 
+// ==========================================
+// NAVIGATION
+// ==========================================
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
-    
+    if (!navItems || navItems.length === 0) return;
+
     navItems.forEach(item => {
+        if (item.dataset.listenerAttached === 'true') return;
         item.addEventListener('click', () => {
             const tab = item.dataset.tab;
             switchTab(tab);
         });
+        item.dataset.listenerAttached = 'true';
     });
 }
 
 function switchTab(tabName) {
+    if (!tabName) return;
+
     // Update nav items
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
@@ -238,16 +249,20 @@ function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
     });
-    document.getElementById(tabName).classList.add('active');
-    
-    // Load specific tab data
+
+    const target = document.getElementById(tabName);
+    if (!target) {
+        console.warn('switchTab: no element with id', tabName);
+        return;
+    }
+
+    target.classList.add('active');
     loadTabData(tabName);
 }
 
 async function loadDashboardData() {
     try {
         if (!isSuperAdmin()) {
-            // Load client info for regular admins
             const { data: client } = await supabase
                 .from('clients')
                 .select('*')
@@ -259,7 +274,6 @@ async function loadDashboardData() {
             }
         }
         
-        // Load stats
         await loadStats();
         
     } catch (error) {
@@ -269,85 +283,107 @@ async function loadDashboardData() {
 
 async function loadStats() {
     try {
+        const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+
         if (isSuperAdmin()) {
-            // SUPER ADMIN: See ALL stats across all clients
-            
-            // Total sessions
             const { count: sessionsCount } = await supabase
                 .from('game_sessions')
                 .select('*', { count: 'exact', head: true });
-            
-            document.getElementById('totalSessions').textContent = sessionsCount || 0;
-            
-            // Total players
+
+            setText('totalSessions', sessionsCount || 0);
+
             const { count: playersCount } = await supabase
                 .from('players')
                 .select('*', { count: 'exact', head: true });
-            
-            document.getElementById('totalPlayers').textContent = playersCount || 0;
-            
-            // Total questions
+
+            setText('totalPlayers', playersCount || 0);
+
             const { count: questionsCount } = await supabase
                 .from('quiz_questions')
                 .select('*', { count: 'exact', head: true });
-            
-            document.getElementById('totalQuestions').textContent = questionsCount || 0;
-            
-            // Active sessions
+
+            setText('totalQuestions', questionsCount || 0);
+
             const { count: activeCount } = await supabase
                 .from('game_sessions')
                 .select('*', { count: 'exact', head: true })
                 .eq('is_active', true);
-            
-            document.getElementById('activeSessions').textContent = activeCount || 0;
-            
-            console.log('✅ Super Admin Stats Loaded');
+
+            setText('activeSessions', activeCount || 0);
+
             return;
         }
-        
-        // REGULAR ADMIN: See only their stats
+
         const { count: sessionsCount } = await supabase
             .from('game_sessions')
             .select('*', { count: 'exact', head: true })
             .eq('client_id', currentClientId);
-        
-        document.getElementById('totalSessions').textContent = sessionsCount || 0;
-        
+
+        setText('totalSessions', sessionsCount || 0);
+
         const { data: sessions } = await supabase
             .from('game_sessions')
             .select('id')
             .eq('client_id', currentClientId);
-        
+
         if (sessions && sessions.length > 0) {
             const sessionIds = sessions.map(s => s.id);
             const { count: playersCount } = await supabase
                 .from('players')
                 .select('*', { count: 'exact', head: true })
                 .in('session_id', sessionIds);
-            
-            document.getElementById('totalPlayers').textContent = playersCount || 0;
+
+            setText('totalPlayers', playersCount || 0);
         } else {
-            document.getElementById('totalPlayers').textContent = 0;
+            setText('totalPlayers', 0);
         }
-        
+
         const { count: questionsCount } = await supabase
             .from('quiz_questions')
             .select('*', { count: 'exact', head: true })
             .eq('client_id', currentClientId);
-        
-        document.getElementById('totalQuestions').textContent = questionsCount || 0;
-        
+
+        setText('totalQuestions', questionsCount || 0);
+
         const { count: activeCount } = await supabase
             .from('game_sessions')
             .select('*', { count: 'exact', head: true })
             .eq('client_id', currentClientId)
             .eq('is_active', true);
-        
-        document.getElementById('activeSessions').textContent = activeCount || 0;
-        
+
+        setText('activeSessions', activeCount || 0);
+
     } catch (error) {
         console.error('Error loading stats:', error);
     }
+}
+
+// Minimal helpers to avoid ReferenceErrors from the dashboard's buttons
+function createNewQuizSession() {
+    // Open quiz editor and reset fields if present
+    switchTab('quiz-editor');
+    const title = document.getElementById('quizEditorTitle');
+    if (title) title.textContent = 'Create Quiz Session';
+    const name = document.getElementById('quizSessionName');
+    if (name) name.value = '';
+    const addForm = document.getElementById('addQuizQuestionForm');
+    if (addForm) addForm.classList.add('hidden');
+    const questionsList = document.getElementById('quizQuestionsList');
+    if (questionsList) questionsList.innerHTML = `<div class="empty-state"><div class="icon">📝</div><h3>No questions yet</h3><p>Add your first question to get started</p></div>`;
+}
+
+function createNewCharadesGame() {
+    // Open charades editor and reset fields if present
+    switchTab('charades-editor');
+    const name = document.getElementById('charadesGameName');
+    if (name) name.value = '';
+    const categoriesGrid = document.getElementById('categoriesGrid');
+    if (categoriesGrid) categoriesGrid.innerHTML = '';
+    const categoryCount = document.getElementById('categoryCount');
+    if (categoryCount) categoryCount.textContent = '0';
 }
 
 async function loadTabData(tabName) {
@@ -364,8 +400,310 @@ async function loadTabData(tabName) {
         case 'players':
             await loadPlayers();
             break;
+        case 'game-control':
+            await loadActiveSessionsForControl();
+            break;
     }
 }
+
+// ==========================================
+// GAME CONTROL FUNCTIONS
+// ==========================================
+async function loadActiveSessionsForControl() {
+    try {
+        let query = supabase
+            .from('game_sessions')
+            .select('*')
+            .eq('is_active', true)
+            .order('created_at', { ascending: false });
+        
+        if (!isSuperAdmin()) {
+            query = query.eq('client_id', currentClientId);
+        }
+        
+        const { data: sessions } = await query;
+        
+        const select = document.getElementById('activeSessionSelect');
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">-- Select a session --</option>';
+        
+        if (sessions && sessions.length > 0) {
+            sessions.forEach(session => {
+                const option = document.createElement('option');
+                option.value = session.id;
+                option.textContent = `${session.session_code} - ${formatDate(session.created_at)}`;
+                select.appendChild(option);
+            });
+        }
+        
+    } catch (error) {
+        console.error('Error loading active sessions:', error);
+    }
+}
+
+async function loadGameSession() {
+    const sessionId = document.getElementById('activeSessionSelect').value;
+    
+    if (!sessionId) {
+        document.getElementById('gameStatusPanel').style.display = 'none';
+        document.getElementById('sessionInfoPanel').style.display = 'none';
+        return;
+    }
+    
+    try {
+        const { data: session } = await supabase
+            .from('game_sessions')
+            .select('*')
+            .eq('id', sessionId)
+            .single();
+        
+        if (!session) {
+            showNotification('Session not found', 'error');
+            return;
+        }
+        
+        currentGameSession = session;
+        
+        // Show panels
+        document.getElementById('gameStatusPanel').style.display = 'block';
+        document.getElementById('sessionInfoPanel').style.display = 'block';
+        
+        // Update UI
+        document.getElementById('sessionCodeDisplay').textContent = session.session_code;
+        document.getElementById('shareCode').textContent = session.session_code;
+        document.getElementById('displayJoinCode').textContent = session.session_code;
+        
+        // Update share link
+        const shareLink = `${window.location.origin}/join-game.html?code=${session.session_code}`;
+        document.getElementById('shareLink').value = shareLink;
+        
+        // Update game status
+        updateGameStatus(session);
+        
+        // Load players
+        await refreshPlayers();
+        
+        // Start auto-refresh
+        startPlayerMonitoring();
+        
+    } catch (error) {
+        console.error('Error loading game session:', error);
+        showNotification('Failed to load session', 'error');
+    }
+}
+
+function updateGameStatus(session) {
+    const badge = document.getElementById('gameStatusBadge');
+    const startBtn = document.getElementById('startGameBtn');
+    const pauseBtn = document.getElementById('pauseGameBtn');
+    const progressPanel = document.getElementById('gameProgressPanel');
+    
+    if (session.started_at && !session.ended_at) {
+        // Game is running
+        badge.textContent = 'In Progress';
+        badge.style.background = '#4caf50';
+        startBtn.style.display = 'none';
+        pauseBtn.style.display = 'inline-block';
+        progressPanel.style.display = 'block';
+        
+        // Start duration counter
+        startDurationCounter();
+    } else if (session.ended_at) {
+        // Game ended
+        badge.textContent = 'Ended';
+        badge.style.background = '#999';
+        startBtn.style.display = 'none';
+        pauseBtn.style.display = 'none';
+        progressPanel.style.display = 'block';
+    } else {
+        // Waiting to start
+        badge.textContent = 'Waiting';
+        badge.style.background = '#ff9800';
+        startBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'none';
+        progressPanel.style.display = 'none';
+    }
+}
+
+async function refreshPlayers() {
+    if (!currentGameSession) return;
+    
+    try {
+        const { data: players } = await supabase
+            .from('players')
+            .select('*')
+            .eq('session_id', currentGameSession.id)
+            .order('joined_at', { ascending: true });
+        
+        const playersList = document.getElementById('livePlayersList');
+        const playerCount = document.getElementById('playerCount');
+        const startBtn = document.getElementById('startGameBtn');
+        
+        playerCount.textContent = players ? players.length : 0;
+        
+        if (!players || players.length === 0) {
+            playersList.innerHTML = `<p class="no-players">No players yet. Share the code: <strong>${currentGameSession.session_code}</strong></p>`;
+            startBtn.disabled = true;
+            return;
+        }
+        
+        // Enable start button if we have players
+        if (!currentGameSession.started_at) {
+            startBtn.disabled = false;
+        }
+        
+        playersList.innerHTML = players.map(player => `
+            <div class="player-chip">
+                <span class="player-avatar" style="background-color: ${player.avatar_color || '#ff69b4'}">
+                    ${player.avatar_emoji || '👤'}
+                </span>
+                <span class="player-name">${player.username}</span>
+                <span class="player-score">${player.score || 0} pts</span>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error refreshing players:', error);
+    }
+}
+
+function startPlayerMonitoring() {
+    // Clear any existing interval
+    if (playerCheckInterval) {
+        clearInterval(playerCheckInterval);
+    }
+    
+    // Refresh players every 3 seconds
+    playerCheckInterval = setInterval(refreshPlayers, 3000);
+}
+
+function stopPlayerMonitoring() {
+    if (playerCheckInterval) {
+        clearInterval(playerCheckInterval);
+        playerCheckInterval = null;
+    }
+}
+
+async function startGame() {
+    if (!currentGameSession) {
+        showNotification('No session selected', 'error');
+        return;
+    }
+    
+    if (!confirm('Start the game now? All players will be notified.')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('game_sessions')
+            .update({
+                started_at: new Date().toISOString(),
+                is_active: true
+            })
+            .eq('id', currentGameSession.id);
+        
+        if (error) throw error;
+        
+        showNotification('🎮 Game started!', 'success');
+        
+        // Reload session
+        await loadGameSession();
+        
+        // In a real app, you'd redirect players to quiz-game.html here
+        // For now, just show notification
+        showNotification('Players can now start playing!', 'success');
+        
+    } catch (error) {
+        console.error('Error starting game:', error);
+        showNotification('Failed to start game', 'error');
+    }
+}
+
+async function pauseGame() {
+    // Implementation for pause functionality
+    showNotification('Pause functionality coming soon', 'error');
+}
+
+async function endGame() {
+    if (!currentGameSession) return;
+    
+    if (!confirm('End this game session? This cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('game_sessions')
+            .update({
+                ended_at: new Date().toISOString(),
+                is_active: false
+            })
+            .eq('id', currentGameSession.id);
+        
+        if (error) throw error;
+        
+        showNotification('🛑 Game ended', 'success');
+        
+        stopPlayerMonitoring();
+        stopDurationCounter();
+        
+        // Reload session
+        await loadGameSession();
+        
+    } catch (error) {
+        console.error('Error ending game:', error);
+        showNotification('Failed to end game', 'error');
+    }
+}
+
+async function createQuickSession() {
+    await createNewSession();
+    await loadActiveSessionsForControl();
+    showNotification('Session created! Select it from the dropdown', 'success');
+}
+
+function startDurationCounter() {
+    if (!currentGameSession || !currentGameSession.started_at) return;
+    
+    gameStartTime = new Date(currentGameSession.started_at);
+    
+    if (gameDurationInterval) {
+        clearInterval(gameDurationInterval);
+    }
+    
+    gameDurationInterval = setInterval(() => {
+        const now = new Date();
+        const diff = Math.floor((now - gameStartTime) / 1000);
+        document.getElementById('gameDuration').textContent = formatDuration(diff);
+        document.getElementById('gameProgressStatus').textContent = 'Game in progress';
+    }, 1000);
+}
+
+function stopDurationCounter() {
+    if (gameDurationInterval) {
+        clearInterval(gameDurationInterval);
+        gameDurationInterval = null;
+    }
+}
+
+function copyJoinCode() {
+    const code = document.getElementById('displayJoinCode').textContent;
+    navigator.clipboard.writeText(code);
+    showNotification('Code copied to clipboard!', 'success');
+}
+
+function copyShareLink() {
+    const link = document.getElementById('shareLink').value;
+    navigator.clipboard.writeText(link);
+    showNotification('Link copied to clipboard!', 'success');
+}
+
+// ==========================================
+// THEME, QUESTIONS, SESSIONS, PLAYERS
+// (Keep existing functions from previous code)
+// ==========================================
 
 function setupThemeForm() {
     const form = document.getElementById('themeForm');
@@ -441,11 +779,9 @@ function setupQuestionForm() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Super admin needs to specify a client
         let questionClientId = currentClientId;
         
         if (isSuperAdmin()) {
-            // For now, create under a super admin client
             const { data: superClient } = await supabase
                 .from('clients')
                 .select('id')
@@ -494,7 +830,6 @@ async function loadQuestions() {
             .select('*')
             .order('created_at', { ascending: false });
         
-        // Super admin sees all questions, regular admin sees only their own
         if (!isSuperAdmin()) {
             query = query.eq('client_id', currentClientId);
         }
@@ -549,7 +884,6 @@ async function deleteQuestion(questionId) {
 
 async function createNewSession() {
     try {
-        // Generate unique join code
         let joinCode;
         let codeExists = true;
         
@@ -562,7 +896,6 @@ async function createNewSession() {
             codeExists = data && data.length > 0;
         }
         
-        // For super admin, create or use a super admin client
         let sessionClientId = currentClientId;
         
         if (isSuperAdmin()) {
@@ -589,7 +922,6 @@ async function createNewSession() {
             }
         }
         
-        // Create session
         const { data: session, error } = await supabase
             .from('game_sessions')
             .insert([
@@ -614,15 +946,14 @@ async function createNewSession() {
     }
 }
 
-// Initialize session cards with navigation
 function initializeSessionCards() {
     const container = document.getElementById('sessionsCardsContainer');
     const prevBtn = document.getElementById('prevCard');
     const nextBtn = document.getElementById('nextCard');
     
     if (!container || !prevBtn || !nextBtn) return;
+    if (container.dataset.initialized === 'true') return;
     
-    // Navigation handlers
     prevBtn.addEventListener('click', () => {
         const scrollAmount = container.offsetWidth * 0.8;
         container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
@@ -633,7 +964,6 @@ function initializeSessionCards() {
         container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     });
     
-    // Update button states
     function updateNavButtons() {
         const isAtStart = container.scrollLeft <= 10;
         const isAtEnd = container.scrollLeft >= container.scrollWidth - container.offsetWidth - 10;
@@ -645,13 +975,12 @@ function initializeSessionCards() {
     container.addEventListener('scroll', updateNavButtons);
     updateNavButtons();
     
-    // Touch swipe support
     let touchStartX = 0;
     let touchEndX = 0;
     
     container.addEventListener('touchstart', (e) => {
         touchStartX = e.changedTouches[0].screenX;
-    });
+    }, { passive: true });
     
     container.addEventListener('touchend', (e) => {
         touchEndX = e.changedTouches[0].screenX;
@@ -666,6 +995,8 @@ function initializeSessionCards() {
             prevBtn.click();
         }
     }
+
+    container.dataset.initialized = 'true';
 }
 
 async function loadSessions() {
@@ -675,14 +1006,12 @@ async function loadSessions() {
             .select('*')
             .order('created_at', { ascending: false });
         
-        // Super admin sees all sessions, regular admin sees only their own
         if (!isSuperAdmin()) {
             query = query.eq('client_id', currentClientId);
         }
         
         const { data: sessions } = await query;
         
-        // Populate cards container
         const cardsContainer = document.getElementById('sessionsCardsContainer');
         if (cardsContainer) {
             if (!sessions || sessions.length === 0) {
@@ -716,7 +1045,6 @@ async function loadSessions() {
             setTimeout(initializeSessionCards, 100);
         }
         
-        // Populate sessions list
         const list = document.getElementById('sessionsList');
         if (list) {
             if (!sessions || sessions.length === 0) {
@@ -768,13 +1096,11 @@ async function loadPlayers() {
         let query;
         
         if (isSuperAdmin()) {
-            // Super admin sees ALL players
             query = supabase
                 .from('players')
                 .select('*')
                 .order('joined_at', { ascending: false });
         } else {
-            // Regular admin sees only their players
             const { data: sessions } = await supabase
                 .from('game_sessions')
                 .select('id')
@@ -840,9 +1166,40 @@ async function deletePlayer(playerId) {
 }
 
 function logout() {
-    sessionStorage.clear();
+    // Clear both session and persistent admin keys
+    try { sessionStorage.clear(); } catch(e) { console.warn('sessionStorage clear failed', e); }
+    try {
+        const keys = ['adminCode','clientId','isSuperAdmin','superAdminId','superAdminCode','superAdminName'];
+        keys.forEach(k => localStorage.removeItem(k));
+    } catch (e) { console.warn('localStorage cleanup failed', e); }
+
+    if (playerCheckInterval) clearInterval(playerCheckInterval);
+    if (gameDurationInterval) clearInterval(gameDurationInterval);
     window.location.href = 'index.html';
 }
+
+// ==========================================
+// MAKE ALL FUNCTIONS GLOBALLY AVAILABLE
+// ==========================================
+window.switchTab = switchTab;
+window.showAddQuestion = showAddQuestion;
+window.hideAddQuestion = hideAddQuestion;
+window.deleteQuestion = deleteQuestion;
+window.createNewSession = createNewSession;
+window.deleteSession = deleteSession;
+window.deletePlayer = deletePlayer;
+window.logout = logout;
+window.loadGameSession = loadGameSession;
+window.refreshPlayers = refreshPlayers;
+window.startGame = startGame;
+window.pauseGame = pauseGame;
+window.endGame = endGame;
+window.createQuickSession = createQuickSession;
+window.copyJoinCode = copyJoinCode;
+window.copyShareLink = copyShareLink;
+// Expose creation helpers referenced by inline HTML
+window.createNewQuizSession = createNewQuizSession;
+window.createNewCharadesGame = createNewCharadesGame;
 
 function setupAdminJoinGame() {
     const form = document.getElementById('adminJoinForm');

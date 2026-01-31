@@ -6,232 +6,1499 @@
     <meta name="apple-mobile-web-app-capable" content="true">
     <meta name="theme-color" content="#ff69b4">
     <title>Admin Dashboard - GloHub</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ==========================================
+           ROOT VARIABLES & RESET
+           ========================================== */
+        :root {
+            --primary: #ff69b4;
+            --secondary: #ffb6d9;
+            --accent: #ff1493;
+            --white: #ffffff;
+            --bg: #fff0f5;
+            --text: #333333;
+            --text-light: #666666;
+            --border: #e0e0e0;
+            --success: #4caf50;
+            --error: #f44336;
+            --warning: #ff9800;
+            
+            /* Baby colors for themes */
+            --baby-purple: #e6d5ff;
+            --baby-pink: #ffd9ec;
+            --baby-blue: #d4e9ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .btn-primary, .btn-secondary, .btn-large {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--text-light);
+            color: white;
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 18px;
+        }
+
+        .btn-start {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-start:hover {
+            background: #45a049;
+        }
+
+        /* ==========================================
+           DASHBOARD CONTAINER & SIDEBAR
+           ========================================== */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+            background: var(--white);
+        }
+
+        .sidebar {
+            background: var(--white);
+            padding: 30px 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 0 30px;
+        }
+
+        .nav-item {
+            padding: 15px 30px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            color: var(--text);
+            font-size: 16px;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item:hover {
+            background: var(--bg);
+            color: var(--primary);
+            border-radius: 0 30px 30px 0;
+        }
+
+        .nav-item.active {
+            background: var(--bg);
+            color: var(--primary);
+            border-left-color: var(--primary);
+            border-radius: 0 30px 30px 0;
+        }
+
+        .nav-spacer {
+            flex: 1;
+        }
+
+        .sidebar-nav .btn-secondary {
+            margin: 20px 30px 0;
+            width: calc(100% - 60px);
+        }
+
+        /* ==========================================
+           MAIN CONTENT AREA
+           ========================================== */
+        .dashboard-content {
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==========================================
+           DASHBOARD CARD WRAPPER
+           ========================================== */
+        .dashboard-card {
+            background: var(--secondary);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card-header h2 {
+            font-size: 28px;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .dashboard-card-header p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .dashboard-card-content {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        /* ==========================================
+           OVERVIEW PAGE
+           ========================================== */
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .guide-btn {
+            background: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .guide-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .game-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .game-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3);
+        }
+
+        .game-card-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+
+        .game-card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .game-card-desc {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .join-game-section {
+            margin-top: 40px;
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--baby-pink), var(--baby-blue));
+            border-radius: 20px;
+        }
+
+        .join-game-section h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        /* ==========================================
+           MODAL / POPUP
+           ========================================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--border);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--error);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-content h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .guide-steps {
+            counter-reset: step-counter;
+        }
+
+        .guide-step {
+            counter-increment: step-counter;
+            margin-bottom: 20px;
+            padding-left: 50px;
+            position: relative;
+        }
+
+        .guide-step::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--primary);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .guide-step h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .guide-step p {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* ==========================================
+           SESSIONS PAGE
+           ========================================== */
+        .sessions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .sessions-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .session-card-item {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .session-card-item:hover {
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .session-card-item h3 {
+            font-size: 20px;
+            color: var(--text);
+            margin-bottom: 15px;
+        }
+
+        .session-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .session-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .session-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .session-actions button {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        /* ==========================================
+           FORM ELEMENTS
+           ========================================== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .color-theme-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .color-option:hover {
+            transform: scale(1.05);
+        }
+
+        .color-option.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.2);
+        }
+
+        .color-baby-purple {
+            background: var(--baby-purple);
+            color: #6a4c93;
+        }
+
+        .color-baby-pink {
+            background: var(--baby-pink);
+            color: #d63384;
+        }
+
+        .color-baby-blue {
+            background: var(--baby-blue);
+            color: #0d6efd;
+        }
+
+        /* ==========================================
+           QUESTIONS MANAGEMENT
+           ========================================== */
+        .questions-list {
+            margin-top: 20px;
+        }
+
+        .question-item {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .question-item:hover {
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
+        }
+
+        .question-content {
+            flex: 1;
+        }
+
+        .question-content strong {
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .question-options {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .question-item button {
+            flex-shrink: 0;
+        }
+
+        /* ==========================================
+           CHARADES CATEGORIES
+           ========================================== */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .category-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.2);
+        }
+
+        .category-emoji {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .category-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .category-count {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .category-actions button {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .add-category-btn {
+            background: var(--bg);
+            border: 2px dashed var(--primary);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .add-category-btn:hover {
+            background: var(--secondary);
+        }
+
+        .add-category-btn .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        /* ==========================================
+           FLASHCARDS
+           ========================================== */
+        .flashcards-container {
+            margin-top: 20px;
+        }
+
+        .flashcard-item {
+            background: var(--bg);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .flashcard-item:hover {
+            background: var(--secondary);
+        }
+
+        .flashcard-text {
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        /* ==========================================
+           BACK NAVIGATION
+           ========================================== */
+        .back-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-nav:hover {
+            color: var(--accent);
+            transform: translateX(-5px);
+        }
+
+        .back-nav .icon {
+            font-size: 20px;
+        }
+
+        /* ==========================================
+           GAME CODE DISPLAY
+           ========================================== */
+        .game-code-display {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .game-code-display h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .game-code {
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .code-actions button {
+            background: white;
+            color: var(--primary);
+        }
+
+        .code-actions button:hover {
+            background: var(--bg);
+        }
+
+        /* ==========================================
+           RESPONSIVE DESIGN
+           ========================================== */
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                grid-template-columns: 220px 1fr;
+            }
+            
+            .nav-item {
+                padding: 14px 20px;
+                font-size: 15px;
+            }
+            
+            .dashboard-content {
+                padding: 28px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: auto;
+                min-height: auto;
+                padding: 10px;
+                z-index: 999;
+                border-bottom: 1px solid var(--border);
+                overflow-x: auto;
+            }
+
+            .sidebar-nav {
+                flex-direction: row;
+                gap: 10px;
+                align-items: center;
+                overflow-x: auto;
+                padding: 5px;
+            }
+
+            .logo {
+                margin: 0;
+                padding: 0 10px;
+                font-size: 20px;
+                white-space: nowrap;
+            }
+
+            .nav-item {
+                padding: 12px 16px;
+                border-radius: 20px;
+                border-left: none;
+                white-space: nowrap;
+                min-width: 80px;
+                text-align: center;
+                font-size: 14px;
+            }
+
+            .nav-item.active {
+                border-radius: 20px;
+            }
+
+            .nav-spacer {
+                display: none;
+            }
+
+            .sidebar-nav .btn-secondary {
+                display: none;
+            }
+
+            .dashboard-content {
+                padding: 80px 16px 16px 16px;
+            }
+
+            .game-cards-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .dashboard-card {
+                padding: 20px;
+            }
+
+            .dashboard-card-content {
+                padding: 20px;
+            }
+
+            .modal-content {
+                padding: 25px;
+                max-width: 95%;
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .game-code {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .overview-header,
+            .sessions-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .code-actions {
+                flex-direction: column;
+            }
+
+            .session-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-item {
+                padding: 10px 14px;
+                min-width: 70px;
+                font-size: 13px;
+            }
+
+            .dashboard-content {
+                padding: 70px 12px 12px 12px;
+            }
+
+            .btn-primary, .btn-secondary {
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+
+            .game-code-display {
+                padding: 20px;
+            }
+
+            .game-code {
+                font-size: 28px;
+                letter-spacing: 3px;
+            }
+        }
+
+        /* ==========================================
+           UTILITY CLASSES
+           ========================================== */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gap-10 {
+            gap: 10px;
+        }
+
+        .gap-15 {
+            gap: 15px;
+        }
+
+        .gap-20 {
+            gap: 20px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        /* Loading state */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body class="dashboard-page">
+    <!-- Guide Modal -->
+    <div id="guideModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeGuideModal()">×</button>
+            <h2>📖 How to Set Up Your Game</h2>
+            <div class="guide-steps">
+                <div class="guide-step">
+                    <h3>Choose Your Game</h3>
+                    <p>Select either Quiz Game or Charades from the overview page. Each game type has its own setup flow.</p>
+                </div>
+                <div class="guide-step">
+                    <h3>Create a Session</h3>
+                    <p>For Quiz: Add questions and choose your theme colors. For Charades: Create categories with flashcards.</p>
+                </div>
+                <div class="guide-step">
+                    <h3>Generate Game Code</h3>
+                    <p>Once your session is ready, generate a unique game code. This code is reusable and will route players to the correct game.</p>
+                </div>
+                <div class="guide-step">
+                    <h3>Share with Players</h3>
+                    <p>Share the game code with your players. They can join through the main join page or you can join as a player yourself to test.</p>
+                </div>
+                <div class="guide-step">
+                    <h3>Start Playing!</h3>
+                    <p>Once players have joined, start the game and enjoy! You can monitor progress, view results, and manage sessions anytime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="dashboard-container">
-     <aside class="sidebar">
-    <nav class="sidebar-nav">
-        <div class="container">
-        <h1 class="logo">GloHub</h1>
-        </div>
-        <button class="nav-item active" data-tab="overview">Overview</button>
-        <button class="nav-item" data-tab="questions">Questions</button>
-        <button class="nav-item" data-tab="sessions">Game Sessions</button>
-        <button class="nav-item" data-tab="players">Players</button>
-        <button class="nav-item" data-tab="join-game">Join Game</button>
-        <button class="nav-item nav-theme" data-tab="theme"> Theme</button>
-        <!-- Spacer to push theme to bottom -->
-        <div class="nav-spacer"></div>
-        <button onclick="logout()" class="btn-secondary">Logout</button>
-    </nav>
-</aside>
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <h1 class="logo">GloHub</h1>
+                
+                <!-- Dynamic navigation items will be updated based on context -->
+                <button class="nav-item active" data-tab="overview">🏠 Overview</button>
+                
+                <!-- These will appear contextually -->
+                <button class="nav-item hidden" data-tab="quiz-sessions">📝 Quiz Sessions</button>
+                <button class="nav-item hidden" data-tab="charades-sessions">🎭 Charades</button>
+                
+                <div class="nav-spacer"></div> 
+                <a href="galentines.html" class="btn-secondary">Logout</a>
 
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
         <main class="dashboard-content">
-            <!-- Overview Tab -->
-          <div id="overview" class="tab-content active">
-    <div class="dashboard-card">
-        <div class="dashboard-card-header">
-            <h2>Dashboard Overview</h2>
-            <p>Welcome back! Here's what's happening with your platform</p>
-        </div>
-        
-        <div class="dashboard-card-content">
-            <div class="stats-grid">
-                <div class="stat-card animate-on-scroll stagger-1" data-animation="zoom-in">
-                    <div class="stat-value" id="totalSessions">0</div>
-                    <div class="stat-label">Total Game Sessions</div>
-                </div>
-                <div class="stat-card animate-on-scroll stagger-2" data-animation="zoom-in">
-                    <div class="stat-value" id="totalPlayers">0</div>
-                    <div class="stat-label">Total Players</div>
-                </div>
-                <div class="stat-card animate-on-scroll stagger-3" data-animation="zoom-in">
-                    <div class="stat-value" id="totalQuestions">0</div>
-                    <div class="stat-label">Quiz Questions</div>
-                </div>
-                <div class="stat-card animate-on-scroll stagger-4" data-animation="zoom-in">
-                    <div class="stat-value" id="activeSessions">0</div>
-                    <div class="stat-label">Active Sessions</div>
+            
+            <!-- ==========================================
+                 OVERVIEW TAB (Default Landing Page)
+                 ========================================== -->
+            <div id="overview" class="tab-content active">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <div class="overview-header">
+                            <div>
+                                <h2>Welcome to Your Game Dashboard</h2>
+                                <p>Choose a game type to get started</p>
+                            </div>
+                            <button class="guide-btn" onclick="openGuideModal()">
+                                <span>📖</span>
+                                <span>Setup Guide</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card-content">
+                        <!-- Game Selection Cards -->
+                        <div class="game-cards-container">
+                            <div class="game-card" onclick="selectGame('quiz')">
+                                <div class="game-card-icon">🧠</div>
+                                <div class="game-card-title">Quiz Game</div>
+                                <div class="game-card-desc">Create custom quiz questions and test your friends' knowledge!</div>
+                                <button class="btn-primary">Select Quiz</button>
+                            </div>
+                            
+                            <div class="game-card" onclick="selectGame('charades')">
+                                <div class="game-card-icon">🎭</div>
+                                <div class="game-card-title">Charades</div>
+                                <div class="game-card-desc">Act it out! Create categories and flashcards for a fun charades game.</div>
+                                <button class="btn-primary">Select Charades</button>
+                            </div>
+                        </div>
+
+                        <!-- Join Game Section -->
+                        <div class="join-game-section">
+                            <h3>Already have a game code?</h3>
+                            <p style="color: var(--text-light); margin-bottom: 15px;">Join an existing game as a player</p>
+                            <button class="btn-primary btn-large" onclick="window.location.href='join-game.html'">
+                                🎮 Join Game
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <div class="quick-actions" style="margin-top: 30px;">
-                <h3>Quick Actions</h3>
-                <button class="btn-primary" onclick="switchTab('sessions')">Create New Game</button>
-                <button class="btn-primary" onclick="switchTab('questions')">Add Questions</button>
-                <button class="btn-primary" onclick="switchTab('theme')">Customize Theme</button>
-                <button class="btn-primary" onclick="switchTab('join-game')">Join as Player</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-            <!-- Theme Tab -->
-           <div id="theme" class="tab-content">
-    <div class="dashboard-card">
-        <div class="dashboard-card-header">
-            <h2>Customize Your Theme</h2>
-            <p>Make your platform uniquely yours with custom colors</p>
-        </div>
-        
-        <div class="dashboard-card-content">
-            <form id="themeForm" class="theme-form">
-                <div class="form-group">
-                    <label>Primary Color</label>
-                    <input type="color" id="primaryColor" value="#ff69b4">
+            <!-- ==========================================
+                 QUIZ SESSIONS TAB
+                 ========================================== -->
+            <div id="quiz-sessions" class="tab-content">
+                <div class="dashboard-card">
+                    <!-- Back navigation -->
+                    <div class="back-nav" onclick="backToOverview()">
+                        <span class="icon">←</span>
+                        <span>Back to Overview</span>
+                    </div>
+                    
+                    <div class="dashboard-card-header">
+                        <div class="sessions-header">
+                            <div>
+                                <h2>Quiz Game Sessions</h2>
+                                <p>Manage your quiz sessions and questions</p>
+                            </div>
+                            <button class="btn-primary" onclick="createNewQuizSession()">
+                                ➕ Create New Session
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card-content">
+                        <!-- Previous Sessions List -->
+                        <div id="quizSessionsList" class="sessions-grid">
+                            <!-- Sessions will be loaded here dynamically -->
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Secondary Color</label>
-                    <input type="color" id="secondaryColor" value="#ffb6d9">
+            </div>
+
+            <!-- ==========================================
+                 QUIZ SESSION EDITOR
+                 ========================================== -->
+            <div id="quiz-editor" class="tab-content">
+                <div class="dashboard-card">
+                    <div class="back-nav" onclick="backToQuizSessions()">
+                        <span class="icon">←</span>
+                        <span>Back to Sessions</span>
+                    </div>
+                    
+                    <div class="dashboard-card-header">
+                        <h2 id="quizEditorTitle">Create Quiz Session</h2>
+                        <p>Add questions and customize your quiz</p>
+                    </div>
+                    
+                    <div class="dashboard-card-content">
+                        <!-- Session Name -->
+                        <div class="form-group">
+                            <label for="quizSessionName">Session Name</label>
+                            <input type="text" id="quizSessionName" placeholder="e.g., Friday Night Quiz" required>
+                        </div>
+
+                        <!-- Theme Color Selection -->
+                        <div class="form-group">
+                            <label>Choose Theme Color</label>
+                            <div class="color-theme-selector">
+                                <div class="color-option color-baby-purple" data-color="baby-purple" onclick="selectQuizColor('baby-purple')">
+                                    Baby Purple
+                                </div>
+                                <div class="color-option color-baby-pink selected" data-color="baby-pink" onclick="selectQuizColor('baby-pink')">
+                                    Baby Pink
+                                </div>
+                                <div class="color-option color-baby-blue" data-color="baby-blue" onclick="selectQuizColor('baby-blue')">
+                                    Baby Blue
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Questions Section -->
+                        <div style="margin-top: 30px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <h3>Quiz Questions</h3>
+                                <button class="btn-primary" onclick="showAddQuizQuestion()">➕ Add Question</button>
+                            </div>
+
+                            <!-- Add Question Form -->
+                            <div id="addQuizQuestionForm" class="hidden" style="background: var(--bg); padding: 25px; border-radius: 15px; margin-bottom: 20px;">
+                                <h4 style="margin-bottom: 15px;">New Question</h4>
+                                <div class="form-group">
+                                    <label for="quizQuestionText">Question Text</label>
+                                    <input type="text" id="quizQuestionText" placeholder="What's your question?" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="quizOption1">Option 1</label>
+                                    <input type="text" id="quizOption1" placeholder="First option" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="quizOption2">Option 2</label>
+                                    <input type="text" id="quizOption2" placeholder="Second option" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="quizOption3">Option 3</label>
+                                    <input type="text" id="quizOption3" placeholder="Third option" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="quizOption4">Option 4</label>
+                                    <input type="text" id="quizOption4" placeholder="Fourth option" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="quizCorrectAnswer">Correct Answer</label>
+                                    <select id="quizCorrectAnswer" required>
+                                        <option value="1">Option 1</option>
+                                        <option value="2">Option 2</option>
+                                        <option value="3">Option 3</option>
+                                        <option value="4">Option 4</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn-primary" onclick="saveQuizQuestion()">Save Question</button>
+                                    <button class="btn-secondary" onclick="cancelAddQuizQuestion()">Cancel</button>
+                                </div>
+                            </div>
+
+                            <!-- Questions List -->
+                            <div id="quizQuestionsList" class="questions-list">
+                                <div class="empty-state">
+                                    <div class="icon">📝</div>
+                                    <h3>No questions yet</h3>
+                                    <p>Add your first question to get started</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Session Button -->
+                        <div style="margin-top: 30px; text-align: center;">
+                            <button class="btn-primary btn-large" onclick="saveQuizSession()">
+                                💾 Save Session & Generate Code
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Accent Color</label>
-                    <input type="color" id="accentColor" value="#ff1493">
+            </div>
+
+            <!-- ==========================================
+                 CHARADES SESSIONS TAB
+                 ========================================== -->
+            <div id="charades-sessions" class="tab-content">
+                <div class="dashboard-card">
+                    <div class="back-nav" onclick="backToOverview()">
+                        <span class="icon">←</span>
+                        <span>Back to Overview</span>
+                    </div>
+                    
+                    <div class="dashboard-card-header">
+                        <div class="sessions-header">
+                            <div>
+                                <h2>Charades Games</h2>
+                                <p>Manage your charades categories and games</p>
+                            </div>
+                            <button class="btn-primary" onclick="createNewCharadesGame()">
+                                ➕ Create New Game
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card-content">
+                        <div id="charadesGamesList" class="sessions-grid">
+                            <!-- Games will be loaded here -->
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn-primary">Save Theme</button>
-            </form>
-        </div>
-    </div>
-</div>
-
-            <!-- Questions Tab -->
-          <div id="questions" class="tab-content">
-    <div class="dashboard-card">
-        <div class="dashboard-card-header">
-            <h2>Manage Quiz Questions</h2>
-            <p>Create engaging questions for your quiz games</p>
-        </div>
-        
-        <div class="dashboard-card-content">
-            <div class="tab-header">
-                <h3 style="margin: 0;">Your Questions</h3>
-                <button class="btn-primary" onclick="showAddQuestion()">+ Add New Question</button>
             </div>
-            
-            <div id="addQuestionForm" class="question-form" style="display: none;">
-                <h3>New Question</h3>
-                <form id="questionForm">
-                    <div class="form-group">
-                        <label>Question Text</label>
-                        <input type="text" id="questionText" placeholder="What's your question?" required>
+
+            <!-- ==========================================
+                 CHARADES EDITOR
+                 ========================================== -->
+            <div id="charades-editor" class="tab-content">
+                <div class="dashboard-card">
+                    <div class="back-nav" onclick="backToCharadesSessions()">
+                        <span class="icon">←</span>
+                        <span>Back to Games</span>
                     </div>
-                    <div class="form-group">
-                        <label>Option 1</label>
-                        <input type="text" id="option1" placeholder="First option" required>
+                    
+                    <div class="dashboard-card-header">
+                        <h2>Create Charades Game</h2>
+                        <p>Add categories and flashcards (max 20 categories, 20 flashcards each)</p>
                     </div>
-                    <div class="form-group">
-                        <label>Option 2</label>
-                        <input type="text" id="option2" placeholder="Second option" required>
+                    
+                    <div class="dashboard-card-content">
+                        <!-- Game Name -->
+                        <div class="form-group">
+                            <label for="charadesGameName">Game Name</label>
+                            <input type="text" id="charadesGameName" placeholder="e.g., Movie Night Charades" required>
+                        </div>
+
+                        <!-- Categories Grid -->
+                        <div style="margin-top: 30px;">
+                            <h3 style="margin-bottom: 20px;">Categories (<span id="categoryCount">5</span>/20)</h3>
+                            <div id="categoriesGrid" class="categories-grid">
+                                <!-- Categories will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Save Game Button -->
+                        <div style="margin-top: 30px; text-align: center;">
+                            <button class="btn-primary btn-large" onclick="saveCharadesGame()">
+                                💾 Save Game & Generate Code
+                            </button>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Option 3</label>
-                        <input type="text" id="option3" placeholder="Third option" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Option 4</label>
-                        <input type="text" id="option4" placeholder="Fourth option" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Correct Answer (1-4)</label>
-                        <select id="correctAnswer" required>
-                            <option value="1">Option 1</option>
-                            <option value="2">Option 2</option>
-                            <option value="3">Option 3</option>
-                            <option value="4">Option 4</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-primary">Save Question</button>
-                    <button type="button" class="btn-secondary" onclick="hideAddQuestion()">Cancel</button>
-                </form>
+                </div>
             </div>
-            
-            <div id="questionsList" class="questions-list"></div>
-        </div>
-    </div>
-</div>
 
-        <!-- Sessions Tab -->
-<div id="sessions" class="tab-content">
-    <div class="sessions-hero">
-        <!-- Cards Container -->
-        <div class="sessions-cards-wrapper">
-            <button class="nav-arrow nav-arrow-left" id="prevCard" aria-label="Previous card">
-                ‹
-            </button>
-            
-            <div class="sessions-cards-container" id="sessionsCardsContainer">
-                <!-- Cards will be dynamically inserted here -->
+            <!-- ==========================================
+                 CATEGORY EDITOR MODAL
+                 ========================================== -->
+            <div id="categoryModal" class="modal">
+                <div class="modal-content">
+                    <button class="modal-close" onclick="closeCategoryModal()">×</button>
+                    <h2 id="categoryModalTitle">Edit Category</h2>
+                    
+                    <div class="form-group">
+                        <label for="categoryName">Category Name</label>
+                        <input type="text" id="categoryName" placeholder="e.g., Movies, Animals" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoryEmoji">Choose Emoji</label>
+                        <input type="text" id="categoryEmoji" placeholder="Click to select emoji" readonly 
+                               onclick="openEmojiPicker()" style="cursor: pointer;">
+                        <p style="font-size: 12px; color: var(--text-light); margin-top: 5px;">
+                            Tip: Use your device's emoji keyboard or paste an emoji
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category Color</label>
+                        <div class="color-theme-selector">
+                            <div class="color-option color-baby-purple" onclick="selectCategoryColor('baby-purple')">
+                                Purple
+                            </div>
+                            <div class="color-option color-baby-pink selected" onclick="selectCategoryColor('baby-pink')">
+                                Pink
+                            </div>
+                            <div class="color-option color-baby-blue" onclick="selectCategoryColor('baby-blue')">
+                                Blue
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Flashcards Section -->
+                    <div style="margin-top: 25px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3>Flashcards (<span id="flashcardCount">0</span>/20)</h3>
+                            <button class="btn-primary" onclick="showAddFlashcard()">➕ Add</button>
+                        </div>
+
+                        <!-- Add Flashcard Form -->
+                        <div id="addFlashcardForm" class="hidden" style="background: var(--bg); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <input type="text" id="flashcardText" placeholder="Enter word or phrase" required>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-primary" onclick="saveFlashcard()">Save</button>
+                                <button class="btn-secondary" onclick="cancelAddFlashcard()">Cancel</button>
+                            </div>
+                        </div>
+
+                        <!-- Flashcards List -->
+                        <div id="flashcardsList" class="flashcards-container">
+                            <div class="empty-state" style="padding: 30px;">
+                                <div class="icon">🎴</div>
+                                <p>No flashcards yet</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn-secondary" onclick="closeCategoryModal()">Cancel</button>
+                        <button class="btn-primary" onclick="saveCategoryChanges()">Save Category</button>
+                    </div>
+                </div>
             </div>
-            
-            <button class="nav-arrow nav-arrow-right" id="nextCard" aria-label="Next card">
-                ›
-            </button>
-        </div>
-        
-        <!-- Heading -->
-        <div class="sessions-heading">
-            <h2>Get the party started with Invites</h2>
-            <p>Create events and invite your friends to join the fun</p>
-        </div>
-        
-        <!-- Create Button -->
-        <button class="btn-create-event" onclick="createNewSession()">Create an Event</button>
-        <!-- Sessions List (existing sessions) -->
-        <div id="sessionsList" class="sessions-list"></div>
-    </div>
-</div>
 
-        <!-- Players Tab -->
-        <div id="players" class="tab-content">
-    <div class="dashboard-card">
-        <div class="dashboard-card-header">
-            <h2>Player Management</h2>
-            <p>View and manage all players who have joined your games</p>
-        </div>
-        
-        <div class="dashboard-card-content">
-            <div id="playersList" class="players-list"></div>
-        </div>
-    </div>
-</div>
+            <!-- ==========================================
+                 GAME CODE VIEW MODAL
+                 ========================================== -->
+            <div id="gameCodeModal" class="modal">
+                <div class="modal-content">
+                    <button class="modal-close" onclick="closeGameCodeModal()">×</button>
+                    <h2>🎉 Game Ready!</h2>
+                    
+                    <div class="game-code-display">
+                        <h3>Your Game Code</h3>
+                        <div class="game-code" id="displayGameCode">ABC123</div>
+                        <div class="code-actions">
+                            <button class="btn-primary" onclick="copyGameCode()">📋 Copy Code</button>
+                            <button class="btn-primary" onclick="shareGameCode()">📤 Share</button>
+                            <button class="btn-primary" onclick="joinOwnGame()">🎮 Join Game</button>
+                        </div>
+                    </div>
 
-        <!-- Join Game Tab (Admin) -->
-        <div id="join-game" class="tab-content">
-    <div class="dashboard-card">
-        <div class="dashboard-card-header">
-            <h2>Join as Player</h2>
-            <p>Experience your game as a player to test it out</p>
-        </div>
-        
-        <div class="dashboard-card-content">
-            <form id="adminJoinForm" class="form-group" style="max-width: 500px; margin: 0 auto;">
-                <label for="adminJoinCode">Game Code</label>
-                <input 
-                    type="text" 
-                    id="adminJoinCode" 
-                    placeholder="Enter game code" 
-                    required
-                    maxlength="6"
-                    style="text-transform: uppercase;">
-                
-                <label for="adminUsername" style="margin-top: 15px;">Player Name</label>
-                <input 
-                    type="text" 
-                    id="adminUsername" 
-                    placeholder="Your test player name" 
-                    required
-                    maxlength="20">
-                
-                <button type="submit" class="btn-primary" style="margin-top: 20px; width: 100%;">Join as Player</button>
-                <div id="adminJoinError" class="error-message" style="display: none; margin-top: 15px; color: #f44336;"></div>
-            </form>
-        </div>
-    </div>
-</div>
+                    <div style="margin-top: 20px; padding: 20px; background: var(--bg); border-radius: 15px;">
+                        <h4 style="margin-bottom: 10px;">📱 Share this code with players</h4>
+                        <p style="color: var(--text-light); font-size: 14px;">
+                            Players can join by entering this code at the join page. The code will automatically route them to the correct game type.
+                        </p>
+                    </div>
 
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="btn-secondary" onclick="closeGameCodeModal()">Done</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
     <script src="admin.js"></script>
-    <script src="animations.js"></script>
+    <script>
+        // Additional inline scripts for modal and navigation management
+        
+        // Guide Modal Functions
+        function openGuideModal() {
+            document.getElementById('guideModal').classList.add('active');
+        }
+
+        function closeGuideModal() {
+            document.getElementById('guideModal').classList.remove('active');
+        }
+
+        // Game Selection
+        function selectGame(gameType) {
+            if (gameType === 'quiz') {
+                switchTab('quiz-sessions');
+                updateSidebarForQuiz();
+            } else if (gameType === 'charades') {
+                switchTab('charades-sessions');
+                updateSidebarForCharades();
+            }
+        }
+
+        // Update sidebar navigation based on game type
+        function updateSidebarForQuiz() {
+            document.querySelector('[data-tab="quiz-sessions"]').classList.remove('hidden');
+            document.querySelector('[data-tab="charades-sessions"]').classList.add('hidden');
+        }
+
+        function updateSidebarForCharades() {
+            document.querySelector('[data-tab="charades-sessions"]').classList.remove('hidden');
+            document.querySelector('[data-tab="quiz-sessions"]').classList.add('hidden');
+        }
+
+        // Back Navigation Functions
+        function backToOverview() {
+            switchTab('overview');
+            // Hide game-specific nav items
+            document.querySelector('[data-tab="quiz-sessions"]').classList.add('hidden');
+            document.querySelector('[data-tab="charades-sessions"]').classList.add('hidden');
+        }
+
+        function backToQuizSessions() {
+            switchTab('quiz-sessions');
+        }
+
+        function backToCharadesSessions() {
+            switchTab('charades-sessions');
+        }
+
+        // Tab Switching Function
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const targetTab = document.getElementById(tabName);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+            
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.tab === tabName) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Load tab-specific data
+            loadTabData(tabName);
+        }
+
+        // Setup navigation listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const tab = item.dataset.tab;
+                    if (tab && !item.classList.contains('hidden')) {
+                        switchTab(tab);
+                    }
+                });
+            });
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>

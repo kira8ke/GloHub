@@ -71,6 +71,14 @@
             width: auto;
             min-width: 200px;
         }
+
+        /* Responsive tweaks */
+        @media (max-width: 480px) {
+            .auth-form input#adminCode { width: calc(100vw - 48px); max-width: 360px; }
+            .auth-form .btn-large { min-width: 90%; }
+            .auth-logo { font-size: 36px; }
+            .auth-card { padding: 20px; }
+        }
     </style>
 </head>
 <body class="auth-page">
@@ -136,9 +144,22 @@
                 throw new Error('Invalid admin code');
             }
 
-            // ✅ SUCCESS
+            // ✅ SUCCESS — persist full session (sessionStorage + localStorage)
             sessionStorage.setItem('superAdminId', superAdmin.id);
             sessionStorage.setItem('isSuperAdmin', 'true');
+            sessionStorage.setItem('superAdminCode', superAdmin.super_code || '');
+            sessionStorage.setItem('superAdminName', superAdmin.name || 'Super Admin');
+
+            // Also persist to localStorage so the session survives across tabs and reloads
+            try {
+                localStorage.setItem('superAdminId', superAdmin.id);
+                localStorage.setItem('isSuperAdmin', 'true');
+                localStorage.setItem('superAdminCode', superAdmin.super_code || '');
+                localStorage.setItem('superAdminName', superAdmin.name || 'Super Admin');
+            } catch (e) {
+                // localStorage may be disabled in some browsers; ignore failures
+                console.warn('localStorage write failed', e);
+            }
 
             window.location.href = 'admin-dashboard.html';
 

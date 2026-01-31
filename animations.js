@@ -2,41 +2,34 @@
 
 // Scroll-triggered animations
 function initScrollAnimations() {
-    const observerOptions = {
-        threshold: 0.15,
-        rootMargin: '0px 0px -50px 0px'
-    };
+    const elements = document.querySelectorAll('.animate-on-scroll');
+    if (!elements.length) return;
 
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const animation = entry.target.dataset.animation;
                 entry.target.classList.add('animated', animation);
             }
         });
-    }, observerOptions);
-
-    // Observe all elements with animate-on-scroll class
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
-        observer.observe(el);
     });
+
+    elements.forEach(el => observer.observe(el));
 }
+
 
 // Header scroll effect
 function initHeaderScroll() {
     const header = document.querySelector('.header');
+    if (!header) return; //prevents errors
+
     let lastScroll = 0;
 
-    window.addEventListener('scroll', () => {
+     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
-        
-        if (currentScroll > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
 
-        // Hide header on scroll down, show on scroll up
+        header.classList.toggle('scrolled', currentScroll > 50);
+
         if (currentScroll > lastScroll && currentScroll > 100) {
             header.style.transform = 'translateY(-100%)';
         } else {
@@ -180,7 +173,7 @@ rippleStyle.textContent = `
 `;
 document.head.appendChild(rippleStyle);
 
-// Initialize all animations when DOM is ready
+// Initialize all animations when DOM is ready (single handler)
 document.addEventListener('DOMContentLoaded', () => {
     initScrollAnimations();
     initHeaderScroll();
@@ -190,6 +183,39 @@ document.addEventListener('DOMContentLoaded', () => {
     initSmoothScroll();
 });
 
-// Expose functions globally
-window.toggleMobileMenu = toggleMobileMenu;
-window.closeMobileMenu = closeMobileMenu;
+// Expose functions globally (safely)
+window.toggleMobileMenu = function() {
+    const nav = document.getElementById('mobileNav');
+    const overlay = document.getElementById('menuOverlay');
+    const toggle = document.querySelector('.menu-toggle');
+    if (!nav || !overlay || !toggle) return;
+    nav.classList.toggle('active');
+    overlay.classList.toggle('active');
+    if (nav.classList.contains('active')) {
+        toggle.textContent = '✕';
+    } else {
+        toggle.textContent = '☰';
+    }
+};
+
+window.closeMobileMenu = function() {
+    const nav = document.getElementById('mobileNav');
+    const overlay = document.getElementById('menuOverlay');
+    const toggle = document.querySelector('.menu-toggle');
+    if (nav) nav.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+    if (toggle) toggle.textContent = '☰';
+};
+
+// Guarded smooth scroll (skip if no matching target)
+function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            const target = href ? document.querySelector(href) : null;
+            if (!target) return;
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+}

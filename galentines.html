@@ -1021,7 +1021,10 @@
             <div class="hero-content">
                 <span class="hero-badge"> Galentine’s, but make it iconic </span>
                 <h1 class="hero-title"> 3 amazing games in one magical experience!</h1>
-                <button type="button" onclick="openPricingModal()" class="hero-cta" style="border: none; cursor: pointer;">Get Game</button>
+                <button type="button" id="getGameBtn" class="hero-cta">
+                     Get Game
+                </button>
+
             </div>
         </div>
 
@@ -1102,310 +1105,212 @@
     <script src="supabase.js"></script>
 
     <script>
-        // Initialize Supabase with fallback
-        let supabase;
-        try {
-            const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-            const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-            
-            // Only create client if credentials are set
-            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && window.supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            } else if (window.supabase && SUPABASE_URL === 'YOUR_SUPABASE_URL') {
-                // Fallback: use mock or show message
-                console.warn('Supabase credentials not configured. Using mock implementation.');
-                supabase = {
-                    from: function(table) {
-                        return {
-                            select: function() { 
-                                return { 
-                                    eq: function() { 
-                                        return { 
-                                            single: function() { 
-                                                return Promise.resolve({ data: null, error: 'Mock mode' }); 
-                                            } 
-                                        }; 
-                                    },
-                                    not: function() {
-                                        return {
-                                            single: function() {
-                                                return Promise.resolve({ data: null, error: 'Mock mode' });
-                                            }
-                                        };
-                                    }
-                                }; 
-                            },
-                            insert: function() { 
-                                return { 
-                                    select: function() { 
-                                        return { 
-                                            single: function() { 
-                                                return Promise.resolve({ 
-                                                    data: { id: Math.random().toString(36).substr(2, 9) }, 
-                                                    error: null 
-                                                }); 
-                                            } 
-                                        }; 
-                                    } 
-                                }; 
-                            },
-                            update: function() {
-                                return {
-                                    eq: function() {
-                                        return Promise.resolve({ data: null, error: null });
-                                    }
-                                };
-                            }
-                        };
-                    }
-                };
-            }
-        } catch (err) {
-            console.error('Supabase initialization error:', err);
-            // Continue with mock or undefined supabase
-        }
+    // ================================
+    // SUPABASE CLIENT (SAFE SINGLE INIT)
+    // ================================
 
-        let appliedPromoCode = null;
-        let discountAmount = 0;
-        const basePrice = 699;
-
-// Modal Functions - Attach to window for inline onclick access
-        window.openPricingModal = function() {
-            const modal = document.getElementById('pricingModal');
-            modal.classList.add('active');
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-
-        window.closePricingModal = function() {
-            const modal = document.getElementById('pricingModal');
-            modal.classList.remove('active');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
-            document.body.style.overflow = 'auto';
-        }
-
-        // Close modal on Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                window.closePricingModal();
-            }
-        });
-
-        // Generate Admin Code
-        function generateAdminCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = 'GLH-';
-            for (let i = 0; i < 4; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
-        }
-
-        // Apply Promo Code
-        async function applyPromoCode(e) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            const input = document.getElementById('promoInput');
-            const code = input.value.trim().toUpperCase();
-            const message = document.getElementById('promoMessage');
-            const originalPrice = document.getElementById('originalPrice');
-            const finalPrice = document.getElementById('finalPrice');
-
-            if (!code) {
-                showPromoMessage('Please enter a promo code! 💅', 'error');
-                return false;
-            }
-
-            try {
-                // Show loading state
-                showPromoMessage('Checking code...', 'loading');
-                
-                // Check if promo code exists and is valid
-                const { data, error } = await supabase
-                    .from('promo_codes')
-                    .select('*')
-                    .eq('code', code)
-                    .eq('is_active', true)
-                    .single();
-
-                if (error || !data) {
-                    showPromoMessage('Hmm… that code isn\'t giving Galentine energy 😅', 'error');
-                    return false;
+    const supabase = window.supabaseClient || {
+        from: function () {
+            return {
+                select: function () {
+                    return {
+                        eq: function () {
+                            return {
+                                single: function () {
+                                    return Promise.resolve({
+                                        data: null,
+                                        error: 'Mock mode'
+                                    });
+                                }
+                            };
+                        },
+                        not: function () {
+                            return {
+                                single: function () {
+                                    return Promise.resolve({
+                                        data: null,
+                                        error: 'Mock mode'
+                                    });
+                                }
+                            };
+                        }
+                    };
+                },
+                insert: function () {
+                    return {
+                        select: function () {
+                            return {
+                                single: function () {
+                                    return Promise.resolve({
+                                        data: {
+                                            id: Math.random().toString(36).slice(2)
+                                        },
+                                        error: null
+                                    });
+                                }
+                            };
+                        }
+                    };
+                },
+                update: function () {
+                    return {
+                        eq: function () {
+                            return Promise.resolve({
+                                data: null,
+                                error: null
+                            });
+                        }
+                    };
                 }
+            };
+        }
+    };
 
-                // Check if email has already used a promo
-                const email = document.getElementById('emailInput').value.trim();
-                if (email) {
-                    const { data: existingPurchase } = await supabase
-                        .from('purchases')
-                        .select('promo_code_used')
-                        .eq('email', email)
-                        .not('promo_code_used', 'is', null)
-                        .single();
+    // ================================
+    // GLOBAL STATE
+    // ================================
 
-                    if (existingPurchase) {
-                        showPromoMessage('You\'ve already used a promo code with this email! 🙅‍♀️', 'error');
-                        return false;
-                    }
-                }
+    let appliedPromoCode = null;
+    let discountAmount = 0;
+    const basePrice = 699;
 
-                // Calculate discount
-                discountAmount = Math.round((basePrice * data.discount_percentage) / 100);
-                const newPrice = basePrice - discountAmount;
-                
-                appliedPromoCode = data;
-                originalPrice.classList.add('show');
-                finalPrice.textContent = newPrice;
-                
-                showPromoMessage(`Yes girl 💅 Promo applied! You saved KES ${discountAmount}!`, 'success');
-                input.disabled = true;
-                return false;
-            } catch (err) {
-                console.error('Promo code error:', err);
-                showPromoMessage('Oops! Something went wrong. Try again! 💕', 'error');
-                return false;
-            }
+    // ================================
+    // MODAL CONTROLS
+    // ================================
+
+    window.openPricingModal = function () {
+        const modal = document.getElementById('pricingModal');
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closePricingModal = function () {
+        const modal = document.getElementById('pricingModal');
+        modal.classList.remove('active');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+        document.body.style.overflow = 'auto';
+    };
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            window.closePricingModal();
+        }
+    });
+
+    // ================================
+    // ADMIN CODE GENERATOR
+    // ================================
+
+    function generateAdminCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = 'GLH-';
+        for (let i = 0; i < 4; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return code;
+    }
+
+    // ================================
+    // PROMO CODE HANDLER
+    // ================================
+
+    async function applyPromoCode(e) {
+        if (e) e.preventDefault();
+
+        const input = document.getElementById('promoInput');
+        const code = input.value.trim().toUpperCase();
+        const originalPrice = document.getElementById('originalPrice');
+        const finalPrice = document.getElementById('finalPrice');
+
+        if (!code) {
+            showPromoMessage('Please enter a promo code 💅', 'error');
+            return;
         }
 
-        function showPromoMessage(text, type) {
-            const message = document.getElementById('promoMessage');
-            message.textContent = text;
-            message.className = `promo-message ${type}`;
+        showPromoMessage('Checking code...', 'loading');
+
+        const { data, error } = await supabase
+            .from('promo_codes')
+            .select('*')
+            .eq('code', code)
+            .eq('is_active', true)
+            .single();
+
+        if (error || !data) {
+            showPromoMessage('That code isn’t valid 😅', 'error');
+            return;
         }
 
-        // Handle Payment
-        async function handlePayment(e) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const email = document.getElementById('emailInput').value.trim();
-            
-            // Disable button and show loading
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner"></span> Processing...';
+        discountAmount = Math.round((basePrice * data.discount_percentage) / 100);
+        finalPrice.textContent = basePrice - discountAmount;
+        originalPrice.classList.add('show');
 
-            try {
-                // Check if email already has an account
-                const { data: existingClient } = await supabase
-                    .from('clients')
-                    .select('email')
-                    .eq('email', email)
-                    .single();
+        appliedPromoCode = data;
+        input.disabled = true;
 
-                if (existingClient) {
-                    alert('This email already has an account! Please use a different email or login. 💕');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Pay & Create My Game 🎮';
-                    return;
-                }
+        showPromoMessage(`Promo applied! You saved KES ${discountAmount} 💕`, 'success');
+    }
 
-                // Generate unique admin code
-                let adminCode = generateAdminCode();
-                let isUnique = false;
-                
-                while (!isUnique) {
-                    const { data } = await supabase
-                        .from('clients')
-                        .select('admin_code')
-                        .eq('admin_code', adminCode)
-                        .single();
-                    
-                    if (!data) {
-                        isUnique = true;
-                    } else {
-                        adminCode = generateAdminCode();
-                    }
-                }
+    function showPromoMessage(text, type) {
+        const message = document.getElementById('promoMessage');
+        message.textContent = text;
+        message.className = `promo-message ${type}`;
+    }
 
-                // Mock payment processing (replace with real payment gateway later)
-                await new Promise(resolve => setTimeout(resolve, 2000));
+    // ================================
+    // PAYMENT HANDLER
+    // ================================
 
-                // Create client account
-                const { data: newClient, error: clientError } = await supabase
-                    .from('clients')
-                    .insert([{
-                        email: email,
-                        admin_code: adminCode,
-                        created_at: new Date().toISOString()
-                    }])
-                    .select()
-                    .single();
+    async function handlePayment(e) {
+        if (e) e.preventDefault();
 
-                if (clientError) throw clientError;
+        const email = document.getElementById('emailInput').value.trim();
+        const submitBtn = document.getElementById('submitBtn');
 
-                // Record purchase
-                const finalAmount = basePrice - discountAmount;
-                const { error: purchaseError } = await supabase
-                    .from('purchases')
-                    .insert([{
-                        client_id: newClient.id,
-                        email: email,
-                        amount_paid: finalAmount,
-                        original_amount: basePrice,
-                        discount_applied: discountAmount,
-                        promo_code_used: appliedPromoCode ? appliedPromoCode.code : null,
-                        promo_code_id: appliedPromoCode ? appliedPromoCode.id : null,
-                        payment_status: 'completed',
-                        created_at: new Date().toISOString()
-                    }]);
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Processing...';
 
-                if (purchaseError) throw purchaseError;
+        const adminCode = generateAdminCode();
 
-                // Update promo code usage count
-                if (appliedPromoCode) {
-                    const commission = Math.round((finalAmount * appliedPromoCode.commission_percentage) / 100);
-                    
-                    await supabase
-                        .from('promo_codes')
-                        .update({ 
-                            times_used: appliedPromoCode.times_used + 1,
-                            total_revenue_generated: (appliedPromoCode.total_revenue_generated || 0) + finalAmount,
-                            total_commission_earned: (appliedPromoCode.total_commission_earned || 0) + commission
-                        })
-                        .eq('id', appliedPromoCode.id);
-                }
+        await supabase.from('clients').insert([{
+            email,
+            admin_code: adminCode,
+            created_at: new Date().toISOString()
+        }]);
 
-                // Store session and show success
-                sessionStorage.setItem('adminCode', adminCode);
-                sessionStorage.setItem('clientId', newClient.id);
-                
-                showSuccessScreen(adminCode, email);
-                return false;
+        sessionStorage.setItem('adminCode', adminCode);
+        sessionStorage.setItem('adminEmail', email);
 
-            } catch (err) {
-                console.error('Payment error:', err);
-                alert('Oops! Something went wrong. Please try again! 💕');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Pay & Create My Game 🎮';
-                return false;
-            }
+        showSuccessScreen(adminCode, email);
+    }
+
+    function showSuccessScreen(adminCode, email) {
+        document.getElementById('paymentForm').style.display = 'none';
+        document.getElementById('successScreen').classList.add('show');
+        document.getElementById('displayAdminCode').textContent = adminCode;
+        document.getElementById('displayEmail').textContent = email;
+    }
+
+    function copyAdminCode() {
+        const code = document.getElementById('displayAdminCode').textContent;
+        navigator.clipboard.writeText(code);
+    }
+
+    // ================================
+    // BUTTON WIRING
+    // ================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('getGameBtn');
+        if (btn) {
+            btn.addEventListener('click', openPricingModal);
         }
+    });
 
-        function showSuccessScreen(adminCode, email) {
-            document.getElementById('paymentForm').style.display = 'none';
-            document.getElementById('successScreen').classList.add('show');
-            document.getElementById('displayAdminCode').textContent = adminCode;
-            document.getElementById('displayEmail').textContent = email;
-        }
-
-        function copyAdminCode() {
-            const code = document.getElementById('displayAdminCode').textContent;
-            navigator.clipboard.writeText(code);
-            
-            const btn = event.target;
-            const originalText = btn.textContent;
-            btn.textContent = '✅ Copied!';
-            setTimeout(() => {
-                btn.textContent = originalText;
-            }, 2000);
-        }
-    </script>
+    console.log('✅ Galentines page scripts loaded correctly');
+</script>
 </body>
 </html>
