@@ -114,7 +114,7 @@ nav {
 .logo {
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: bold;
-    color: white;
+    color: #8A2BE2;
     font-family: var(--font-handwritten);
 }
 
@@ -125,19 +125,19 @@ nav {
 }
 
 .header.scrolled .nav a{
-    color: #B072E5;
+    color: #8A2BE2;
 }
 
 nav a {
     text-decoration: none;
-    color: black;
+    color: white;
     font-weight: 700;
     font-size: 17px;
     transition: color 0.3s;
 }
 
 nav a:hover {
-    color: #B67BEF;
+    color: #8A2BE2;
 }
 
 .menu-toggle {
@@ -242,7 +242,6 @@ nav a:hover {
     font-weight: 500;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);
-
     animation: fadeInScale 1.6s ease;
     position: relative;
     overflow: hidden;
@@ -590,7 +589,6 @@ nav a:hover {
 .flow-icon {
     width: 100px;
     height: 100px;
-    background: #8e0038;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -611,7 +609,7 @@ nav a:hover {
 }
 
 .flow-content p {
-    color: var(--text-light);
+    color: white;
     line-height: 1.6;
     font-size: 16px;
 }
@@ -702,7 +700,7 @@ nav a:hover {
 
 .game-image-wrapper {
     position: relative;
-    height: 100px;
+    height: 200px;
     overflow: hidden;
 }
 
@@ -1023,9 +1021,22 @@ nav a:hover {
         gap: 40px;
     }
 
-    .about-image {
-        max-width: 100%;
+    .about-text {
+    order: 1;
     }
+
+     .about-image {
+    max-width: 100%;
+    max-height: 350px;
+    height: auto;
+    object-fit: cover;
+    margin: 0 auto;
+  }
+   .about-visual {
+    order: 2;
+    padding-top: 150px;
+    padding-bottom: 80px;
+  }
 }
 
 
@@ -1073,7 +1084,7 @@ nav a:hover {
     background-repeat: no-repeat;
     color: white;
     text-align: center;
-   padding: 200px 0 30px; /* increased top padding */
+    padding: 300px 0 30px; /* increased top padding */
     margin-bottom: -30px;
     height: 700px;
 }
@@ -1196,7 +1207,9 @@ nav a:hover {
         height: 830px;
         min-height: 80vh;
         padding: 100px 0 40px;
-    }
+        background: url(assets/hero-bg-mobile.gif) no-repeat center center;
+        background-size: cover;
+         }
     
     .float-3d {
         font-size: 30px;
@@ -1230,6 +1243,11 @@ nav a:hover {
         grid-template-columns: 1fr;
         gap: 25px;
     }
+     .how-it-works-flow {
+        background: url(assets/how-bg-mobile.gif) no-repeat center center;
+        background-size: cover;
+        padding-bottom: 150px;   
+     }
     
     .about-content {
         grid-template-columns: 1fr;
@@ -1267,6 +1285,11 @@ nav a:hover {
     .reviews-section,
     .about-section {
         padding: 60px 0;
+    }
+    
+    .how-it-works-flow {
+        background: url(assets/how-bg-mobile.gif) no-repeat center center;
+        background-size: cover;
     }
     
     .section-title {
@@ -2494,6 +2517,10 @@ a.btn-large {
     /* Footer */
     .footer {
         padding: 20px 0;
+        background-image: url('assets/footer-bg-mobile.gif');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 
     /* Auth Pages */
@@ -2984,6 +3011,15 @@ a.btn-large {
     .history-item {
         font-size: 13px;
     }
+
+     /* Footer */
+    .footer {
+        padding: 100px 0;
+    }
+
+    .footer p {
+        font-size: 12px;
+    }
 }
 
 /* Responsive - Small Phones (max-width: 480px) */
@@ -3148,7 +3184,7 @@ a.btn-large {
 
     /* Footer */
     .footer {
-        padding: 15px 0;
+        padding: 100px 0;
     }
 
     .footer p {
