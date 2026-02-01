@@ -276,6 +276,7 @@
             font-size: 18px;
             text-decoration: none;
             position: relative;
+            z-index: 2000;
             overflow: hidden;
             box-shadow:
                 0 0 20px rgba(255, 79, 216, 0.6),
@@ -1021,15 +1022,15 @@
             <div class="hero-content">
                 <span class="hero-badge"> Galentine’s, but make it iconic </span>
                 <h1 class="hero-title"> 3 amazing games in one magical experience!</h1>
-                <button type="button" id="getGameBtn" class="hero-cta">
-                     Get Game
+                <button type="button" id="getGameBtn" class="hero-cta" onclick="openPricingModal()" aria-haspopup="dialog" aria-controls="pricingModal">
+                     Get Started
                 </button>
 
             </div>
         </div>
 
         <!-- Pricing Modal -->
-<div id="pricingModal" class="modal">
+<div id="pricingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="pricingTitle">
     <div class="modal-overlay" onclick="closePricingModal()"></div>
     <div class="modal-content">
         <button class="modal-close" onclick="closePricingModal()">×</button>
@@ -1037,7 +1038,7 @@
         <div class="pricing-card modal-card">
             <div class="card-shimmer"></div>
             <div class="pricing-badge">MOST POPULAR</div>
-            <h3>Galentine's Game Night</h3>
+            <h3 id="pricingTitle">Galentine's Game Night</h3>
             <div class="pricing-amount">
                 <div class="original-price" id="originalPrice">KES 1299</div>
                 <div class="price">KES <span id="finalPrice">999</span></div>
@@ -1109,62 +1110,11 @@
     // SUPABASE CLIENT (SAFE SINGLE INIT)
     // ================================
 
-    const supabase = window.supabaseClient || {
-        from: function () {
-            return {
-                select: function () {
-                    return {
-                        eq: function () {
-                            return {
-                                single: function () {
-                                    return Promise.resolve({
-                                        data: null,
-                                        error: 'Mock mode'
-                                    });
-                                }
-                            };
-                        },
-                        not: function () {
-                            return {
-                                single: function () {
-                                    return Promise.resolve({
-                                        data: null,
-                                        error: 'Mock mode'
-                                    });
-                                }
-                            };
-                        }
-                    };
-                },
-                insert: function () {
-                    return {
-                        select: function () {
-                            return {
-                                single: function () {
-                                    return Promise.resolve({
-                                        data: {
-                                            id: Math.random().toString(36).slice(2)
-                                        },
-                                        error: null
-                                    });
-                                }
-                            };
-                        }
-                    };
-                },
-                update: function () {
-                    return {
-                        eq: function () {
-                            return Promise.resolve({
-                                data: null,
-                                error: null
-                            });
-                        }
-                    };
-                }
-            };
-        }
-    };
+    const supabase = window.supabaseClient;
+
+    if (!supabase) {
+        console.error('❌ Supabase client not found. Check supabase.js');
+    }
 
     // ================================
     // GLOBAL STATE
@@ -1303,12 +1253,21 @@
     // BUTTON WIRING
     // ================================
 
+    // Attach listener when DOM loads — plus a quick immediate check (defensive) in case the script runs after DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('getGameBtn');
         if (btn) {
             btn.addEventListener('click', openPricingModal);
+        } else {
+            console.warn('⚠️ getGameBtn not found on DOMContentLoaded');
         }
     });
+
+    // Defensive immediate attach if the document is already parsed
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        const btnNow = document.getElementById('getGameBtn');
+        if (btnNow) btnNow.addEventListener('click', openPricingModal);
+    }
 
     console.log('✅ Galentines page scripts loaded correctly');
 </script>
