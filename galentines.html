@@ -1382,7 +1382,7 @@ body {
         </div>
 
         <!-- Pricing Modal -->
-<div id="pricingModal" class="modal">
+<div id="pricingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="pricingTitle">
     <div class="modal-overlay" onclick="closePricingModal()"></div>
     <div class="modal-content">
         <button class="modal-close" onclick="closePricingModal()">×</button>
@@ -1390,7 +1390,7 @@ body {
         <div class="pricing-card modal-card">
             <div class="card-shimmer"></div>
             <div class="pricing-badge">MOST POPULAR</div>
-            <h3>Galentine's Game Night</h3>
+            <h3 id="pricingTitle">Galentine's Game Night</h3>
             <div class="pricing-amount">
                 <div class="original-price" id="originalPrice">KES 1299</div>
                 <div class="price">KES <span id="finalPrice">999</span></div>
@@ -1462,62 +1462,11 @@ body {
     // SUPABASE CLIENT (SAFE SINGLE INIT)
     // ================================
 
-    const supabase = window.supabaseClient || {
-        from: function () {
-            return {
-                select: function () {
-                    return {
-                        eq: function () {
-                            return {
-                                single: function () {
-                                    return Promise.resolve({
-                                        data: null,
-                                        error: 'Mock mode'
-                                    });
-                                }
-                            };
-                        },
-                        not: function () {
-                            return {
-                                single: function () {
-                                    return Promise.resolve({
-                                        data: null,
-                                        error: 'Mock mode'
-                                    });
-                                }
-                            };
-                        }
-                    };
-                },
-                insert: function () {
-                    return {
-                        select: function () {
-                            return {
-                                single: function () {
-                                    return Promise.resolve({
-                                        data: {
-                                            id: Math.random().toString(36).slice(2)
-                                        },
-                                        error: null
-                                    });
-                                }
-                            };
-                        }
-                    };
-                },
-                update: function () {
-                    return {
-                        eq: function () {
-                            return Promise.resolve({
-                                data: null,
-                                error: null
-                            });
-                        }
-                    };
-                }
-            };
-        }
-    };
+    const supabase = window.supabaseClient;
+
+    if (!supabase) {
+        console.error('❌ Supabase client not found. Check supabase.js');
+    }
 
     // ================================
     // GLOBAL STATE
@@ -1706,12 +1655,21 @@ body {
     // BUTTON WIRING
     // ================================
 
+    // Attach listener when DOM loads — plus a quick immediate check (defensive) in case the script runs after DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('getGameBtn');
         if (btn) {
             btn.addEventListener('click', openPricingModal);
+        } else {
+            console.warn('⚠️ getGameBtn not found on DOMContentLoaded');
         }
     });
+
+    // Defensive immediate attach if the document is already parsed
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        const btnNow = document.getElementById('getGameBtn');
+        if (btnNow) btnNow.addEventListener('click', openPricingModal);
+    }
 
     console.log('✅ Galentines page scripts loaded correctly');
 </script>
