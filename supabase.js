@@ -6,7 +6,11 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 // Create Supabase client
 if (window.supabase && typeof window.supabase.createClient === 'function') {
-  var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: {
+      headers: { 'Accept': 'application/json' }
+    }
+  });
   window.supabase = supabase;
   window.supabaseClient = supabase;
 } else {
