@@ -238,19 +238,30 @@ function initHeaderScroll() {
     if (!header) return;
 
     let lastScroll = 0;
-    
+
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
-        
+
+        // Background effect: only depends on scroll position
         if (currentScroll > 100) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
-        
+
+        // Visibility effect: depends on scroll direction
+        if (currentScroll > lastScroll && currentScroll > 100) {
+            // Scrolling down
+            header.classList.add('hidden');
+        } else if (currentScroll < lastScroll) {
+            // Scrolling up
+            header.classList.remove('hidden');
+        }
+
         lastScroll = currentScroll;
     });
 }
+
 
 // ==========================================
 // FLAGSHIP SECTION ANIMATIONS
