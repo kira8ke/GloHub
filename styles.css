@@ -266,18 +266,10 @@ nav a:hover {
 }
 
 .btn-explore:hover {
-<<<<<<< HEAD
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 15px 40px rgba(255, 105, 180, 0.6);
-}
-
-
-=======
     color:white;
     border: none;
     background-color: #B67BEF;
 }
->>>>>>> a388633b09b2f760a1d8ae12464808df55de5adf
 
 /* ==========================================
    FLAGSHIP PRODUCT SECTION
