@@ -4,29 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="apple-mobile-web-app-capable" content="true">
-    <meta name="theme-color" content="#ff69b4">
-    <title>Admin Dashboard - GloHub</title>
+    <meta name="theme-color" content="#0a0e27">
+    <title>Command Center - GloHub Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* ==========================================
            ROOT VARIABLES & RESET
            ========================================== */
         :root {
-            --primary: #ff69b4;
-            --secondary: #ffb6d9;
-            --accent: #ff1493;
-            --white: #ffffff;
-            --bg: #fff0f5;
-            --text: #333333;
-            --text-light: #666666;
-            --border: #e0e0e0;
-            --success: #4caf50;
-            --error: #f44336;
-            --warning: #ff9800;
+            /* Cyberpunk Color Palette */
+            --bg-dark: #1C1C1C;
+            --bg-darker: #1C1C1C;
+            --bg-card: #8435DE;
+            --bg-card-hover: #1a2350;
             
-            /* Baby colors for themes */
-            --baby-purple: #e6d5ff;
-            --baby-pink: #ffd9ec;
-            --baby-blue: #d4e9ff;
+            --primary: white;
+            --primary-glow: rgba(0, 240, 255, 0.5);
+            --secondary: #ff00ff;
+            --secondary-glow: rgba(255, 0, 255, 0.5);
+            --accent: #00ff88;
+            --accent-glow: rgba(0, 255, 136, 0.5);
+            
+            --text: #e0e6ff;
+            --text-dim: #8892b8;
+            --text-bright: #ffffff;
+            
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --error: #ff0055;
+            
+            --border: rgba(0, 240, 255, 0.2);
+            --border-bright: rgba(0, 240, 255, 0.5);
+            
+            /* Category Colors */
+            --baby-purple: #a855f7;
+            --baby-pink: #ec4899;
+            --baby-blue: #3b82f6;
+            
+            /* Fonts */
+            --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+            
+            /* Spacing */
+            --nav-height: 70px;
+            --mobile-nav-height: 70px;
         }
 
         * {
@@ -36,299 +57,745 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg);
+            font-family: var(--font-body);
+            background: var(--bg-dark);
             color: var(--text);
             line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        .btn-primary, .btn-secondary, .btn-large {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            white-space: nowrap;
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 240, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(0, 255, 136, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--border);
-            color: var(--text);
-        }
-
-        .btn-secondary:hover {
-            background: var(--text-light);
-            color: white;
-        }
-
-        .btn-large {
-            padding: 16px 32px;
-            font-size: 18px;
-        }
-
-        .btn-start {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-start:hover {
-            background: #45a049;
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
         }
 
         /* ==========================================
-           DASHBOARD CONTAINER & SIDEBAR
+           MAIN LAYOUT CONTAINER
            ========================================== */
-        .dashboard-container {
+        .game-container {
             display: grid;
-            grid-template-columns: 250px 1fr;
+            grid-template-columns: 1fr;
             min-height: 100vh;
-            background: var(--white);
+            position: relative;
+            z-index: 50;
         }
 
+        .game-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+
+        /* ==========================================
+           DESKTOP SIDEBAR NAVIGATION
+           ========================================== */
         .sidebar {
-            background: var(--white);
-            padding: 30px 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
-            position: sticky;
+            position: fixed;
+            left: 0;
             top: 0;
+            width: 280px;
             height: 100vh;
+            background: #8435DE;
+            padding: 30px 0;
+            display: none;
+            flex-direction: column;
             overflow-y: auto;
+            z-index: 100;
         }
 
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 2px;
             height: 100%;
+            background: linear-gradient(90deg, #3C0E70  0%, #8435DE 100%);
+            opacity: 0.5;
+            filter: blur(4px);
         }
 
         .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 24px;
+            font-weight: 900;
             text-align: center;
-            margin-bottom: 30px;
-            padding: 0 30px;
+            margin-bottom: 40px;
+            padding: 0 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+        }
+
+        .logo::after {
+            content: 'ARENA';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 4px;
         }
 
         .nav-item {
-            padding: 15px 30px;
+            padding: 14px 20px;
             border: none;
             background: none;
             text-align: left;
             cursor: pointer;
-            color: var(--text);
-            font-size: 16px;
-            transition: all 0.3s;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 3px solid transparent;
             position: relative;
             width: 100%;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            text-transform: uppercase;
+            font-family: var(--font-display);
+        }
+
+        .nav-item .icon {
+            font-size: 24px;
+            transition: transform 0.3s ease;
         }
 
         .nav-item:hover {
-            background: var(--bg);
+            background: rgba(0, 240, 255, 0.1);
             color: var(--primary);
-            border-radius: 0 30px 30px 0;
+            border-left-color: var(--primary);
+            padding-left: 35px;
+            border-radius: 30px;
+        }
+
+        .nav-item:hover .icon {
+            transform: scale(1.2) rotate(5deg);
         }
 
         .nav-item.active {
-            background: var(--bg);
+            background: rgba(0, 240, 255, 0.15);
             color: var(--primary);
             border-left-color: var(--primary);
-            border-radius: 0 30px 30px 0;
+            border-radius: 30px;
+            box-shadow: 
+                0 0 20px rgba(0, 240, 255, 0.2),
+                inset 0 0 20px rgba(0, 240, 255, 0.1);
+        }
+
+        .nav-item.active .icon {
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .nav-spacer {
             flex: 1;
         }
 
-        .sidebar-nav .btn-secondary {
-            margin: 20px 30px 0;
-            width: calc(100% - 60px);
+        .sidebar .btn-logout {
+            margin: 20px 20px 0;
+            width: 200px;
+            background: linear-gradient(90deg, #3C0E70  0%, #8435DE 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-left: 25px;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.35),
+        0 0 18px rgba(132, 53, 222, 0.45);
+        }
+
+        .sidebar .btn-logout:hover {
+            background: white;
+            color: #3C0E70;
+            transform: translateY(-2px);
+            font-weight: 700;
+        }
+
+        /* ==========================================
+           MOBILE BOTTOM NAVIGATION
+           ========================================== */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--mobile-nav-height);
+            background: linear-gradient(90deg, #3C0E70  0%, #8435DE 100%);
+            border-top: 2px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .mobile-nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3C0E70  0%, #8435DE 100%);
+            opacity: 0.5;
+            filter: blur(2px);
+        }
+
+        .mobile-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px;
+            cursor: pointer;
+            color: var(--text-dim);
+            transition: all 0.3s ease;
+            position: relative;
+            border: none;
+            background: none;
+            font-family: var(--font-display);
+        }
+
+        .mobile-nav-item .icon {
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-nav-item .label {
+            font-size: 11px;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--primary);
+        }
+
+        .mobile-nav-item.active .icon {
+            animation: mobileBounce 0.5s ease;
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+
+        .mobile-nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 0 0 3px 3px;
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        @keyframes mobileBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         /* ==========================================
            MAIN CONTENT AREA
            ========================================== */
-        .dashboard-content {
-            padding: 40px;
+       .dashboard-content {
+            padding: 30px 20px;
+            padding-bottom: calc(var(--mobile-nav-height) + 30px);
             overflow-y: auto;
+            min-height: 100vh;
+            position: relative; /* ADD THIS LINE */
+            z-index: 10; /* ADD THIS LINE */
         }
 
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease;
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 50;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.98);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+            }
         }
 
         /* ==========================================
-           DASHBOARD CARD WRAPPER
+           GAME CARD STYLES
            ========================================== */
-        .dashboard-card {
-            background: var(--secondary);
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
+        .game-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            z-index: 50;
         }
 
-        .dashboard-card-header {
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-card-header {
             text-align: center;
             margin-bottom: 30px;
         }
 
-        .dashboard-card-header h2 {
-            font-size: 28px;
-            color: var(--text);
-            margin-bottom: 8px;
-            font-weight: 700;
+        .game-card-header h2 {
+            font-family: var(--font-display);
+            font-size: 32px;
+            color: white;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: white;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .dashboard-card-header p {
+        .game-card-header p {
             font-size: 14px;
-            color: var(--text-light);
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .dashboard-card-content {
-            background: var(--white);
-            padding: 30px;
-            border-radius: 15px;
+        .game-card-content {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(0, 240, 255, 0.1);
         }
 
         /* ==========================================
-           OVERVIEW PAGE
+           BUTTONS
            ========================================== */
-        .overview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .guide-btn {
-            background: var(--success);
-            color: white;
-            padding: 12px 24px;
+        .btn {
+            padding: 14px 28px;
             border: none;
-            border-radius: 25px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .guide-btn:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-        }
-
-        .game-cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            margin: 30px 0;
-        }
-
-        .game-card {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .game-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3);
-        }
-
-        .game-card-icon {
-            font-size: 64px;
-            margin-bottom: 15px;
-        }
-
-        .game-card-title {
-            font-size: 24px;
             font-weight: 700;
-            color: var(--text);
-            margin-bottom: 10px;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .game-card-desc {
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #3C0E70  0%, #8435DE 100%);
+            color: white;
+            border-radius: 30px;
+            border: none;
+            box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.35),
+        0 0 18px rgba(132, 53, 222, 0.45);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            background: white;
+            color: #3C0E70;
+            font-weight: 700;
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--primary);
+            padding: 14px 28px;
+            border: 2px solid var(--primary);
+            border-radius: 30px;
             font-size: 14px;
-            color: var(--text-light);
-            margin-bottom: 20px;
         }
 
-        .join-game-section {
-            margin-top: 40px;
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(135deg, var(--baby-pink), var(--baby-blue));
-            border-radius: 20px;
+        .btn-secondary:hover {
+            background: rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            transform: translateY(-2px);
         }
 
-        .join-game-section h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: var(--text);
+        .btn-large {
+            padding: 18px 36px;
+            font-size: 18px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--success), #00cc70);
+            color: var(--bg-dark);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-start:hover {
+            box-shadow: 
+                0 8px 25px rgba(0, 255, 136, 0.5),
+                0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--error), #cc0044);
+            color: var(--text-bright);
+            box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 
+                0 8px 25px rgba(255, 0, 85, 0.5),
+                0 0 30px rgba(255, 0, 85, 0.3);
         }
 
         /* ==========================================
-           MODAL / POPUP
+           STATS GRID
            ========================================== */
-        .modal {
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #3C0E70;
+            border-radius: 30px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            transition: left 0.5s ease;
+        }
+
+        .stat-card:hover {
+             transform: translateY(-5px);
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ==========================================
+           GAME SELECTION CARDS
+           ========================================== */
+        .game-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .game-type-card {
+            background: #3C0E70;
+            border-radius: 30px;
+            padding: 35px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-type-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .game-type-card:hover::before {
+            opacity: 1;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .game-type-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.6),
+                0 0 40px rgba(0, 240, 255, 0.3),
+                inset 0 0 30px rgba(0, 240, 255, 0.05);
+        }
+
+        .game-type-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: block;
+            filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.5));
+        }
+
+        .game-type-card h3 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            color: var(--text-bright);
+            margin-bottom: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-type-card p {
+            color: white;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ==========================================
+           SESSIONS LIST
+           ========================================== */
+        .sessions-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .session-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 20px;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .session-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .session-card:hover {
+            border-color: var(--border-bright);
+            box-shadow: 0 5px 20px rgba(0, 240, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .session-card:hover::before {
+            opacity: 1;
+        }
+
+        .session-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px var(--accent-glow);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        .session-info h4 {
+            font-family: var(--font-display);
+            font-size: 18px;
+            color: var(--text-bright);
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .session-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .session-code {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--primary);
+            padding: 10px 20px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* ==========================================
+           EMPTY STATE
+           ========================================== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 2px dashed var(--border);
+        }
+
+        .empty-state .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+            filter: grayscale(100%);
+        }
+
+        .empty-state p {
+            color: var(--text-dim);
+            font-size: 16px;
+        }
+
+        /* ==========================================
+           MODALS
+           ========================================== */
+       .modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 10000;
-            justify-content: center;
-            align-items: center;
+            background: rgba(5, 8, 22, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            overflow-y: auto;
             padding: 20px;
-            animation: modalFadeIn 0.3s ease;
+            animation: fadeIn 0.3s ease;
+            pointer-events: none; /* ADD THIS LINE */
         }
 
         .modal.active {
             display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto; /* ADD THIS LINE */
         }
 
         @keyframes modalFadeIn {
@@ -337,33 +804,44 @@
         }
 
         .modal-content {
-            background: var(--white);
+            background: var(--bg-card);
+            border: 2px solid var(--border-bright);
             border-radius: 20px;
             padding: 40px;
             max-width: 600px;
             width: 100%;
-            max-height: 80vh;
+            max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            animation: modalSlideIn 0.3s ease;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.8),
+                0 0 40px rgba(0, 240, 255, 0.2);
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @keyframes modalSlideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from { 
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .modal-close {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: var(--border);
-            border: none;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border: 2px solid white;
+            background: transparent;
+            color: var(--text-bright);
+            font-size: 24px;
             cursor: pointer;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -372,141 +850,49 @@
 
         .modal-close:hover {
             background: var(--error);
-            color: white;
+            color: var(--text-bright);
             transform: rotate(90deg);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
         }
 
-        .modal-content h2 {
+        .modal h2 {
+            font-family: var(--font-display);
             font-size: 28px;
-            margin-bottom: 20px;
-            color: var(--primary);
-        }
-
-        .guide-steps {
-            counter-reset: step-counter;
-        }
-
-        .guide-step {
-            counter-increment: step-counter;
-            margin-bottom: 20px;
-            padding-left: 50px;
-            position: relative;
-        }
-
-        .guide-step::before {
-            content: counter(step-counter);
-            position: absolute;
-            left: 0;
-            top: 0;
-            background: var(--primary);
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .guide-step h3 {
-            font-size: 18px;
-            margin-bottom: 8px;
-            color: var(--text);
-        }
-
-        .guide-step p {
-            font-size: 14px;
-            color: var(--text-light);
-            line-height: 1.6;
+            color: var(--text-bright);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         /* ==========================================
-           SESSIONS PAGE
-           ========================================== */
-        .sessions-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .sessions-grid {
-            display: grid;
-            gap: 20px;
-        }
-
-        .session-card-item {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .session-card-item:hover {
-            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.2);
-            transform: translateY(-3px);
-        }
-
-        .session-card-item h3 {
-            font-size: 20px;
-            color: var(--text);
-            margin-bottom: 15px;
-        }
-
-        .session-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: var(--text-light);
-        }
-
-        .session-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .session-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .session-actions button {
-            padding: 8px 16px;
-            font-size: 14px;
-        }
-
-        /* ==========================================
-           FORM ELEMENTS
+           FORMS
            ========================================== */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             color: var(--text);
             font-weight: 600;
             font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 12px;
+            padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.4);
             border: 2px solid var(--border);
-            border-radius: 10px;
+            border-radius: 8px;
+            color: var(--text);
             font-size: 16px;
-            transition: border-color 0.3s ease;
+            font-family: var(--font-body);
+            transition: all 0.3s ease;
         }
 
         .form-group input:focus,
@@ -514,240 +900,48 @@
         .form-group textarea:focus {
             outline: none;
             border-color: var(--primary);
-        }
-
-        .color-theme-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .color-option {
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .color-option:hover {
-            transform: scale(1.05);
-        }
-
-        .color-option.selected {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.2);
-        }
-
-        .color-baby-purple {
-            background: var(--baby-purple);
-            color: #6a4c93;
-        }
-
-        .color-baby-pink {
-            background: var(--baby-pink);
-            color: #d63384;
-        }
-
-        .color-baby-blue {
-            background: var(--baby-blue);
-            color: #0d6efd;
-        }
-
-        /* ==========================================
-           QUESTIONS MANAGEMENT
-           ========================================== */
-        .questions-list {
-            margin-top: 20px;
-        }
-
-        .question-item {
-            background: var(--bg);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .question-item:hover {
-            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
-        }
-
-        .question-content {
-            flex: 1;
-        }
-
-        .question-content strong {
-            color: var(--primary);
-            font-size: 16px;
-        }
-
-        .question-options {
-            margin-top: 10px;
-            font-size: 14px;
-            color: var(--text-light);
-        }
-
-        .question-item button {
-            flex-shrink: 0;
-        }
-
-        /* ==========================================
-           CHARADES CATEGORIES
-           ========================================== */
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .category-card {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.2);
-        }
-
-        .category-emoji {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-
-        .category-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 10px;
-        }
-
-        .category-count {
-            font-size: 14px;
-            color: var(--text-light);
-        }
-
-        .category-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        .category-actions button {
-            padding: 6px 12px;
-            font-size: 13px;
-        }
-
-        .add-category-btn {
-            background: var(--bg);
-            border: 2px dashed var(--primary);
-            color: var(--primary);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
-        }
-
-        .add-category-btn:hover {
-            background: var(--secondary);
-        }
-
-        .add-category-btn .icon {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-
-        /* ==========================================
-           FLASHCARDS
-           ========================================== */
-        .flashcards-container {
-            margin-top: 20px;
-        }
-
-        .flashcard-item {
-            background: var(--bg);
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .flashcard-item:hover {
-            background: var(--secondary);
-        }
-
-        .flashcard-text {
-            font-size: 16px;
-            color: var(--text);
-        }
-
-        /* ==========================================
-           BACK NAVIGATION
-           ========================================== */
-        .back-nav {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            color: var(--primary);
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .back-nav:hover {
-            color: var(--accent);
-            transform: translateX(-5px);
-        }
-
-        .back-nav .icon {
-            font-size: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
         }
 
         /* ==========================================
            GAME CODE DISPLAY
            ========================================== */
         .game-code-display {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            padding: 30px;
-            border-radius: 20px;
             text-align: center;
-            margin: 20px 0;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border-radius: 16px;
+            border: 2px solid var(--border-bright);
+            margin: 30px 0;
         }
 
         .game-code-display h3 {
+            font-family: var(--font-display);
             font-size: 18px;
-            margin-bottom: 15px;
-            opacity: 0.9;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .game-code {
-            font-size: 48px;
-            font-weight: bold;
+            font-family: var(--font-display);
+            font-size: 56px;
+            font-weight: 900;
+            color: var(--primary);
             letter-spacing: 8px;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            text-shadow: 
+                0 0 20px var(--primary-glow),
+                0 0 40px var(--primary-glow),
+                0 0 60px var(--primary-glow);
+            animation: codeGlow 2s ease-in-out infinite;
+            margin: 20px 0;
+        }
+
+        @keyframes codeGlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
 
         .code-actions {
@@ -755,338 +949,597 @@
             gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
-        }
-
-        .code-actions button {
-            background: white;
-            color: var(--primary);
-        }
-
-        .code-actions button:hover {
-            background: var(--bg);
+            margin-top: 30px;
         }
 
         /* ==========================================
-           RESPONSIVE DESIGN
+           LEADERBOARD
            ========================================== */
-        @media (max-width: 1024px) {
-            .dashboard-container {
-                grid-template-columns: 220px 1fr;
+        .leaderboard-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .leaderboard-item {
+            display: grid;
+            grid-template-columns: 60px 1fr auto;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:nth-child(1) {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--bg-card));
+            border-color: #ffd700;
+        }
+
+        .leaderboard-item:nth-child(2) {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.1), var(--bg-card));
+            border-color: #c0c0c0;
+        }
+
+        .leaderboard-item:nth-child(3) {
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.1), var(--bg-card));
+            border-color: #cd7f32;
+        }
+
+        .leaderboard-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(0, 240, 255, 0.2);
+        }
+
+        .rank {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .leaderboard-item:nth-child(1) .rank {
+            color: #ffd700;
+            font-size: 40px;
+        }
+
+        .leaderboard-item:nth-child(2) .rank {
+            color: #c0c0c0;
+        }
+
+        .leaderboard-item:nth-child(3) .rank {
+            color: #cd7f32;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .player-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid var(--border-bright);
+        }
+
+        .player-name {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+
+        .score {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* ==========================================
+           PROFILE PAGE
+           ========================================== */
+        .profile-header {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-darker));
+            border-radius: 16px;
+            border: 2px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            margin: 0 auto 20px;
+            border: 4px solid var(--border-bright);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        }
+
+        .profile-name {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--text-bright);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .profile-role {
+            font-size: 16px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ==========================================
+           CATEGORY COLORS
+           ========================================== */
+        .color-theme-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .color-option {
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 700;
+            border: 2px solid transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .color-baby-purple {
+            background: rgba(168, 85, 247, 0.2);
+            color: var(--baby-purple);
+        }
+
+        .color-baby-pink {
+            background: rgba(236, 72, 153, 0.2);
+            color: var(--baby-pink);
+        }
+
+        .color-baby-blue {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--baby-blue);
+        }
+
+        .color-option:hover,
+        .color-option.selected {
+            border-color: currentColor;
+            box-shadow: 0 0 20px currentColor;
+            transform: scale(1.05);
+        }
+
+        /* ==========================================
+           FLASHCARDS
+           ========================================== */
+        .flashcards-container {
+            display: grid;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .flashcard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .flashcard-item:hover {
+            background: rgba(0, 0, 0, 0.5);
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .flashcard-text {
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        .flashcard-delete {
+            background: rgba(255, 0, 85, 0.2);
+            border: 1px solid var(--error);
+            color: var(--error);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .flashcard-delete:hover {
+            background: var(--error);
+            color: var(--text-bright);
+            transform: rotate(90deg);
+        }
+
+        /* ==========================================
+           UTILITY CLASSES
+           ========================================== */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* ==========================================
+           RESPONSIVE - DESKTOP
+           ========================================== */
+        @media (min-width: 769px) {
+            .sidebar {
+                display: flex;
             }
-            
-            .nav-item {
-                padding: 14px 20px;
-                font-size: 15px;
+
+            .mobile-nav {
+                display: none;
             }
-            
+
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+
             .dashboard-content {
-                padding: 28px;
+                padding: 40px 50px;
+                padding-bottom: 40px;
+                margin-left: 280px;
+                position: relative;
+                z-index: 10;
+            }
+
+            .game-card {
+                padding: 40px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
         }
 
+        /* ==========================================
+           RESPONSIVE - TABLET
+           ========================================== */
         @media (max-width: 768px) {
-            .dashboard-container {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: auto;
-                min-height: auto;
-                padding: 10px;
-                z-index: 999;
-                border-bottom: 1px solid var(--border);
-                overflow-x: auto;
-            }
-
-            .sidebar-nav {
-                flex-direction: row;
-                gap: 10px;
-                align-items: center;
-                overflow-x: auto;
-                padding: 5px;
-            }
-
-            .logo {
-                margin: 0;
-                padding: 0 10px;
-                font-size: 20px;
-                white-space: nowrap;
-            }
-
-            .nav-item {
-                padding: 12px 16px;
-                border-radius: 20px;
-                border-left: none;
-                white-space: nowrap;
-                min-width: 80px;
-                text-align: center;
-                font-size: 14px;
-            }
-
-            .nav-item.active {
-                border-radius: 20px;
-            }
-
-            .nav-spacer {
-                display: none;
-            }
-
-            .sidebar-nav .btn-secondary {
-                display: none;
-            }
-
-            .dashboard-content {
-                padding: 80px 16px 16px 16px;
-            }
-
-            .game-cards-container {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .dashboard-card {
-                padding: 20px;
-            }
-
-            .dashboard-card-content {
-                padding: 20px;
-            }
-
-            .modal-content {
-                padding: 25px;
-                max-width: 95%;
-            }
-
-            .categories-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 15px;
+            .game-card-header h2 {
+                font-size: 24px;
             }
 
             .game-code {
-                font-size: 32px;
+                font-size: 36px;
                 letter-spacing: 4px;
-            }
-
-            .overview-header,
-            .sessions-header {
-                flex-direction: column;
-                align-items: stretch;
             }
 
             .code-actions {
                 flex-direction: column;
             }
 
-            .session-actions {
-                flex-direction: column;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .nav-item {
-                padding: 10px 14px;
-                min-width: 70px;
-                font-size: 13px;
+            .code-actions .btn {
+                width: 100%;
             }
 
-            .dashboard-content {
-                padding: 70px 12px 12px 12px;
+            .session-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 15px;
             }
 
-            .btn-primary, .btn-secondary {
-                padding: 10px 18px;
-                font-size: 14px;
+            .session-code {
+                font-size: 20px;
             }
 
-            .game-code-display {
-                padding: 20px;
-            }
-
-            .game-code {
-                font-size: 28px;
-                letter-spacing: 3px;
+            .game-selection {
+                grid-template-columns: 1fr;
             }
         }
 
         /* ==========================================
-           UTILITY CLASSES
+           SCROLLBAR STYLING
            ========================================== */
-        .text-center {
-            text-align: center;
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
         }
 
-        .mt-20 {
-            margin-top: 20px;
+        ::-webkit-scrollbar-track {
+            background: var(--bg-darker);
         }
 
-        .mb-20 {
-            margin-bottom: 20px;
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
         }
 
-        .hidden {
-            display: none !important;
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
         }
 
-        .flex-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .gap-10 {
-            gap: 10px;
-        }
-
-        .gap-15 {
-            gap: 15px;
-        }
-
-        .gap-20 {
-            gap: 20px;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-light);
-        }
-
-        .empty-state .icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        .empty-state h3 {
-            font-size: 20px;
-            margin-bottom: 10px;
-            color: var(--text);
-        }
-
-        /* Loading state */
+        /* ==========================================
+           LOADING ANIMATION
+           ========================================== */
         .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-        }
-
-        .spinner {
-            border: 4px solid var(--border);
-            border-top: 4px solid var(--primary);
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            border-top-color: var(--primary);
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="dashboard-page">
-    <!-- Guide Modal -->
-    <div id="guideModal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeGuideModal()">×</button>
-            <h2> How to Set Up Your Game</h2>
-            <div class="guide-steps">
-                <div class="guide-step">
-                    <h3>Choose Your Game</h3>
-                    <p>Select either Quiz Game or Charades from the overview page. Each game type has its own setup flow.</p>
-                </div>
-                <div class="guide-step">
-                    <h3>Create a Session</h3>
-                    <p>For Quiz: Add questions and choose your theme colors. For Charades: Create categories with flashcards.</p>
-                </div>
-                <div class="guide-step">
-                    <h3>Generate Game Code</h3>
-                    <p>Once your session is ready, generate a unique game code. This code is reusable and will route players to the correct game.</p>
-                </div>
-                <div class="guide-step">
-                    <h3>Share with Players</h3>
-                    <p>Share the game code with your players. They can join through the main join page or you can join as a player yourself to test.</p>
-                </div>
-                <div class="guide-step">
-                    <h3>Start Playing!</h3>
-                    <p>Once players have joined, start the game and enjoy! You can monitor progress, view results, and manage sessions anytime.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
+<body>
+    <div class="game-container">
+        <!-- ==========================================
+             DESKTOP SIDEBAR NAVIGATION
+             ========================================== -->
         <aside class="sidebar">
+            <div class="logo">Qitz!</div>
+            
             <nav class="sidebar-nav">
-                <h1 class="logo">GloHub</h1>
+                <button class="nav-item active" data-tab="overview">
+                    <span class="icon">🏠</span>
+                    <span>Overview</span>
+                </button>
                 
-                <!-- Dynamic navigation items will be updated based on context -->
-                <button class="nav-item active" data-tab="overview"> Overview</button>
+                <button class="nav-item" data-tab="sessions">
+                    <span class="icon">🎮</span>
+                    <span>Sessions</span>
+                </button>
                 
-                <!-- These will appear contextually -->
-                <button class="nav-item hidden" data-tab="quiz-sessions">Quiz Sessions</button>
-                <button class="nav-item hidden" data-tab="charades-sessions">Charades</button>
+                <button class="nav-item" data-tab="leaderboard">
+                    <span class="icon">🏆</span>
+                    <span>Leaderboard</span>
+                </button>
                 
-                <div class="nav-spacer"></div> 
-                <a href="galentines.html" class="btn-secondary">Logout</a>
-
+                <button class="nav-item" data-tab="profile">
+                    <span class="icon">👤</span>
+                    <span>Profile</span>
+                </button>
+                
+                <button class="nav-item hidden" data-tab="quiz-sessions">
+                    <span class="icon">❓</span>
+                    <span>Quiz Manager</span>
+                </button>
+                
+                <button class="nav-item hidden" data-tab="charades-sessions">
+                    <span class="icon">🎭</span>
+                    <span>Charades</span>
+                </button>
+                
+                <div class="nav-spacer"></div>
+                
+                <button class="btn-logout" onclick="logout()">
+                  Logout
+                </button>
             </nav>
         </aside>
 
-        <!-- Main Content Area -->
+        <!-- ==========================================
+             MAIN CONTENT
+             ========================================== -->
         <main class="dashboard-content">
-            
             <!-- ==========================================
-                 OVERVIEW TAB (Default Landing Page)
+                 OVERVIEW TAB
                  ========================================== -->
             <div id="overview" class="tab-content active">
-                <div class="dashboard-card">
-                    <div class="dashboard-card-header">
-                        <div class="overview-header">
-                            <div>
-                                <h2>Welcome to Your Game Dashboard</h2>
-                                <p>Choose a game type to get started</p>
-                            </div>
-                            <button class="guide-btn" onclick="openGuideModal()">
-                                <span>📖</span>
-                                <span>Setup Guide</span>
-                            </button>
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h2> Command Center</h2>
+                        <p>Game Metrics</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                           <div class="stat-icon">
+                            <img src="assets/gamepad.svg" alt="Game icon">
+                        </div>
+
+                            <div class="stat-value" id="totalGames">0</div>
+                            <div class="stat-label">Active Games</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-value" id="totalPlayers">0</div>
+                            <div class="stat-label">Total Players</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-value" id="activeSessions">0</div>
+                            <div class="stat-label">Live Sessions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-value" id="topScore">0</div>
+                            <div class="stat-label">High Score</div>
                         </div>
                     </div>
-                    
-                    <div class="dashboard-card-content">
-                        <!-- Game Selection Cards -->
-                        <div class="game-cards-container">
-                            <div class="game-card" onclick="selectGame('quiz')">
-                                <div class="game-card-icon">🧠</div>
-                                <div class="game-card-title">Quiz Game</div>
-                                <div class="game-card-desc">Create custom quiz questions and test your friends' knowledge!</div>
-                                <button class="btn-primary">Select Quiz</button>
+
+
+                        <div style="margin-top: 25px; text-align: center;">
+                            <button class="btn-primary btn-large" onclick="openGuideModal()">
+                                📖 Guide
+                            </button>
+                        </div>
+                  
+                </div>
+
+                <!-- Game Selection -->
+                <div class="game-card">
+                    <div style="margin-top: 25px; text-align: center;">
+                            <button class="btn-primary btn-large" onclick="openGuideModal()">
+                                📖 Guide
+                            </button>
+                        </div>
+                    <div class="game-card-header">
+                        <h2> Select Game Mode</h2>
+                        <p>Choose your arena</p>
+                    </div>
+
+                    <div class="game-selection">
+                        <div class="game-type-card" onclick="selectGame('quiz')">
+                            <span class="game-type-icon">❓</span>
+                            <h3>Quiz Arena</h3>
+                            <p>Test knowledge with multiple-choice questions. Perfect for trivia battles and educational challenges.</p>
+                        </div>
+
+                        <div class="game-type-card" onclick="selectGame('charades')">
+                            <span class="game-type-icon">🎭</span>
+                            <h3>Charades Zone</h3>
+                            <p>Act it out! Create custom categories with flashcards for endless party fun.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SESSIONS TAB
+                 ========================================== -->
+            <div id="sessions" class="tab-content">
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h2>🎮 Active Sessions</h2>
+                        <p>Live game monitoring</p>
+                    </div>
+
+                    <div class="game-card-content">
+                        <div class="sessions-list">
+                            <div class="empty-state">
+                                <div class="icon">🎮</div>
+                                <p>No active sessions</p>
+                                <p style="margin-top: 10px;">Create a game from the Overview to get started!</p>
                             </div>
-                            
-                            <div class="game-card" onclick="selectGame('charades')">
-                                <div class="game-card-icon">🎭</div>
-                                <div class="game-card-title">Charades</div>
-                                <div class="game-card-desc">Act it out! Create categories and flashcards for a fun charades game.</div>
-                                <button class="btn-primary">Select Charades</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 LEADERBOARD TAB
+                 ========================================== -->
+            <div id="leaderboard" class="tab-content">
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h2>🏆 Leaderboard</h2>
+                        <p>Top Players</p>
+                    </div>
+
+                    <div class="game-card-content">
+                        <div class="leaderboard-list">
+                            <div class="leaderboard-item">
+                                <div class="rank">1</div>
+                                <div class="player-info">
+                                    <div class="player-avatar">🎮</div>
+                                    <div class="player-name">Player One</div>
+                                </div>
+                                <div class="score">1250</div>
+                            </div>
+                            <div class="leaderboard-item">
+                                <div class="rank">2</div>
+                                <div class="player-info">
+                                    <div class="player-avatar">⚡</div>
+                                    <div class="player-name">Speed Runner</div>
+                                </div>
+                                <div class="score">1100</div>
+                            </div>
+                            <div class="leaderboard-item">
+                                <div class="rank">3</div>
+                                <div class="player-info">
+                                    <div class="player-avatar">🔥</div>
+                                    <div class="player-name">Fire Starter</div>
+                                </div>
+                                <div class="score">980</div>
+                            </div>
+                            <div class="leaderboard-item">
+                                <div class="rank">4</div>
+                                <div class="player-info">
+                                    <div class="player-avatar">💎</div>
+                                    <div class="player-name">Diamond Ace</div>
+                                </div>
+                                <div class="score">875</div>
+                            </div>
+                            <div class="leaderboard-item">
+                                <div class="rank">5</div>
+                                <div class="player-info">
+                                    <div class="player-avatar">🌟</div>
+                                    <div class="player-name">Star Player</div>
+                                </div>
+                                <div class="score">820</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 PROFILE TAB
+                 ========================================== -->
+            <div id="profile" class="tab-content">
+                <div class="profile-header">
+                    <div class="profile-avatar-large">👨‍💼</div>
+                    <div class="profile-name">Admin Player</div>
+                    <div class="profile-role">Game Master</div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h2>⚙️ Settings</h2>
+                        <p>Customize your profile</p>
+                    </div>
+
+                    <div class="game-card-content">
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input type="text" placeholder="Enter your name" value="Admin Player">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Select Avatar</label>
+                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-top: 15px;">
+                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">👨‍💼</div>
+                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">🎮</div>
+                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">⚡</div>
+                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">🔥</div>
+                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">💎</div>
                             </div>
                         </div>
 
-                        <!-- Join Game Section -->
-                        <div class="join-game-section">
-                            <h3>Already have a game code?</h3>
-                            <p style="color: var(--text-light); margin-bottom: 15px;">Join an existing game as a player</p>
-                            <button class="btn-primary btn-large" onclick="window.location.href='join-game.html'">
-                                🎮 Join Game
-                            </button>
+                        <div style="margin-top: 30px;">
+                            <button class="btn-primary btn-large">💾 Save Changes</button>
                         </div>
                     </div>
                 </div>
@@ -1096,131 +1549,46 @@
                  QUIZ SESSIONS TAB
                  ========================================== -->
             <div id="quiz-sessions" class="tab-content">
-                <div class="dashboard-card">
-                    <!-- Back navigation -->
-                    <div class="back-nav" onclick="backToOverview()">
-                        <span class="icon">←</span>
-                        <span>Back to Overview</span>
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h2> Quiz Manager</h2>
+                        <p>Create and manage quiz sessions</p>
                     </div>
-                    
-                    <div class="dashboard-card-header">
-                        <div class="sessions-header">
-                            <div>
-                                <h2>Quiz Game Sessions</h2>
-                                <p>Manage your quiz sessions and questions</p>
-                            </div>
-                            <button class="btn-primary" onclick="createNewQuizSession()">
-                                ➕ Create New Session
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-card-content">
-                        <!-- Previous Sessions List -->
-                        <div id="quizSessionsList" class="sessions-grid">
-                            <!-- Sessions will be loaded here dynamically -->
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- ==========================================
-                 QUIZ SESSION EDITOR
-                 ========================================== -->
-            <div id="quiz-editor" class="tab-content">
-                <div class="dashboard-card">
-                    <div class="back-nav" onclick="backToQuizSessions()">
-                        <span class="icon">←</span>
-                        <span>Back to Sessions</span>
+                    <div style="margin-bottom: 25px; text-align: left;">
+                        <button class="btn-secondary" onclick="backToOverview()">
+                            ← Back to Overview
+                        </button>
                     </div>
-                    
-                    <div class="dashboard-card-header">
-                        <h2 id="quizEditorTitle">Create Quiz Session</h2>
-                        <p>Add questions and customize your quiz</p>
-                    </div>
-                    
-                    <div class="dashboard-card-content">
-                        <!-- Session Name -->
+
+                    <div class="game-card-content">
                         <div class="form-group">
-                            <label for="quizSessionName">Session Name</label>
-                            <input type="text" id="quizSessionName" placeholder="e.g., Friday Night Quiz" required>
+                            <label>Quiz Title</label>
+                            <input type="text" id="quizTitle" placeholder="e.g., General Knowledge Quiz">
                         </div>
 
-                        <!-- Theme Color Selection -->
                         <div class="form-group">
-                            <label>Choose Theme Color</label>
-                            <div class="color-theme-selector">
-                                <div class="color-option color-baby-purple" data-color="baby-purple" onclick="selectQuizColor('baby-purple')">
-                                     Purple
-                                </div>
-                                <div class="color-option color-baby-pink selected" data-color="baby-pink" onclick="selectQuizColor('baby-pink')">
-                                    Pink
-                                </div>
-                                <div class="color-option color-baby-blue" data-color="baby-blue" onclick="selectQuizColor('baby-blue')">
-                                    Blue
-                                </div>
-                            </div>
+                            <label>Number of Questions</label>
+                            <input type="number" id="questionCount" placeholder="10" min="1" max="50">
                         </div>
 
-                        <!-- Questions Section -->
-                        <div style="margin-top: 30px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                                <h3>Quiz Questions</h3>
-                                <button class="btn-primary" onclick="showAddQuizQuestion()">➕ Add Question</button>
-                            </div>
-
-                            <!-- Add Question Form -->
-                            <div id="addQuizQuestionForm" class="hidden" style="background: var(--bg); padding: 25px; border-radius: 15px; margin-bottom: 20px;">
-                                <h4 style="margin-bottom: 15px;">New Question</h4>
-                                <div class="form-group">
-                                    <label for="quizQuestionText">Question Text</label>
-                                    <input type="text" id="quizQuestionText" placeholder="What's your question?" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="quizOption1">Option 1</label>
-                                    <input type="text" id="quizOption1" placeholder="First option" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="quizOption2">Option 2</label>
-                                    <input type="text" id="quizOption2" placeholder="Second option" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="quizOption3">Option 3</label>
-                                    <input type="text" id="quizOption3" placeholder="Third option" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="quizOption4">Option 4</label>
-                                    <input type="text" id="quizOption4" placeholder="Fourth option" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="quizCorrectAnswer">Correct Answer</label>
-                                    <select id="quizCorrectAnswer" required>
-                                        <option value="1">Option 1</option>
-                                        <option value="2">Option 2</option>
-                                        <option value="3">Option 3</option>
-                                        <option value="4">Option 4</option>
-                                    </select>
-                                </div>
-                                <div style="display: flex; gap: 10px;">
-                                    <button class="btn-primary" onclick="saveQuizQuestion()">Save Question</button>
-                                    <button class="btn-secondary" onclick="cancelAddQuizQuestion()">Cancel</button>
-                                </div>
-                            </div>
-
-                            <!-- Questions List -->
-                            <div id="quizQuestionsList" class="questions-list">
-                                <div class="empty-state">
-                                    <div class="icon">📝</div>
-                                    <h3>No questions yet</h3>
-                                    <p>Add your first question to get started</p>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label>Time per Question (seconds)</label>
+                            <input type="number" id="timePerQuestion" placeholder="30" min="5" max="120">
                         </div>
 
-                        <!-- Save Session Button -->
+                        <div class="form-group">
+                            <label>Difficulty Level</label>
+                            <select id="difficulty">
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+
                         <div style="margin-top: 30px; text-align: center;">
-                            <button class="btn-primary btn-large" onclick="saveQuizSession()">
-                                💾 Save Session & Generate Code
+                            <button class="btn-primary btn-large" onclick="createQuizSession()">
+                                🚀 Create Quiz Session
                             </button>
                         </div>
                     </div>
@@ -1231,63 +1599,43 @@
                  CHARADES SESSIONS TAB
                  ========================================== -->
             <div id="charades-sessions" class="tab-content">
-                <div class="dashboard-card">
-                    <div class="back-nav" onclick="backToOverview()">
-                        <span class="icon">←</span>
-                        <span>Back to Overview</span>
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h2> Charades Builder</h2>
+                        <p>Create custom categories and flashcards</p>
                     </div>
-                    
-                    <div class="dashboard-card-header">
-                        <div class="sessions-header">
-                            <div>
-                                <h2>Charades Games</h2>
-                                <p>Manage your charades categories and games</p>
-                            </div>
-                            <button class="btn-primary" onclick="createNewCharadesGame()">
-                                ➕ Create New Game
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-card-content">
-                        <div id="charadesGamesList" class="sessions-grid">
-                            <!-- Games will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- ==========================================
-                 CHARADES EDITOR
-                 ========================================== -->
-            <div id="charades-editor" class="tab-content">
-                <div class="dashboard-card">
-                    <div class="back-nav" onclick="backToCharadesSessions()">
-                        <span class="icon">←</span>
-                        <span>Back to Games</span>
+                    <div style="margin-bottom: 25px; text-align: left;">
+                        <button class="btn-secondary" onclick="backToOverview()">
+                            ← Back to Overview
+                        </button>
                     </div>
-                    
-                    <div class="dashboard-card-header">
-                        <h2>Create Charades Game</h2>
-                        <p>Add categories and flashcards (max 20 categories, 20 flashcards each)</p>
-                    </div>
-                    
-                    <div class="dashboard-card-content">
-                        <!-- Game Name -->
+
+                    <div class="game-card-content">
                         <div class="form-group">
-                            <label for="charadesGameName">Game Name</label>
-                            <input type="text" id="charadesGameName" placeholder="e.g., Movie Night Charades" required>
+                            <label>Game Name</label>
+                            <input type="text" id="charadesGameName" placeholder="e.g., Movie Night Charades">
                         </div>
 
-                        <!-- Categories Grid -->
-                        <div style="margin-top: 30px;">
-                            <h3 style="margin-bottom: 20px;">Categories (<span id="categoryCount">5</span>/20)</h3>
-                            <div id="categoriesGrid" class="categories-grid">
-                                <!-- Categories will be loaded here -->
+                        <div class="form-group">
+                            <label>Time per Round (seconds)</label>
+                            <input type="number" id="roundTime" placeholder="60" min="30" max="180">
+                        </div>
+
+                        <div style="margin-top: 30px; margin-bottom: 25px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <h3 style="font-family: var(--font-display); color: var(--text-bright); text-transform: uppercase;">Categories</h3>
+                                <button class="btn-primary" onclick="openCategoryModal()">➕ Add Category</button>
+                            </div>
+
+                            <div id="categoriesList" class="sessions-list">
+                                <div class="empty-state">
+                                    <div class="icon">🎴</div>
+                                    <p>No categories yet. Add your first category!</p>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Save Game Button -->
                         <div style="margin-top: 30px; text-align: center;">
                             <button class="btn-primary btn-large" onclick="saveCharadesGame()">
                                 💾 Save Game & Generate Code
@@ -1296,110 +1644,166 @@
                     </div>
                 </div>
             </div>
-
-            <!-- ==========================================
-                 CATEGORY EDITOR MODAL
-                 ========================================== -->
-            <div id="categoryModal" class="modal">
-                <div class="modal-content">
-                    <button class="modal-close" onclick="closeCategoryModal()">×</button>
-                    <h2 id="categoryModalTitle">Edit Category</h2>
-                    
-                    <div class="form-group">
-                        <label for="categoryName">Category Name</label>
-                        <input type="text" id="categoryName" placeholder="e.g., Movies, Animals" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="categoryEmoji">Choose Emoji</label>
-                        <input type="text" id="categoryEmoji" placeholder="Click to select emoji" readonly 
-                               onclick="openEmojiPicker()" style="cursor: pointer;">
-                        <p style="font-size: 12px; color: var(--text-light); margin-top: 5px;">
-                            Tip: Use your device's emoji keyboard or paste an emoji
-                        </p>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Category Color</label>
-                        <div class="color-theme-selector">
-                            <div class="color-option color-baby-purple" onclick="selectCategoryColor('baby-purple')">
-                                Purple
-                            </div>
-                            <div class="color-option color-baby-pink selected" onclick="selectCategoryColor('baby-pink')">
-                                Pink
-                            </div>
-                            <div class="color-option color-baby-blue" onclick="selectCategoryColor('baby-blue')">
-                                Blue
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcards Section -->
-                    <div style="margin-top: 25px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3>Flashcards (<span id="flashcardCount">0</span>/20)</h3>
-                            <button class="btn-primary" onclick="showAddFlashcard()">➕ Add</button>
-                        </div>
-
-                        <!-- Add Flashcard Form -->
-                        <div id="addFlashcardForm" class="hidden" style="background: var(--bg); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                            <div class="form-group" style="margin-bottom: 10px;">
-                                <input type="text" id="flashcardText" placeholder="Enter word or phrase" required>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn-primary" onclick="saveFlashcard()">Save</button>
-                                <button class="btn-secondary" onclick="cancelAddFlashcard()">Cancel</button>
-                            </div>
-                        </div>
-
-                        <!-- Flashcards List -->
-                        <div id="flashcardsList" class="flashcards-container">
-                            <div class="empty-state" style="padding: 30px;">
-                                <div class="icon">🎴</div>
-                                <p>No flashcards yet</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
-                        <button class="btn-secondary" onclick="closeCategoryModal()">Cancel</button>
-                        <button class="btn-primary" onclick="saveCategoryChanges()">Save Category</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==========================================
-                 GAME CODE VIEW MODAL
-                 ========================================== -->
-            <div id="gameCodeModal" class="modal">
-                <div class="modal-content">
-                    <button class="modal-close" onclick="closeGameCodeModal()">×</button>
-                    <h2>🎉 Game Ready!</h2>
-                    
-                    <div class="game-code-display">
-                        <h3>Your Game Code</h3>
-                        <div class="game-code" id="displayGameCode">ABC123</div>
-                        <div class="code-actions">
-                            <button class="btn-primary" onclick="copyGameCode()">📋 Copy Code</button>
-                            <button class="btn-primary" onclick="shareGameCode()">📤 Share</button>
-                            <button class="btn-primary" onclick="joinOwnGame()">🎮 Join Game</button>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 20px; padding: 20px; background: var(--bg); border-radius: 15px;">
-                        <h4 style="margin-bottom: 10px;">📱 Share this code with players</h4>
-                        <p style="color: var(--text-light); font-size: 14px;">
-                            Players can join by entering this code at the join page. The code will automatically route them to the correct game type.
-                        </p>
-                    </div>
-
-                    <div style="margin-top: 20px; text-align: center;">
-                        <button class="btn-secondary" onclick="closeGameCodeModal()">Done</button>
-                    </div>
-                </div>
-            </div>
-
         </main>
+
+        <!-- ==========================================
+             MOBILE BOTTOM NAVIGATION
+             ========================================== -->
+        <nav class="mobile-nav">
+            <button class="mobile-nav-item active" data-tab="overview">
+                <span class="icon">🏠</span>
+                <span class="label">Home</span>
+            </button>
+            <button class="mobile-nav-item" data-tab="sessions">
+                <span class="icon">🎮</span>
+                <span class="label">Sessions</span>
+            </button>
+            <button class="mobile-nav-item" data-tab="leaderboard">
+                <span class="icon">🏆</span>
+                <span class="label">Ranks</span>
+            </button>
+            <button class="mobile-nav-item" data-tab="profile">
+                <span class="icon">👤</span>
+                <span class="label">Profile</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ==========================================
+         GUIDE MODAL
+         ========================================== -->
+    <div id="guideModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeGuideModal()">×</button>
+            <h2>📖 Game Master Guide</h2>
+            
+            <div style="color: var(--text); line-height: 1.8;">
+                <h3 style="color: var(--primary); margin: 20px 0 10px; font-family: var(--font-display);">Getting Started</h3>
+                <p>Welcome to the Command Center! Here's how to create and manage game sessions:</p>
+                
+                <h3 style="color: var(--primary); margin: 20px 0 10px; font-family: var(--font-display);">Quiz Mode</h3>
+                <p><strong>1.</strong> Select "Quiz Arena" from the Overview<br>
+                <strong>2.</strong> Set your quiz parameters (title, questions, time)<br>
+                <strong>3.</strong> Generate a game code<br>
+                <strong>4.</strong> Share the code with players</p>
+                
+                <h3 style="color: var(--primary); margin: 20px 0 10px; font-family: var(--font-display);">Charades Mode</h3>
+                <p><strong>1.</strong> Select "Charades Zone" from Overview<br>
+                <strong>2.</strong> Create custom categories<br>
+                <strong>3.</strong> Add flashcards to each category<br>
+                <strong>4.</strong> Save and share your game code</p>
+                
+                <h3 style="color: var(--primary); margin: 20px 0 10px; font-family: var(--font-display);">Managing Sessions</h3>
+                <p>Monitor active games in the Sessions tab. View player connections, game codes, and session status in real-time.</p>
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="btn-primary" onclick="closeGuideModal()">Got It!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         CATEGORY EDITOR MODAL
+         ========================================== -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCategoryModal()">×</button>
+            <h2 id="categoryModalTitle">🎨 Edit Category</h2>
+            
+            <div class="form-group">
+                <label>Category Name</label>
+                <input type="text" id="categoryName" placeholder="e.g., Movies, Animals">
+            </div>
+
+            <div class="form-group">
+                <label>Choose Emoji</label>
+                <input type="text" id="categoryEmoji" placeholder="Click to select emoji" readonly 
+                       onclick="openEmojiPicker()" style="cursor: pointer;">
+                <p style="font-size: 12px; color: var(--text-dim); margin-top: 8px;">
+                    💡 Tip: Use your device's emoji keyboard or paste an emoji
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label>Category Color</label>
+                <div class="color-theme-selector">
+                    <div class="color-option color-baby-purple" onclick="selectCategoryColor('baby-purple')">
+                        Purple
+                    </div>
+                    <div class="color-option color-baby-pink selected" onclick="selectCategoryColor('baby-pink')">
+                        Pink
+                    </div>
+                    <div class="color-option color-baby-blue" onclick="selectCategoryColor('baby-blue')">
+                        Blue
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="font-family: var(--font-display); color: var(--text-bright);">
+                        Flashcards (<span id="flashcardCount">0</span>/20)
+                    </h3>
+                    <button class="btn-primary" onclick="showAddFlashcard()">➕ Add</button>
+                </div>
+
+                <div id="addFlashcardForm" class="hidden" style="background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="text" id="flashcardText" placeholder="Enter word or phrase">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-primary" onclick="saveFlashcard()">💾 Save</button>
+                        <button class="btn-secondary" onclick="cancelAddFlashcard()">✖ Cancel</button>
+                    </div>
+                </div>
+
+                <div id="flashcardsList" class="flashcards-container">
+                    <div class="empty-state" style="padding: 40px;">
+                        <div class="icon">🎴</div>
+                        <p>No flashcards yet. Add your first one!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="btn-secondary" onclick="closeCategoryModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveCategoryChanges()">💾 Save Category</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         GAME CODE MODAL
+         ========================================== -->
+    <div id="gameCodeModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeGameCodeModal()">×</button>
+            <h2>🎉 Game Ready!</h2>
+            
+            <div class="game-code-display">
+                <h3>Your Game Code</h3>
+                <div class="game-code" id="displayGameCode">ABC123</div>
+                <div class="code-actions">
+                    <button class="btn-primary" onclick="copyGameCode()">📋 Copy</button>
+                    <button class="btn-primary" onclick="shareGameCode()">📤 Share</button>
+                    <button class="btn-start" onclick="joinOwnGame()">🎮 Join Game</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px; padding: 25px; background: rgba(0, 0, 0, 0.3); border-radius: 12px; border: 1px solid var(--border);">
+                <h4 style="margin-bottom: 12px; color: var(--text-bright); font-family: var(--font-display);">
+                    📱 Share with Players
+                </h4>
+                <p style="color: var(--text-dim); font-size: 14px; line-height: 1.6;">
+                    Players can join by entering this code at the join page. The code automatically routes them to the correct game type.
+                </p>
+            </div>
+
+            <div style="margin-top: 25px; text-align: center;">
+                <button class="btn-secondary" onclick="closeGameCodeModal()">Done</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
@@ -1407,55 +1811,10 @@
     <script src="supabase.js"></script>
     <script src="admin.js"></script>
     <script>
-        // Additional inline scripts for modal and navigation management
+        // ==========================================
+        // NAVIGATION & TAB MANAGEMENT
+        // ==========================================
         
-        // Guide Modal Functions
-        function openGuideModal() {
-            document.getElementById('guideModal').classList.add('active');
-        }
-
-        function closeGuideModal() {
-            document.getElementById('guideModal').classList.remove('active');
-        }
-
-        // Game Selection
-        function selectGame(gameType) {
-            if (gameType === 'quiz') {
-                switchTab('quiz-sessions');
-                updateSidebarForQuiz();
-            } else if (gameType === 'charades') {
-                switchTab('charades-sessions');
-                updateSidebarForCharades();
-            }
-        }
-
-        // Update sidebar navigation based on game type
-        function updateSidebarForQuiz() {
-            document.querySelector('[data-tab="quiz-sessions"]').classList.remove('hidden');
-            document.querySelector('[data-tab="charades-sessions"]').classList.add('hidden');
-        }
-
-        function updateSidebarForCharades() {
-            document.querySelector('[data-tab="charades-sessions"]').classList.remove('hidden');
-            document.querySelector('[data-tab="quiz-sessions"]').classList.add('hidden');
-        }
-
-        // Back Navigation Functions
-        function backToOverview() {
-            switchTab('overview');
-            // Hide game-specific nav items
-            document.querySelector('[data-tab="quiz-sessions"]').classList.add('hidden');
-            document.querySelector('[data-tab="charades-sessions"]').classList.add('hidden');
-        }
-
-        function backToQuizSessions() {
-            switchTab('quiz-sessions');
-        }
-
-        function backToCharadesSessions() {
-            switchTab('charades-sessions');
-        }
-
         // Tab Switching Function
         function switchTab(tabName) {
             // Hide all tabs
@@ -1469,8 +1828,16 @@
                 targetTab.classList.add('active');
             }
             
-            // Update nav items
-            document.querySelectorAll('.nav-item').forEach(item => {
+            // Update desktop nav items
+            document.querySelectorAll('.sidebar .nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.tab === tabName) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Update mobile nav items
+            document.querySelectorAll('.mobile-nav-item').forEach(item => {
                 item.classList.remove('active');
                 if (item.dataset.tab === tabName) {
                     item.classList.add('active');
@@ -1483,7 +1850,8 @@
 
         // Setup navigation listeners
         document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.nav-item').forEach(item => {
+            // Desktop sidebar navigation
+            document.querySelectorAll('.sidebar .nav-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const tab = item.dataset.tab;
                     if (tab && !item.classList.contains('hidden')) {
@@ -1491,7 +1859,44 @@
                     }
                 });
             });
+
+            // Mobile bottom navigation
+            document.querySelectorAll('.mobile-nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const tab = item.dataset.tab;
+                    if (tab) {
+                        switchTab(tab);
+                    }
+                });
+            });
+
+            // Initialize stats
+            updateDashboardStats();
         });
+
+        // ==========================================
+        // MODAL FUNCTIONS
+        // ==========================================
+        
+        function openGuideModal() {
+            document.getElementById('guideModal').classList.add('active');
+        }
+
+        function closeGuideModal() {
+            document.getElementById('guideModal').classList.remove('active');
+        }
+
+        function openCategoryModal() {
+            document.getElementById('categoryModal').classList.add('active');
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').classList.remove('active');
+        }
+
+        function closeGameCodeModal() {
+            document.getElementById('gameCodeModal').classList.remove('active');
+        }
 
         // Close modals when clicking outside
         window.addEventListener('click', (e) => {
@@ -1499,6 +1904,299 @@
                 e.target.classList.remove('active');
             }
         });
+
+        // ==========================================
+        // GAME SELECTION
+        // ==========================================
+        
+        function selectGame(gameType) {
+            if (gameType === 'quiz') {
+                switchTab('quiz-sessions');
+                document.querySelector('[data-tab="quiz-sessions"]').classList.remove('hidden');
+                document.querySelector('[data-tab="charades-sessions"]').classList.add('hidden');
+            } else if (gameType === 'charades') {
+                switchTab('charades-sessions');
+                document.querySelector('[data-tab="charades-sessions"]').classList.remove('hidden');
+                document.querySelector('[data-tab="quiz-sessions"]').classList.add('hidden');
+            }
+        }
+
+        function backToOverview() {
+            switchTab('overview');
+            document.querySelector('[data-tab="quiz-sessions"]').classList.add('hidden');
+            document.querySelector('[data-tab="charades-sessions"]').classList.add('hidden');
+        }
+
+        // ==========================================
+        // QUIZ FUNCTIONS
+        // ==========================================
+        
+        function createQuizSession() {
+            const title = document.getElementById('quizTitle').value;
+            const questionCount = document.getElementById('questionCount').value;
+            const timePerQuestion = document.getElementById('timePerQuestion').value;
+            const difficulty = document.getElementById('difficulty').value;
+
+            if (!title || !questionCount || !timePerQuestion) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Generate random game code
+            const gameCode = generateGameCode();
+            
+            // Show game code modal
+            document.getElementById('displayGameCode').textContent = gameCode;
+            document.getElementById('gameCodeModal').classList.add('active');
+
+            // In production, this would save to database
+            console.log('Quiz Session Created:', { title, questionCount, timePerQuestion, difficulty, gameCode });
+        }
+
+        // ==========================================
+        // CHARADES FUNCTIONS
+        // ==========================================
+        
+        let currentCategories = [];
+        let currentFlashcards = [];
+        let editingCategoryIndex = -1;
+
+        function saveCharadesGame() {
+            const gameName = document.getElementById('charadesGameName').value;
+            const roundTime = document.getElementById('roundTime').value;
+
+            if (!gameName || !roundTime) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (currentCategories.length === 0) {
+                alert('Please add at least one category');
+                return;
+            }
+
+            // Generate random game code
+            const gameCode = generateGameCode();
+            
+            // Show game code modal
+            document.getElementById('displayGameCode').textContent = gameCode;
+            document.getElementById('gameCodeModal').classList.add('active');
+
+            // In production, this would save to database
+            console.log('Charades Game Created:', { gameName, roundTime, categories: currentCategories, gameCode });
+        }
+
+        function selectCategoryColor(color) {
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        function showAddFlashcard() {
+            document.getElementById('addFlashcardForm').classList.remove('hidden');
+            document.getElementById('flashcardText').focus();
+        }
+
+        function cancelAddFlashcard() {
+            document.getElementById('addFlashcardForm').classList.add('hidden');
+            document.getElementById('flashcardText').value = '';
+        }
+
+        function saveFlashcard() {
+            const text = document.getElementById('flashcardText').value.trim();
+            if (!text) return;
+
+            currentFlashcards.push(text);
+            updateFlashcardsList();
+            cancelAddFlashcard();
+        }
+
+        function updateFlashcardsList() {
+            const container = document.getElementById('flashcardsList');
+            document.getElementById('flashcardCount').textContent = currentFlashcards.length;
+
+            if (currentFlashcards.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 40px;">
+                        <div class="icon">🎴</div>
+                        <p>No flashcards yet. Add your first one!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = currentFlashcards.map((card, index) => `
+                <div class="flashcard-item">
+                    <span class="flashcard-text">${card}</span>
+                    <button class="flashcard-delete" onclick="deleteFlashcard(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteFlashcard(index) {
+            currentFlashcards.splice(index, 1);
+            updateFlashcardsList();
+        }
+
+        function saveCategoryChanges() {
+            const name = document.getElementById('categoryName').value.trim();
+            const emoji = document.getElementById('categoryEmoji').value.trim();
+            const selectedColor = document.querySelector('.color-option.selected');
+            
+            if (!name || !emoji) {
+                alert('Please fill in category name and emoji');
+                return;
+            }
+
+            if (currentFlashcards.length === 0) {
+                alert('Please add at least one flashcard');
+                return;
+            }
+
+            const category = {
+                name,
+                emoji,
+                color: selectedColor ? selectedColor.textContent.trim() : 'Pink',
+                flashcards: [...currentFlashcards]
+            };
+
+            if (editingCategoryIndex >= 0) {
+                currentCategories[editingCategoryIndex] = category;
+            } else {
+                currentCategories.push(category);
+            }
+
+            updateCategoriesList();
+            closeCategoryModal();
+            resetCategoryForm();
+        }
+
+        function updateCategoriesList() {
+            const container = document.getElementById('categoriesList');
+            
+            if (currentCategories.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🎴</div>
+                        <p>No categories yet. Add your first category!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = currentCategories.map((cat, index) => `
+                <div class="session-card">
+                    <div class="session-status"></div>
+                    <div class="session-info">
+                        <h4>${cat.emoji} ${cat.name}</h4>
+                        <div class="session-meta">
+                            <span>${cat.flashcards.length} flashcards</span>
+                            <span>Color: ${cat.color}</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-secondary" onclick="editCategory(${index})" style="padding: 8px 16px; font-size: 14px;">✏️ Edit</button>
+                        <button class="btn-danger" onclick="deleteCategory(${index})" style="padding: 8px 16px; font-size: 14px;">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editCategory(index) {
+            editingCategoryIndex = index;
+            const category = currentCategories[index];
+            
+            document.getElementById('categoryName').value = category.name;
+            document.getElementById('categoryEmoji').value = category.emoji;
+            currentFlashcards = [...category.flashcards];
+            
+            updateFlashcardsList();
+            openCategoryModal();
+        }
+
+        function deleteCategory(index) {
+            if (confirm('Delete this category?')) {
+                currentCategories.splice(index, 1);
+                updateCategoriesList();
+            }
+        }
+
+        function resetCategoryForm() {
+            editingCategoryIndex = -1;
+            document.getElementById('categoryName').value = '';
+            document.getElementById('categoryEmoji').value = '';
+            currentFlashcards = [];
+            updateFlashcardsList();
+        }
+
+        function openEmojiPicker() {
+            // Allow native emoji keyboard
+            const input = document.getElementById('categoryEmoji');
+            input.removeAttribute('readonly');
+            input.focus();
+            setTimeout(() => {
+                input.setAttribute('readonly', true);
+            }, 100);
+        }
+
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+        
+        function generateGameCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        function copyGameCode() {
+            const code = document.getElementById('displayGameCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            });
+        }
+
+        function shareGameCode() {
+            const code = document.getElementById('displayGameCode').textContent;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Join my game!',
+                    text: `Join my game with code: ${code}`,
+                }).catch(() => {
+                    copyGameCode();
+                });
+            } else {
+                copyGameCode();
+            }
+        }
+
+        function joinOwnGame() {
+            const code = document.getElementById('displayGameCode').textContent;
+            alert(`Joining game with code: ${code}`);
+            // In production, this would navigate to the game page
+        }
+
+        function updateDashboardStats() {
+            // In production, these would fetch from database
+            document.getElementById('totalGames').textContent = '12';
+            document.getElementById('totalPlayers').textContent = '48';
+            document.getElementById('activeSessions').textContent = '3';
+            document.getElementById('topScore').textContent = '1250';
+        }
+
+        function loadTabData(tabName) {
+            // In production, this would fetch relevant data for each tab
+            console.log('Loading data for tab:', tabName);
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // In production, this would handle actual logout
+                alert('Logged out successfully!');
+            }
+        }
     </script>
 </body>
 </html>

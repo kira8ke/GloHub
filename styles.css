@@ -1770,8 +1770,7 @@ nav a:hover {
     justify-content: center;
     min-height: 100vh;
     position: relative;
-    
-    /* Same gradient background as galentines hero */
+
     background:
         radial-gradient(circle at 20% 30%, #ff4fd8 0%, transparent 40%),
         radial-gradient(circle at 80% 70%, #6c2cff 0%, transparent 45%),
@@ -1779,7 +1778,7 @@ nav a:hover {
     overflow: hidden;
 }
 
-/* Add animated particles to join page */
+/* Animated particles */
 .join-page::before {
     content: '';
     position: absolute;
@@ -1802,81 +1801,133 @@ nav a:hover {
 
 .join-container {
     width: 100%;
-    max-width: 500px;
+    max-width: 420px; /* match auth width */
     padding: 20px;
     position: relative;
     z-index: 1;
 }
 
 .join-card {
-    /* Make card slightly transparent to show background colors */
-    background:transparent;
-    padding: 30px;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
+    padding: 32px;
+    border-radius: 16px; /* auth radius */
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
+/* LOGO */
 .join-logo {
     text-align: center;
-    font-size: 60px;
-    color: white; /* Match galentines pink */
-    margin-bottom: 10px;
-    text-shadow: 
-        0 0 10px rgba(255,255,255,0.3),
-        0 0 30px rgba(255,79,216,0.6);
+    font-size: 56px; /* slightly tighter like auth */
+    color: white;
+    margin-bottom: 12px;
 }
 
+/* TITLE */
 .join-title {
     text-align: center;
-    color: #ff4fd8; /* Match galentines pink */
-    margin-bottom: 30px;
+    color: #ff4fd8;
+    margin-bottom: 24px;
+    font-size: 28px;
+    font-weight: 700; /* auth typography */
 }
 
-/* Optional: Add glow effect to button to match galentines style */
+/* ========================= */
+/* FORM LAYOUT (AUTH MATCH) */
+/* ========================= */
+
+.join-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* auth spacing */
+    width: 100%;
+}
+
+.join-card input,
+.join-card select,
+.join-card textarea {
+    width: 100%;
+    height: 48px; /* auth input height */
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background:white;
+    color: black;
+    font-size: 15px;
+}
+
+.join-card input::placeholder {
+    color: var(--text-light);
+}
+
+.join-card input:focus,
+.join-card select:focus,
+.join-card textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Center the Enter button */
+.join-card .btn-large {
+    align-self: center;
+}
+
+/* BUTTON STYLING (AUTH CONSISTENT) */
 .join-page .btn-large {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: linear-gradient(135deg, #ff4fd8, #7b2cff);
     border: none;
-    padding: 18px 50px;
-    border-radius: 50px;
+    height: 48px; /* auth button height */
+    padding: 0 36px;
+    border-radius: 999px;
     color: white;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 16px;
     text-decoration: none;
     position: relative;
     overflow: hidden;
     box-shadow:
         0 0 20px rgba(255, 79, 216, 0.6),
         0 0 40px rgba(123, 44, 255, 0.4);
-    animation: floatingGlow 3s ease-in-out infinite;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
     cursor: pointer;
     letter-spacing: 0.5px;
-    margin-top: 15px;
-    margin-bottom: 50px;
-    width: auto;
-     min-width: 200px;
+    margin-top: 8px;
+    margin-bottom: 0;
+    min-width: 200px;
 }
 
 .join-page .btn-large:hover {
-     transform: scale(1.08) translateY(-5px);
-            box-shadow:
-                0 0 10px rgba(255, 79, 216, 0.9),
-                0 0 20px rgba(123, 44, 255, 0.7),
-                inset 0 0 20px rgba(255,255,255,0.2);
-            letter-spacing: 1px;
+    transform: translateY(-3px);
+    box-shadow:
+        0 0 15px rgba(255, 79, 216, 0.9),
+        0 0 30px rgba(123, 44, 255, 0.7);
+}
+
+/* Mobile spacing refinement */
+@media (max-width: 768px) {
+    .join-card {
+        padding: 24px;
+    }
+
+    .join-card form {
+        gap: 14px;
+    }
+
+    .join-title {
+        font-size: 24px;
+    }
 }
 
 /* Mobile responsive */
 @media (max-width: 600px) {
     .join-card {
-        padding: 30px 20px;
-        background: rgba(255, 255, 255, 0.98); /* Slightly more opaque on mobile */
+        padding: 22px 18px;
     }
 }
+
 /* Avatar Customizer */
 .avatar-page {
     padding: 40px 20px;

@@ -74,11 +74,11 @@ body {
 .game-nav-btn {
     background: linear-gradient(135deg, rgba(255, 79, 216, 0.15), rgba(123, 44, 255, 0.15));
     color: white;
-    padding: 12px 28px;
+    padding: 10px 20px;
     border-radius: 25px;
     text-decoration: none;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 14px;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     border: 2px solid rgba(255, 105, 180, 0.3);
     backdrop-filter: blur(6px);
@@ -274,10 +274,10 @@ body {
     display: inline-block;
     background: linear-gradient(135deg, #ff4fd8, #7b2cff);
     border: none;
-    padding: 18px 50px;
+    padding: 12px 25px;
     border-radius: 50px;
     color: white;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -1015,15 +1015,16 @@ body {
         justify-content: center;
     }
     
-    .hero-content {
-        flex-shrink: 0;
-        order: 1;
-        text-align: center;
+    /* CHANGE ORDER: Image first, then content */
+    .hero-visual {
+        order: 1;  /* Changed from order: 2 */
+        flex-shrink: 1;
     }
     
-    .hero-visual {
-        order: 2;
-        flex-shrink: 1;
+    .hero-content {
+        flex-shrink: 0;
+        order: 2;  /* Changed from order: 1 */
+        text-align: center;
     }
     
     .hero-visual img {
@@ -1032,7 +1033,7 @@ body {
         display: block;
     }
     
-    /* REDUCE CHARACTER IMAGE SIZE */
+    /* Rest of the mobile styles remain the same... */
     .game-preview-card {
         height: auto;
         min-height: unset;
@@ -1372,11 +1373,7 @@ body {
             <div class="hero-content">
                 <span class="hero-badge"> Galentine’s, but make it iconic </span>
                 <h1 class="hero-title"> 3 amazing games in one magical experience!</h1>
-                <button type="button" class="game-cta-button" id="newGetGameBtn">
-                <span class="button-content">
-                    <span class="button-text">Get Game</span>
-                </span>
-            </button>
+                <button type="button" class="hero-cta" id="newGetGameBtn">Get Game</button>
 
             </div>
         </div>
