@@ -1357,54 +1357,31 @@
                  OVERVIEW TAB
                  ========================================== -->
             <div id="overview" class="tab-content active">
-                <div class="game-card">
-                    <div class="game-card-header">
-                        <h2> Command Center</h2>
-                        <p>Game Metrics</p>
-                    </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                           <div class="stat-icon">
-                            <img src="assets/gamepad.svg" alt="Game icon">
-                        </div>
-
-                            <div class="stat-value" id="totalGames">0</div>
-                            <div class="stat-label">Active Games</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">👥</div>
-                            <div class="stat-value" id="totalPlayers">0</div>
-                            <div class="stat-label">Total Players</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">⚡</div>
-                            <div class="stat-value" id="activeSessions">0</div>
-                            <div class="stat-label">Live Sessions</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">🏆</div>
-                            <div class="stat-value" id="topScore">0</div>
-                            <div class="stat-label">High Score</div>
-                        </div>
-                    </div>
-
-
-                        <div style="margin-top: 25px; text-align: center;">
-                            <button class="btn-primary btn-large" onclick="openGuideModal()">
-                                📖 Guide
-                            </button>
-                        </div>
-                  
-                </div>
-
+                
                 <!-- Game Selection -->
                 <div class="game-card">
-                    <div style="margin-top: 25px; text-align: center;">
-                            <button class="btn-primary btn-large" onclick="openGuideModal()">
-                                📖 Guide
-                            </button>
-                        </div>
+      <div style="text-align: right;">
+                        <button
+                            onclick="openGuideModal()"
+                            style="
+                                width: 48px;
+                                height: 48px;
+                                border-radius: 50%;
+                                border: 2px solid white;
+                                cursor: pointer;
+                                background: transparent;
+                                color: white;
+                                font-size: 22px;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+                            "
+                            aria-label="Help"
+                        >
+                            ❔
+                        </button>
+                    </div>
                     <div class="game-card-header">
                         <h2> Select Game Mode</h2>
                         <p>Choose your arena</p>
