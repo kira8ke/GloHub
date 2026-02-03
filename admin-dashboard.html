@@ -1057,7 +1057,7 @@
         .profile-header {
             text-align: center;
             padding: 40px;
-            background: linear-gradient(135deg, var(--bg-card), var(--bg-darker));
+            background: #8435DE;
             border-radius: 16px;
             border: 2px solid var(--border);
             margin-bottom: 30px;
@@ -1088,7 +1088,7 @@
 
         .profile-role {
             font-size: 16px;
-            color: var(--text-dim);
+            color: white;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
@@ -1414,7 +1414,7 @@
             <div id="sessions" class="tab-content">
                 <div class="game-card">
                     <div class="game-card-header">
-                        <h2>🎮 Active Sessions</h2>
+                        <h2> Active Sessions</h2>
                         <p>Live game monitoring</p>
                     </div>
 
@@ -1436,7 +1436,7 @@
             <div id="leaderboard" class="tab-content">
                 <div class="game-card">
                     <div class="game-card-header">
-                        <h2>🏆 Leaderboard</h2>
+                        <h2> Leaderboard</h2>
                         <p>Top Players</p>
                     </div>
 
@@ -1499,7 +1499,6 @@
 
                 <div class="game-card">
                     <div class="game-card-header">
-                        <h2> Settings</h2>
                         <p>Customize your profile</p>
                     </div>
 
@@ -1539,23 +1538,10 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Number of Questions</label>
-                            <input type="number" id="questionCount" placeholder="10" min="1" max="50">
-                        </div>
-
-                        <div class="form-group">
                             <label>Time per Question (seconds)</label>
                             <input type="number" id="timePerQuestion" placeholder="30" min="5" max="120">
                         </div>
 
-                        <div class="form-group">
-                            <label>Difficulty Level</label>
-                            <select id="difficulty">
-                                <option value="easy">Easy</option>
-                                <option value="medium">Medium</option>
-                                <option value="hard">Hard</option>
-                            </select>
-                        </div>
 
                         <div style="margin-top: 30px; text-align: center;">
                             <button class="btn-primary btn-large" onclick="createQuizSession()">
