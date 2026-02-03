@@ -114,62 +114,78 @@
     </div>
 
             <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-        <script src="supabase.js"></script>
+            <script src="supabase.js"></script>
 
-        <script>
-        const form = document.getElementById('adminLoginForm');
-        const errorMsg = document.getElementById('errorMessage');
+            <script>
+            const form = document.getElementById('adminLoginForm');
+            const errorMsg = document.getElementById('errorMessage');
 
-        form.addEventListener('submit', async (e) => {
+            form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const code = document.getElementById('adminCode').value.trim();
+            const code = document.getElementById('adminCode').value.trim().toUpperCase();
 
             try {
-            // ✅ SUPER ADMIN CHECK
-            const { data: superAdmin, error: superError } = await supabase
+                /* ===============================
+                1️⃣ TRY SUPER ADMIN FIRST
+                =============================== */
+                let { data: superAdmin, error: superError } = await supabase
                 .from('super_admins')
                 .select('*')
                 .eq('super_code', code)
                 .eq('is_active', true)
-                .single();
+                .maybeSingle(); // ✅ prevents 406
 
-            // 🔒 Handle real DB errors only
-            if (superError && superError.code !== 'PGRST116') {
-                throw superError;
-            }
+                if (superAdmin) {
+                persistSession({
+                    role: 'super',
+                    id: superAdmin.id,
+                    name: superAdmin.name || 'Super Admin',
+                    code: superAdmin.super_code
+                });
 
-            // ❌ No matching admin
-            if (!superAdmin) {
+                window.location.href = 'admin-dashboard.html';
+                return;
+                }
+
+                /* ===============================
+                2️⃣ TRY CLIENT ADMIN
+                =============================== */
+                let { data: client, error: clientError } = await supabase
+                .from('clients')
+                .select('*')
+                .eq('admin_code', code)
+                .maybeSingle(); // ✅ prevents 406
+
+                if (!client) {
                 throw new Error('Invalid admin code');
-            }
+                }
 
-            // ✅ SUCCESS — persist full session (sessionStorage + localStorage)
-            sessionStorage.setItem('superAdminId', superAdmin.id);
-            sessionStorage.setItem('isSuperAdmin', 'true');
-            sessionStorage.setItem('superAdminCode', superAdmin.super_code || '');
-            sessionStorage.setItem('superAdminName', superAdmin.name || 'Super Admin');
+                persistSession({
+                role: 'client',
+                id: client.id,
+                email: client.email,
+                code: client.admin_code
+                });
 
-            // Also persist to localStorage so the session survives across tabs and reloads
-            try {
-                localStorage.setItem('superAdminId', superAdmin.id);
-                localStorage.setItem('isSuperAdmin', 'true');
-                localStorage.setItem('superAdminCode', superAdmin.super_code || '');
-                localStorage.setItem('superAdminName', superAdmin.name || 'Super Admin');
-            } catch (e) {
-                // localStorage may be disabled in some browsers; ignore failures
-                console.warn('localStorage write failed', e);
-            }
-
-            window.location.href = 'admin-dashboard.html';
+                window.location.href = 'admin-dashboard.html';
 
             } catch (err) {
-            console.error('Login error:', err);
-            showError(err.message || 'Login failed. Please try again.');
+                console.error('Login error:', err);
+                showError(err.message || 'Login failed');
             }
-        });
+            });
 
-        function showError(message) {
+            function persistSession(payload) {
+            Object.entries(payload).forEach(([key, value]) => {
+                sessionStorage.setItem(key, value);
+                try {
+                localStorage.setItem(key, value);
+                } catch {}
+            });
+            }
+
+            function showError(message) {
             errorMsg.textContent = message;
             errorMsg.style.display = 'block';
             errorMsg.style.background = '#f8d7da';
@@ -178,8 +194,8 @@
             errorMsg.style.padding = '12px';
             errorMsg.style.borderRadius = '8px';
             errorMsg.style.marginTop = '15px';
-        }
-        </script>
+            }
+            </script>
 
         
 </body>

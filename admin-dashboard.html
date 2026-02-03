@@ -1628,10 +1628,18 @@
                                 <button class="btn-primary" onclick="openCategoryModal()">➕ Add Category</button>
                             </div>
 
-                            <div id="categoriesList" class="sessions-list">
-                                <div class="empty-state">
-                                    <div class="icon">🎴</div>
-                                    <p>No categories yet. Add your first category!</p>
+                            <div style="display:flex; gap:20px; align-items:flex-start;">
+                                <div style="flex:1">
+                                    <div id="categoriesList" class="sessions-list">
+                                        <p>No categories yet. Add your first category!</p>
+                                    </div>
+                                </div>
+                                <div style="width:360px; background: rgba(0,0,0,0.12); padding:18px; border-radius:12px; margin-left:12px; border:1px solid var(--border);">
+                                    <h4 style="margin:0 0 8px;">Saved Charades Games</h4>
+                                    <div id="charadesGamesList">
+                                        <p style="color:var(--text-dim);">Loading games...</p>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-top:12px; width:100%;" onclick="refreshCharadesGames()">🔄 Refresh</button>
                                 </div>
                             </div>
                         </div>
@@ -1961,8 +1969,9 @@
         let currentFlashcards = [];
         let editingCategoryIndex = -1;
 
-        function saveCharadesGame() {
-            const gameName = document.getElementById('charadesGameName').value;
+        let currentGameId = null;
+        async function saveCharadesGame() {
+            const gameName = document.getElementById('charadesGameName').value.trim();
             const roundTime = document.getElementById('roundTime').value;
 
             if (!gameName || !roundTime) {
@@ -1975,15 +1984,65 @@
                 return;
             }
 
-            // Generate random game code
-            const gameCode = generateGameCode();
-            
-            // Show game code modal
-            document.getElementById('displayGameCode').textContent = gameCode;
-            document.getElementById('gameCodeModal').classList.add('active');
+            try {
+                // Insert game
+                const gameCode = generateGameCode();
+                const { data: gameData, error: gameErr } = await window.supabaseClient
+                    .from('charades_games')
+                    .insert([{ name: gameName, round_time: roundTime, code: gameCode }])
+                    .select('*')
+                    .single();
 
-            // In production, this would save to database
-            console.log('Charades Game Created:', { gameName, roundTime, categories: currentCategories, gameCode });
+                if (gameErr) throw gameErr;
+                currentGameId = gameData.id;
+
+                // Link default categories to this game
+                const { data: defaultCats, error: defErr } = await window.supabaseClient
+                    .from('charades_categories')
+                    .select('*')
+                    .eq('is_default', true);
+                if (defErr) throw defErr;
+
+                if (defaultCats.length) {
+                    const links = defaultCats.map(c => ({ game_id: currentGameId, category_id: c.id }));
+                    const { error: linkErr } = await window.supabaseClient.from('charades_game_categories').insert(links);
+                    if (linkErr) {
+                        // Some DBs will error if limit exceeded or other constraint; if so, continue but notify
+                        throw linkErr;
+                    }
+                }
+
+                // Insert custom categories and link them
+                for (const cat of currentCategories.filter(c => !c.is_default)) {
+                    const { data: newCat, error: catErr } = await window.supabaseClient
+                        .from('charades_categories')
+                        .insert([{ name: cat.name, emoji: cat.emoji, color: cat.color || null, is_default: false, is_locked: false }])
+                        .select('*')
+                        .single();
+                    if (catErr) throw catErr;
+
+                    // link
+                    const { error: linkErr2 } = await window.supabaseClient
+                        .from('charades_game_categories')
+                        .insert([{ game_id: currentGameId, category_id: newCat.id }]);
+                    if (linkErr2) throw linkErr2;
+
+                    // Insert flashcards
+                    for (const fc of (cat.flashcards || [])) {
+                        const { error: fcErr } = await window.supabaseClient
+                            .from('charades_flashcards')
+                            .insert([{ category_id: newCat.id, text: fc }]);
+                        if (fcErr) throw fcErr;
+                    }
+                }
+
+                document.getElementById('displayGameCode').textContent = gameCode;
+                document.getElementById('gameCodeModal').classList.add('active');
+                alert('Game saved successfully!');
+                await loadCharadesGames();
+            } catch (err) {
+                handleSupabaseError(err);
+            }
         }
 
         function selectCategoryColor(color) {
@@ -1992,6 +2051,10 @@
         }
 
         function showAddFlashcard() {
+            if (currentFlashcards.length >= 20) {
+                alert('A category may have a maximum of 20 flashcards.');
+                return;
+            }
             document.getElementById('addFlashcardForm').classList.remove('hidden');
             document.getElementById('flashcardText').focus();
         }
@@ -2004,6 +2067,10 @@
         function saveFlashcard() {
             const text = document.getElementById('flashcardText').value.trim();
             if (!text) return;
+            if (currentFlashcards.length >= 20) {
+                alert('Cannot add more than 20 flashcards for a category.');
+                return;
+            }
 
             currentFlashcards.push(text);
             updateFlashcardsList();
@@ -2037,7 +2104,7 @@
             updateFlashcardsList();
         }
 
-        function saveCategoryChanges() {
+        async function saveCategoryChanges() {
             const name = document.getElementById('categoryName').value.trim();
             const emoji = document.getElementById('categoryEmoji').value.trim();
             const selectedColor = document.querySelector('.color-option.selected');
@@ -2052,22 +2119,82 @@
                 return;
             }
 
-            const category = {
-                name,
-                emoji,
-                color: selectedColor ? selectedColor.textContent.trim() : 'Pink',
-                flashcards: [...currentFlashcards]
-            };
-
-            if (editingCategoryIndex >= 0) {
-                currentCategories[editingCategoryIndex] = category;
-            } else {
-                currentCategories.push(category);
+            // If we are editing an existing category that is locked, block
+            if (editingCategoryIndex >= 0 && currentCategories[editingCategoryIndex].is_locked) {
+                alert('This category is locked and cannot be edited.');
+                return;
             }
 
-            updateCategoriesList();
-            closeCategoryModal();
-            resetCategoryForm();
+            const categoryPayload = {
+                name,
+                emoji,
+                color: selectedColor ? selectedColor.textContent.trim() : null
+            };
+
+            try {
+                // If editing an existing category with an id -> update DB
+                if (editingCategoryIndex >= 0 && currentCategories[editingCategoryIndex].id) {
+                    const existing = currentCategories[editingCategoryIndex];
+                    const { error: updErr } = await window.supabaseClient
+                        .from('charades_categories')
+                        .update(categoryPayload)
+                        .eq('id', existing.id);
+                    if (updErr) throw updErr;
+
+                    // replace flashcards for category
+                    const { error: delErr } = await window.supabaseClient
+                        .from('charades_flashcards')
+                        .delete()
+                        .eq('category_id', existing.id);
+                    if (delErr) throw delErr;
+
+                    for (const fc of currentFlashcards) {
+                        const { error: fcErr } = await window.supabaseClient
+                            .from('charades_flashcards')
+                            .insert([{ category_id: existing.id, text: fc }]);
+                        if (fcErr) throw fcErr;
+                    }
+
+                    // refresh that category's flashcards count locally
+                    existing.name = name; existing.emoji = emoji; existing.color = categoryPayload.color;
+                    existing.flashcards = [...currentFlashcards];
+                    currentCategories[editingCategoryIndex] = existing;
+                } else if (currentGameId) {
+                    // New category for an existing saved game: insert category, link it, insert flashcards
+                    const { data: newCat, error: catErr } = await window.supabaseClient
+                        .from('charades_categories')
+                        .insert([{ name: name, emoji: emoji, color: categoryPayload.color, is_default: false, is_locked: false }])
+                        .select('*')
+                        .single();
+                    if (catErr) throw catErr;
+
+                    const { error: linkErr } = await window.supabaseClient
+                        .from('charades_game_categories')
+                        .insert([{ game_id: currentGameId, category_id: newCat.id }]);
+                    if (linkErr) throw linkErr;
+
+                    for (const fc of currentFlashcards) {
+                        const { error: fcErr } = await window.supabaseClient
+                            .from('charades_flashcards')
+                            .insert([{ category_id: newCat.id, text: fc }]);
+                        if (fcErr) throw fcErr;
+                    }
+
+                    newCat.flashcards = [...currentFlashcards];
+                    currentCategories.push(newCat);
+                } else {
+                    // New unsaved game -> create locally
+                    const newCatLocal = { ...categoryPayload, flashcards: [...currentFlashcards], is_default: false, is_locked: false };
+                    currentCategories.push(newCatLocal);
+                }
+
+                updateCategoriesList();
+                closeCategoryModal();
+                resetCategoryForm();
+                await loadCharadesGames();
+            } catch (err) {
+                handleSupabaseError(err);
+            }
         }
 
         function updateCategoriesList() {
@@ -2083,40 +2210,94 @@
                 return;
             }
 
-            container.innerHTML = currentCategories.map((cat, index) => `
+            container.innerHTML = currentCategories.map((cat, index) => {
+                const locked = !!cat.is_locked;
+                const lockBadge = locked ? '<span style="color:var(--text-dim); margin-right:8px;">🔒</span>' : '';
+                const editBtn = `<button class="btn-secondary" ${locked ? 'disabled title="Locked"' : `onclick="editCategory(${index})` } style="padding: 8px 16px; font-size: 14px;">✏️ Edit</button>`;
+                const delBtn = `<button class="btn-danger" ${locked ? 'disabled title="Locked"' : `onclick="deleteCategory(${index})` } style="padding: 8px 16px; font-size: 14px;">🗑️</button>`;
+
+                return `
                 <div class="session-card">
                     <div class="session-status"></div>
                     <div class="session-info">
-                        <h4>${cat.emoji} ${cat.name}</h4>
+                        <h4>${lockBadge}${cat.emoji || ''} ${cat.name}</h4>
                         <div class="session-meta">
-                            <span>${cat.flashcards.length} flashcards</span>
-                            <span>Color: ${cat.color}</span>
+                            <span>${(cat.flashcards||[]).length} flashcards</span>
+                            <span>Color: ${cat.color || '—'}</span>
+                            ${cat.is_default ? '<span style="margin-left:8px; color:var(--text-dim)">Default</span>' : ''}
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn-secondary" onclick="editCategory(${index})" style="padding: 8px 16px; font-size: 14px;">✏️ Edit</button>
-                        <button class="btn-danger" onclick="deleteCategory(${index})" style="padding: 8px 16px; font-size: 14px;">🗑️</button>
+                        ${editBtn}
+                        ${delBtn}
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
-        function editCategory(index) {
+        async function editCategory(index) {
             editingCategoryIndex = index;
             const category = currentCategories[index];
-            
-            document.getElementById('categoryName').value = category.name;
-            document.getElementById('categoryEmoji').value = category.emoji;
-            currentFlashcards = [...category.flashcards];
-            
+
+            if (category.is_locked) {
+                alert('This is a locked default category and cannot be edited.');
+                return;
+            }
+
+            document.getElementById('categoryName').value = category.name || '';
+            document.getElementById('categoryEmoji').value = category.emoji || '';
+
+            // If this category comes from DB and we haven't loaded flashcards, fetch them
+            if (category.id) {
+                const { data: fcs, error } = await window.supabaseClient
+                    .from('charades_flashcards')
+                    .select('*')
+                    .eq('category_id', category.id);
+                if (error) {
+                    handleSupabaseError(error);
+                    currentFlashcards = [];
+                } else {
+                    currentFlashcards = (fcs || []).map(f => f.text);
+                }
+            } else {
+                currentFlashcards = [...(category.flashcards || [])];
+            }
+
             updateFlashcardsList();
             openCategoryModal();
         }
 
-        function deleteCategory(index) {
-            if (confirm('Delete this category?')) {
+        async function deleteCategory(index) {
+            const cat = currentCategories[index];
+            if (!confirm('Delete this category?')) return;
+
+            if (cat.is_locked) {
+                alert('This category is locked and cannot be deleted.');
+                return;
+            }
+
+            try {
+                // If it exists in DB, remove link and category
+                if (cat.id) {
+                    const { error: unlinkErr } = await window.supabaseClient
+                        .from('charades_game_categories')
+                        .delete()
+                        .eq('category_id', cat.id);
+                    if (unlinkErr) throw unlinkErr;
+
+                    const { error: delErr } = await window.supabaseClient
+                        .from('charades_categories')
+                        .delete()
+                        .eq('id', cat.id);
+                    if (delErr) throw delErr;
+                }
+
+                // Remove locally
                 currentCategories.splice(index, 1);
                 updateCategoriesList();
+                await loadCharadesGames();
+            } catch (err) {
+                handleSupabaseError(err);
             }
         }
 
@@ -2185,6 +2366,105 @@
             document.getElementById('activeSessions').textContent = '3';
             document.getElementById('topScore').textContent = '1250';
         }
+
+        async function loadCharadesGames() {
+            const container = document.getElementById('charadesGamesList');
+            container.innerHTML = '<p style="color:var(--text-dim);">Loading games...</p>';
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('charades_games')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="color:var(--text-dim);">No saved games yet</p>';
+                    return;
+                }
+
+                container.innerHTML = data.map(g => `
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;">
+                        <div>
+                            <strong>${g.name}</strong>
+                            <div style="font-size:12px; color:var(--text-dim)">Code: ${g.code}</div>
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn-secondary" onclick="openCharadesGame('${g.id}')">Open</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                handleSupabaseError(err);
+            }
+        }
+
+        function refreshCharadesGames() {
+            loadCharadesGames();
+        }
+
+        async function openCharadesGame(gameId) {
+            try {
+                const { data: game, error: gErr } = await window.supabaseClient
+                    .from('charades_games')
+                    .select('*')
+                    .eq('id', gameId)
+                    .single();
+                if (gErr) throw gErr;
+                currentGameId = game.id;
+                document.getElementById('charadesGameName').value = game.name || '';
+                document.getElementById('roundTime').value = game.round_time || '';
+
+                // Load linked categories via join
+                const { data: links, error: lErr } = await window.supabaseClient
+                    .from('charades_game_categories')
+                    .select('*,charades_categories(*)')
+                    .eq('game_id', gameId);
+                if (lErr) throw lErr;
+
+                // Build currentCategories with category info and flashcards
+                currentCategories = [];
+                for (const link of links) {
+                    const c = link.charades_categories;
+                    const categoryObj = { id: c.id, name: c.name, emoji: c.emoji, color: c.color, is_default: c.is_default, is_locked: c.is_locked, flashcards: [] };
+                    // fetch flashcards for category
+                    const { data: fcs, error: fErr } = await window.supabaseClient
+                        .from('charades_flashcards')
+                        .select('*')
+                        .eq('category_id', c.id)
+                        .order('id');
+                    if (fErr) {
+                        handleSupabaseError(fErr);
+                    } else {
+                        categoryObj.flashcards = (fcs || []).map(f => f.text);
+                    }
+                    currentCategories.push(categoryObj);
+                }
+
+                updateCategoriesList();
+                switchTab('charades-sessions');
+            } catch (err) {
+                handleSupabaseError(err);
+            }
+        }
+
+        function handleSupabaseError(err) {
+            console.error('Supabase error', err);
+            // Map some common Postgres error codes/messages to user-friendly messages
+            if (err && err.code === '23514') {
+                alert('A database constraint blocked the action (limit exceeded or invalid data).');
+            } else if (err && err.details && /locked/.test(err.details)) {
+                alert('This operation is not permitted on a locked category.');
+            } else {
+                alert('An error occurred. See console for details.');
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            if (window.supabaseClient) {
+                loadCharadesGames();
+            }
+        });
 
         function loadTabData(tabName) {
             // In production, this would fetch relevant data for each tab
