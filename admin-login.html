@@ -114,62 +114,118 @@
     </div>
 
             <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-        <script src="supabase.js"></script>
+            <script src="supabase.js"></script>
 
-        <script>
-        const form = document.getElementById('adminLoginForm');
-        const errorMsg = document.getElementById('errorMessage');
+            <script>
+            const form = document.getElementById('adminLoginForm');
+            const errorMsg = document.getElementById('errorMessage');
 
-        form.addEventListener('submit', async (e) => {
+            form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const code = document.getElementById('adminCode').value.trim();
+            const code = document.getElementById('adminCode').value.trim().toUpperCase();
 
             try {
-            // ✅ SUPER ADMIN CHECK
-            const { data: superAdmin, error: superError } = await supabase
-                .from('super_admins')
-                .select('*')
-                .eq('super_code', code)
-                .eq('is_active', true)
-                .single();
+                // Discover backend endpoint (try configured BACKEND_URL then common localhost addresses)
+                async function findBackend() {
+                    const candidates = [];
+                    if (window.BACKEND_URL) candidates.push(window.BACKEND_URL.replace(/\/$/, ''));
+                    // try host-specific localhost variants
+                    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                        candidates.push(`http://${location.hostname}:4000`);
+                    }
+                    // common local backends
+                    candidates.push('http://localhost:4000', 'http://127.0.0.1:4000');
 
-            // 🔒 Handle real DB errors only
-            if (superError && superError.code !== 'PGRST116') {
-                throw superError;
-            }
+                    for (const c of candidates) {
+                        try {
+                            const h = await fetch(c + '/health', { method: 'GET', mode: 'cors' });
+                            if (h && h.ok) return c;
+                        } catch (e) {
+                            // ignore
+                        }
+                    }
+                    return '';
+                }
 
-            // ❌ No matching admin
-            if (!superAdmin) {
+                let base = '';
+                if (window.BACKEND_URL) base = window.BACKEND_URL.replace(/\/$/, '');
+                if (!base) base = await findBackend();
+
+                if (!base) {
+                    throw new Error('Cannot reach backend. Start the backend (cd backend && npm start) or set window.BACKEND_URL to your backend URL.');
+                }
+
+                const resp = await fetch(base + '/auth/verify-admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+
+                if (resp.status === 405) {
+                    const text = await resp.text().catch(() => '');
+                    throw new Error(`405 Method Not Allowed. Likely the request reached a static server (Live Server). Ensure your backend is running at ${base} and accessible, or set window.BACKEND_URL to your backend URL. Server responded: ${text}`);
+                }
+
+                if (!resp.ok) {
+                    const text = await resp.text().catch(() => '');
+                    throw new Error(`Server error: ${resp.status} ${text}`);
+                }
+
+                let result;
+                try {
+                    result = await resp.json();
+                } catch (e) {
+                    throw new Error('Invalid server response');
+                }
+
+                if (result && result.success) {
+                    if (result.role === 'super') {
+                        persistSession({
+                            role: 'super',
+                            id: result.id,
+                            name: result.name || 'Super Admin',
+                            code: result.code
+                        });
+                        window.location.href = 'admin-dashboard.html';
+                        return;
+                    }
+
+                    if (result.role === 'client') {
+                        persistSession({
+                            role: 'client',
+                            id: result.id,
+                            email: result.email,
+                            code: result.code
+                        });
+                        window.location.href = 'admin-dashboard.html';
+                        return;
+                    }
+                }
+
+                // If the server provided a helpful message (e.g., service_unavailable, db errors), show it
+                if (result && result.message) {
+                    throw new Error(result.message);
+                }
+
                 throw new Error('Invalid admin code');
-            }
-
-            // ✅ SUCCESS — persist full session (sessionStorage + localStorage)
-            sessionStorage.setItem('superAdminId', superAdmin.id);
-            sessionStorage.setItem('isSuperAdmin', 'true');
-            sessionStorage.setItem('superAdminCode', superAdmin.super_code || '');
-            sessionStorage.setItem('superAdminName', superAdmin.name || 'Super Admin');
-
-            // Also persist to localStorage so the session survives across tabs and reloads
-            try {
-                localStorage.setItem('superAdminId', superAdmin.id);
-                localStorage.setItem('isSuperAdmin', 'true');
-                localStorage.setItem('superAdminCode', superAdmin.super_code || '');
-                localStorage.setItem('superAdminName', superAdmin.name || 'Super Admin');
-            } catch (e) {
-                // localStorage may be disabled in some browsers; ignore failures
-                console.warn('localStorage write failed', e);
-            }
-
-            window.location.href = 'admin-dashboard.html';
 
             } catch (err) {
-            console.error('Login error:', err);
-            showError(err.message || 'Login failed. Please try again.');
+                console.error('Login error:', err);
+                showError(err.message || 'Login failed');
             }
-        });
+            });
 
-        function showError(message) {
+            function persistSession(payload) {
+            Object.entries(payload).forEach(([key, value]) => {
+                sessionStorage.setItem(key, value);
+                try {
+                localStorage.setItem(key, value);
+                } catch {}
+            });
+            }
+
+            function showError(message) {
             errorMsg.textContent = message;
             errorMsg.style.display = 'block';
             errorMsg.style.background = '#f8d7da';
@@ -178,8 +234,8 @@
             errorMsg.style.padding = '12px';
             errorMsg.style.borderRadius = '8px';
             errorMsg.style.marginTop = '15px';
-        }
-        </script>
+            }
+            </script>
 
         
 </body>

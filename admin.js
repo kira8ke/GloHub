@@ -511,10 +511,23 @@ async function editQuizSession(sessionId) {
 async function deleteQuizSession(sessionId) {
     if (!confirm('Delete this quiz session? This cannot be undone.')) return;
     try {
-        const { error } = await supabase.from('quiz_sessions').delete().eq('id', sessionId);
-        if (error) throw error;
-        showNotification('Session deleted', 'success');
-        await loadQuizSessions();
+        const role = sessionStorage.getItem('role') || (sessionStorage.getItem('isSuperAdmin') === 'true' ? 'super' : 'client');
+        const code = sessionStorage.getItem('superAdminCode') || sessionStorage.getItem('adminCode');
+
+        const base = window.BACKEND_URL || '';
+        const resp = await fetch(base + '/admin/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itemType: 'quiz_session', id: sessionId, role, code })
+        });
+
+        const result = await resp.json();
+        if (result.success) {
+            showNotification('Session deleted', 'success');
+            await loadQuizSessions();
+        } else {
+            throw new Error(result.message || 'delete failed');
+        }
     } catch (error) {
         console.error('Error deleting quiz session:', error);
         showNotification('Failed to delete session', 'error');
@@ -861,10 +874,23 @@ async function editCharadesGame(gameId) {
 async function deleteCharadesGame(gameId) {
     if (!confirm('Delete this charades game? This cannot be undone.')) return;
     try {
-        const { error } = await supabase.from('charades_games').delete().eq('id', gameId);
-        if (error) throw error;
-        showNotification('Game deleted', 'success');
-        await loadCharadesGames();
+        const role = sessionStorage.getItem('role') || (sessionStorage.getItem('isSuperAdmin') === 'true' ? 'super' : 'client');
+        const code = sessionStorage.getItem('superAdminCode') || sessionStorage.getItem('adminCode');
+
+        const base = window.BACKEND_URL || '';
+        const resp = await fetch(base + '/admin/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itemType: 'charades_game', id: gameId, role, code })
+        });
+
+        const result = await resp.json();
+        if (result.success) {
+            showNotification('Game deleted', 'success');
+            await loadCharadesGames();
+        } else {
+            throw new Error(result.message || 'delete failed');
+        }
     } catch (error) {
         console.error('Error deleting charades game:', error);
         showNotification('Failed to delete game', 'error');

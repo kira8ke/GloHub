@@ -1459,129 +1459,70 @@ body {
     // SUPABASE CLIENT (SAFE SINGLE INIT)
     // ================================
 
-    const supabase = window.supabaseClient;
+        const sb = window.supabaseClient;
 
-    if (!supabase) {
+        if (!sb) {
         console.error('❌ Supabase client not found. Check supabase.js');
-    }
+        }
 
-    // ================================
-    // GLOBAL STATE
-    // ================================
+        /* ================================
+        GLOBAL STATE
+        ================================ */
+        let appliedPromoCode = null;
+        let discountAmount = 0;
+        const basePrice = 699;
 
-    let appliedPromoCode = null;
-    let discountAmount = 0;
-    const basePrice = 699;
-
-        // ==========================================
-        // NEW MODAL CONTROL SYSTEM
-        // ==========================================
-
-        // Simple and reliable modal opener
+        /* ================================
+        MODAL CONTROLS
+        ================================ */
         function openGameModal() {
-            const modal = document.getElementById('pricingModal');
-            if (modal) {
-                modal.classList.add('active');
-                modal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-                console.log('✅ Modal opened successfully');
-            } else {
-                console.error('❌ Modal element not found!');
-            }
+        const modal = document.getElementById('pricingModal');
+        if (!modal) return console.error('❌ Modal not found');
+
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
         }
 
-        // Modal closer
         function closePricingModal() {
-            const modal = document.getElementById('pricingModal');
-            if (modal) {
-                modal.classList.remove('active');
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                }, 300);
-                document.body.style.overflow = 'auto';
-            }
+        const modal = document.getElementById('pricingModal');
+        if (!modal) return;
+
+        modal.classList.remove('active');
+        setTimeout(() => (modal.style.display = 'none'), 300);
+        document.body.style.overflow = 'auto';
         }
 
-        // Initialize button when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎮 Galentines Game - Initializing...');
-            
-            // Get the new button
-            const gameButton = document.getElementById('newGetGameBtn');
-            
-            if (gameButton) {
-                console.log('✅ Button found!');
-                
-                // Add click event listener
-                gameButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('🎯 Button clicked!');
-                    openGameModal();
-                });
-                
-                // Add visual feedback on click
-                gameButton.addEventListener('mousedown', function() {
-                    this.style.transform = 'translateY(-2px) scale(0.98)';
-                });
-                
-                gameButton.addEventListener('mouseup', function() {
-                    this.style.transform = '';
-                });
-            } else {
-                console.error('❌ Button not found!');
-            }
-            
-            // Check if modal exists
-            const modal = document.getElementById('pricingModal');
-            if (modal) {
-                console.log('✅ Modal found!');
-            } else {
-                console.error('❌ Modal not found!');
-            }
+        document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closePricingModal();
         });
 
-        // Close modal on Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closePricingModal();
-            }
-        });
-
-        console.log('✅ Modal script loaded');
-
-    // ================================
-    // ADMIN CODE GENERATOR
-    // ================================
-
-    function generateAdminCode() {
+        /* ================================
+        ADMIN CODE
+        ================================ */
+        function generateAdminCode() {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let code = 'GLH-';
-        for (let i = 0; i < 4; i++) {
-            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        return 'GLH-' + Array.from({ length: 4 }, () =>
+            chars[Math.floor(Math.random() * chars.length)]
+        ).join('');
         }
-        return code;
-    }
 
-    // ================================
-    // PROMO CODE HANDLER
-    // ================================
-
-    async function applyPromoCode(e) {
-        if (e) e.preventDefault();
+        /* ================================
+        PROMO CODE
+        ================================ */
+        async function applyPromoCode(e) {
+        e?.preventDefault();
 
         const input = document.getElementById('promoInput');
         const code = input.value.trim().toUpperCase();
         const originalPrice = document.getElementById('originalPrice');
         const finalPrice = document.getElementById('finalPrice');
 
-        if (!code) {
-            showPromoMessage('Please enter a promo code ', 'error');
-            return;
-        }
+        if (!code) return showPromoMessage('Enter a promo code', 'error');
 
         showPromoMessage('Checking code...', 'loading');
 
-        const { data, error } = await supabase
+        const { data, error } = await sb
             .from('promo_codes')
             .select('*')
             .eq('code', code)
@@ -1589,8 +1530,7 @@ body {
             .single();
 
         if (error || !data) {
-            showPromoMessage('That code isn’t valid ', 'error');
-            return;
+            return showPromoMessage('Invalid promo code', 'error');
         }
 
         discountAmount = Math.round((basePrice * data.discount_percentage) / 100);
@@ -1600,75 +1540,61 @@ body {
         appliedPromoCode = data;
         input.disabled = true;
 
-        showPromoMessage(`Promo applied! You saved KES ${discountAmount} `, 'success');
-    }
+        showPromoMessage(`You saved KES ${discountAmount}`, 'success');
+        }
 
-    function showPromoMessage(text, type) {
-        const message = document.getElementById('promoMessage');
-        message.textContent = text;
-        message.className = `promo-message ${type}`;
-    }
+        function showPromoMessage(text, type) {
+        const msg = document.getElementById('promoMessage');
+        msg.textContent = text;
+        msg.className = `promo-message ${type}`;
+        }
 
-    // ================================
-    // PAYMENT HANDLER
-    // ================================
-
-    async function handlePayment(e) {
-        if (e) e.preventDefault();
+        /* ================================
+        PAYMENT
+        ================================ */
+        async function handlePayment(e) {
+        e?.preventDefault();
 
         const email = document.getElementById('emailInput').value.trim();
         const submitBtn = document.getElementById('submitBtn');
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML = 'Processing...';
+        submitBtn.textContent = 'Processing...';
 
         const adminCode = generateAdminCode();
 
-        await supabase.from('clients').insert([{
+        await sb.from('clients').insert({
             email,
-            admin_code: adminCode,
-            created_at: new Date().toISOString()
-        }]);
+            admin_code: adminCode
+        });
 
         sessionStorage.setItem('adminCode', adminCode);
         sessionStorage.setItem('adminEmail', email);
 
         showSuccessScreen(adminCode, email);
-    }
+        }
 
-    function showSuccessScreen(adminCode, email) {
+        function showSuccessScreen(code, email) {
         document.getElementById('paymentForm').style.display = 'none';
         document.getElementById('successScreen').classList.add('show');
-        document.getElementById('displayAdminCode').textContent = adminCode;
+        document.getElementById('displayAdminCode').textContent = code;
         document.getElementById('displayEmail').textContent = email;
-    }
-
-    function copyAdminCode() {
-        const code = document.getElementById('displayAdminCode').textContent;
-        navigator.clipboard.writeText(code);
-    }
-
-    // ================================
-    // BUTTON WIRING
-    // ================================
-
-    // Attach listener when DOM loads — plus a quick immediate check (defensive) in case the script runs after DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', () => {
-        const btn = document.getElementById('getGameBtn');
-        if (btn) {
-            btn.addEventListener('click', openPricingModal);
-        } else {
-            console.warn('⚠️ getGameBtn not found on DOMContentLoaded');
         }
-    });
 
-    // Defensive immediate attach if the document is already parsed
-    if (document.readyState === 'interactive' || document.readyState === 'complete') {
-        const btnNow = document.getElementById('getGameBtn');
-        if (btnNow) btnNow.addEventListener('click', openPricingModal);
-    }
+        function copyAdminCode() {
+        navigator.clipboard.writeText(
+            document.getElementById('displayAdminCode').textContent
+        );
+        }
 
-    console.log('✅ Galentines page scripts loaded correctly');
-</script>
+        /* ================================
+        BUTTON WIRING
+        ================================ */
+        document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('newGetGameBtn');
+        if (btn) btn.addEventListener('click', openGameModal);
+        });
+        </script>
+
 </body>
 </html>
