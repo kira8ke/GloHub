@@ -68,7 +68,7 @@ function checkAuth() {
 
         return {
             adminCode: superAdminCode,
-            clientId: 'super-admin-global',
+            clientId: null, // no specific client id for super admin; look up when needed
             isSuperAdmin: true,
             superAdminId: superAdminId
         };
@@ -410,8 +410,18 @@ async function saveQuizSession() {
         let sessionClientId = currentClientId;
 
         if (isSuperAdmin()) {
-            const { data: superClient } = await supabase.from('clients').select('id').eq('email', 'superadmin@glohub.com').single();
-            if (superClient) sessionClientId = superClient.id;
+            const { data: superClient, error: clientError } = await supabase.from('clients').select('id').eq('email', 'superadmin@glohub.com').maybeSingle();
+            if (clientError) {
+                console.error('Failed to look up super client:', clientError);
+                showNotification('Failed to find super client record. Cannot save session in Super Admin mode.', 'error');
+                return; // abort save to avoid inserting invalid UUID
+            }
+            if (!superClient) {
+                console.warn('No super client record found for superadmin@glohub.com');
+                showNotification('No super client record found. Cannot save session.', 'error');
+                return; // abort save
+            }
+            sessionClientId = superClient.id;
         }
 
         const sessionData = {
@@ -763,8 +773,18 @@ async function saveCharadesGame() {
     try {
         let gameClientId = currentClientId;
         if (isSuperAdmin()) {
-            const { data: superClient } = await supabase.from('clients').select('id').eq('email', 'superadmin@glohub.com').single();
-            if (superClient) gameClientId = superClient.id;
+            const { data: superClient, error: clientError } = await supabase.from('clients').select('id').eq('email', 'superadmin@glohub.com').maybeSingle();
+            if (clientError) {
+                console.error('Failed to look up super client for charades game:', clientError);
+                showNotification('Failed to find super client record. Cannot save game in Super Admin mode.', 'error');
+                return; // abort save
+            }
+            if (!superClient) {
+                console.warn('No super client record found for superadmin@glohub.com (charades)');
+                showNotification('No super client record found. Cannot save game.', 'error');
+                return; // abort save
+            }
+            gameClientId = superClient.id;
         }
 
         const gameData = { client_id: gameClientId, game_name: gameName, categories: charadesCategories };
