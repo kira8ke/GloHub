@@ -1,8 +1,10 @@
 // supabase.js
 // PRODUCTION Supabase Client Initialization
 
-const SUPABASE_URL = 'https://uceacvdgglhjmljqfkou.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjZWFjdmRnZ2xoam1sanFma291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1ODExMzgsImV4cCI6MjA4NTE1NzEzOH0.jQ3kgK2jy9_NyivP5scW3wQH9u-Hfl-NBjEw0SIcWIM';
+// IMPORTANT: Only the PUBLIC anon key should ever appear in frontend code.
+// For service-role operations use the backend service client.
+const SUPABASE_URL = window.SUPABASE_URL || 'https://uceacvdgglhjmljqfkou.supabase.co';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjZWFjdmRnZ2xoam1sanFma291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1ODExMzgsImV4cCI6MjA4NTE1NzEzOH0.jQ3kgK2jy9_NyivP5scW3wQH9u-Hfl-NBjEw0SIcWIM';
 
 // Create Supabase client
 if (window.supabase && typeof window.supabase.createClient === 'function') {

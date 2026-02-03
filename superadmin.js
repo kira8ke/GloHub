@@ -1,8 +1,8 @@
 // Super Admin Dashboard Logic
 
-// Supabase Configuration
-const SUPABASE_URL = 'https://uceacvdgglhjmljqfkou.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjZWFjdmRnZ2xoam1sanFma291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1ODExMzgsImV4cCI6MjA4NTE1NzEzOH0.jQ3kgK2jy9_NyivP5scW3wQH9u-Hfl-NBjEw0SIcWIM';
+// Supabase Configuration (frontend should only use public anon key via supabase.js)
+const SUPABASE_URL = window.SUPABASE_URL || 'https://uceacvdgglhjmljqfkou.supabase.co';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjZWFjdmRnZ2xoam1sanFma291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1ODExMzgsImV4cCI6MjA4NTE1NzEzOH0.jQ3kgK2jy9_NyivP5scW3wQH9u-Hfl-NBjEw0SIcWIM';
 
 // Prefer the global supabase/client from supabase.js (mock or real). Fallback to local client.
 let supabaseClient = null;
@@ -34,35 +34,49 @@ function setupLogin() {
         const password = document.getElementById('superAdminPassword').value;
         
         try {
-            // Try to authenticate against Supabase super_admins table
-            const client = supabaseClient || (typeof supabase !== 'undefined' ? supabase : null);
-            if (!client) throw new Error('Supabase not available');
+            // Discover backend (prefer explicit BACKEND_URL, else localhost fallback when developing)
+            const base = window.BACKEND_URL || (location.hostname === 'localhost' ? 'http://localhost:4000' : '');
+            const resp = await fetch(base + '/auth/verify-super', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
 
-            const { data: superAdmin, error } = await client
-                .from('super_admins')
-                .select('*')
-                .eq('password', password)
-                .eq('is_active', true)
-                .single();
+            if (resp.status === 405) {
+                const txt = await resp.text().catch(() => '');
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = `405 Method Not Allowed. Ensure the backend is running at ${base} and not being served by a static server. ${txt}`;
+                errorDiv.style.display = 'block';
+                return;
+            }
 
-            if (superAdmin && superAdmin.id) {
+            if (!resp.ok) {
+                const txt = await resp.text().catch(() => '');
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = `Server error: ${resp.status} ${txt}`;
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const result = await resp.json();
+
+            if (result.success) {
                 isAuthenticated = true;
                 document.getElementById('superAdminLogin').style.display = 'none';
                 document.getElementById('superAdminDashboard').style.display = 'grid';
 
                 // store session hints
                 sessionStorage.setItem('isSuperAdmin', 'true');
-                sessionStorage.setItem('superAdminId', superAdmin.id);
-                sessionStorage.setItem('superAdminName', superAdmin.name || 'Super Admin');
-                sessionStorage.setItem('superAdminCode', superAdmin.super_code || '');
+                sessionStorage.setItem('superAdminId', result.id);
+                sessionStorage.setItem('superAdminName', result.name || 'Super Admin');
+                sessionStorage.setItem('superAdminCode', result.code || '');
 
                 await loadDashboard();
                 return;
             }
 
-            // Fallback: if no record found, fail with message
             const errorDiv = document.getElementById('loginError');
-            errorDiv.textContent = 'Invalid password or not authorized';
+            errorDiv.textContent = result && result.message ? result.message : 'Invalid password or not authorized';
             errorDiv.style.display = 'block';
         } catch (err) {
             console.error('Super admin login error:', err);
@@ -309,24 +323,26 @@ async function resetClient(clientId) {
     if (!confirm('Are you sure you want to reset this client? This will delete all their sessions and questions.')) {
         return;
     }
-    
+
     try {
-        // Delete sessions
-        await db
-            .from('sessions')
-            .delete()
-            .eq('client_id', clientId);
-        
-        // Delete questions
-        await db
-            .from('questions')
-            .delete()
-            .eq('client_id', clientId);
-        
-        showNotification('Client reset successfully', 'success');
-        await loadClients();
-        await loadOverview();
-        
+        const role = sessionStorage.getItem('role') || (sessionStorage.getItem('isSuperAdmin') === 'true' ? 'super' : 'client');
+        const code = sessionStorage.getItem('superAdminCode') || sessionStorage.getItem('adminCode');
+
+        const base = window.BACKEND_URL || '';
+        const resp = await fetch(base + '/admin/reset-client', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId, role, code })
+        });
+
+        const result = await resp.json();
+        if (result.success) {
+            showNotification('Client reset successfully', 'success');
+            await loadClients();
+            await loadOverview();
+        } else {
+            throw new Error(result.message || 'reset failed');
+        }
     } catch (error) {
         console.error('Error resetting client:', error);
         showNotification('Failed to reset client', 'error');
@@ -337,29 +353,24 @@ async function revokeAccess(clientId) {
     if (!confirm('Are you sure you want to permanently revoke access for this client? This cannot be undone.')) {
         return;
     }
-    
+
     try {
-        // Delete all related data
-        await db
-            .from('sessions')
-            .delete()
-            .eq('client_id', clientId);
-        
-        await db
-            .from('questions')
-            .delete()
-            .eq('client_id', clientId);
-        
-        // Delete client
-        await db
-            .from('clients')
-            .delete()
-            .eq('id', clientId);
-        
-        showNotification('Access revoked successfully', 'success');
-        await loadClients();
-        await loadOverview();
-        
+        const code = sessionStorage.getItem('superAdminCode');
+        const base = window.BACKEND_URL || '';
+        const resp = await fetch(base + '/admin/revoke-access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId, role: 'super', code })
+        });
+
+        const result = await resp.json();
+        if (result.success) {
+            showNotification('Access revoked successfully', 'success');
+            await loadClients();
+            await loadOverview();
+        } else {
+            throw new Error(result.message || 'revoke failed');
+        }
     } catch (error) {
         console.error('Error revoking access:', error);
         showNotification('Failed to revoke access', 'error');
