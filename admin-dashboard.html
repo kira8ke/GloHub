@@ -256,7 +256,7 @@
             left: 0;
             right: 0;
             height: var(--mobile-nav-height);
-            background: linear-gradient(90deg, #3C0E70  0%, #8435DE 100%);
+            background: #8435DE;
             border-top: 2px solid var(--border);
             display: flex;
             justify-content: space-around;
@@ -271,7 +271,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, #3C0E70  0%, #8435DE 100%);
+            background: #8435DE;
             opacity: 0.5;
             filter: blur(2px);
         }
@@ -607,6 +607,11 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;      /* horizontal centering */
+            justify-content: center;  /* vertical centering */
+            text-align: center;
         }
 
         .game-type-card::before {
@@ -1338,7 +1343,7 @@
                 
                 <button class="nav-item hidden" data-tab="charades-sessions">
                     <span class="icon">🎭</span>
-                    <span>Charades</span>
+                    <span>Act It Out</span>
                 </button>
                 
                 <div class="nav-spacer"></div>
@@ -1357,7 +1362,7 @@
                  OVERVIEW TAB
                  ========================================== -->
             <div id="overview" class="tab-content active">
-                
+
                 <!-- Game Selection -->
                 <div class="game-card">
       <div style="text-align: right;">
@@ -1396,7 +1401,7 @@
 
                         <div class="game-type-card" onclick="selectGame('charades')">
                             <span class="game-type-icon">🎭</span>
-                            <h3>Charades Zone</h3>
+                            <h3>Act it Out</h3>
                             <p>Act it out! Create custom categories with flashcards for endless party fun.</p>
                         </div>
                     </div>
@@ -1494,7 +1499,7 @@
 
                 <div class="game-card">
                     <div class="game-card-header">
-                        <h2>⚙️ Settings</h2>
+                        <h2> Settings</h2>
                         <p>Customize your profile</p>
                     </div>
 
@@ -1502,17 +1507,6 @@
                         <div class="form-group">
                             <label>Display Name</label>
                             <input type="text" placeholder="Enter your name" value="Admin Player">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Select Avatar</label>
-                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-top: 15px;">
-                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">👨‍💼</div>
-                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">🎮</div>
-                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">⚡</div>
-                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">🔥</div>
-                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">💎</div>
-                            </div>
                         </div>
 
                         <div style="margin-top: 30px;">
@@ -1528,7 +1522,7 @@
             <div id="quiz-sessions" class="tab-content">
                 <div class="game-card">
                     <div class="game-card-header">
-                        <h2> Quiz Manager</h2>
+                        <h2> Quiz Arena</h2>
                         <p>Create and manage quiz sessions</p>
                     </div>
 
@@ -1565,7 +1559,7 @@
 
                         <div style="margin-top: 30px; text-align: center;">
                             <button class="btn-primary btn-large" onclick="createQuizSession()">
-                                🚀 Create Quiz Session
+                                 Create Quiz Session
                             </button>
                         </div>
                     </div>
@@ -1578,7 +1572,7 @@
             <div id="charades-sessions" class="tab-content">
                 <div class="game-card">
                     <div class="game-card-header">
-                        <h2> Charades Builder</h2>
+                        <h2> ACT IT OUT</h2>
                         <p>Create custom categories and flashcards</p>
                     </div>
 
