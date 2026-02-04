@@ -1086,7 +1086,7 @@
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--secondary)) center/cover no-repeat;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1094,6 +1094,8 @@
             margin: 0 auto 20px;
             border: 4px solid var(--border-bright);
             box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+            background-size: contain;
+            background-position: center;
         }
 
         .profile-name {
@@ -1998,6 +2000,33 @@
             document.querySelector('[data-tab="quiz-sessions"]').classList.add('hidden');
             document.querySelector('[data-tab="charades-sessions"]').classList.add('hidden');
         }
+
+        // ==========================================
+        // PROFILE INITIALIZATION (from sessionStorage)
+        // ==========================================
+        function initializeProfile() {
+            const avatarElement = document.querySelector('.profile-avatar-large');
+            const nameElement = document.querySelector('.profile-name');
+            
+            // Get data from sessionStorage
+            const selectedAvatarImage = sessionStorage.getItem('selectedAvatarImage');
+            const adminDisplayName = sessionStorage.getItem('adminDisplayName');
+            
+            // Update avatar image if available
+            if (selectedAvatarImage && avatarElement) {
+                avatarElement.style.backgroundImage = `url('${selectedAvatarImage}')`;
+                // Clear text content to show image only
+                avatarElement.textContent = '';
+            }
+            
+            // Update display name if available
+            if (adminDisplayName && nameElement) {
+                nameElement.textContent = adminDisplayName;
+            }
+        }
+        
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', initializeProfile);
 
         // ==========================================
         // QUIZ FUNCTIONS

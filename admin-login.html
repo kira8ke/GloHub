@@ -95,6 +95,15 @@
                         autocomplete="off"
                         style="text-align: center; width: 400px;">
                 </div>
+
+                <div class="form-group">
+                    <input
+                        type="text"
+                        id="adminDisplayName"
+                        placeholder="What should we call you?"
+                        autocomplete="name"
+                        style="text-align: center; width: 400px; margin-top: 10px;">
+                </div>
                 
                 <button type="submit" class="btn-large" style=" box-shadow:
                 0 0 20px rgba(255, 79, 216, 0.6),
@@ -187,7 +196,16 @@
                             name: result.name || 'Super Admin',
                             code: result.code
                         });
-                        window.location.href = 'admin-dashboard.html';
+
+                        // Save optional admin display name (from login form) into sessionStorage
+                        const displayName = document.getElementById('adminDisplayName')?.value.trim() || '';
+                        if (displayName) {
+                            sessionStorage.setItem('adminDisplayName', displayName);
+                            try { localStorage.setItem('adminDisplayName', displayName); } catch (e) {}
+                        }
+
+                        // Redirect to intro page (preserve existing role logic)
+                        window.location.href = 'intro.html';
                         return;
                     }
 
@@ -198,7 +216,16 @@
                             email: result.email,
                             code: result.code
                         });
-                        window.location.href = 'admin-dashboard.html';
+
+                        // Save optional admin display name (from login form) into sessionStorage
+                        const displayName = document.getElementById('adminDisplayName')?.value.trim() || '';
+                        if (displayName) {
+                            sessionStorage.setItem('adminDisplayName', displayName);
+                            try { localStorage.setItem('adminDisplayName', displayName); } catch (e) {}
+                        }
+
+                        // Redirect to intro page (preserve existing role logic)
+                        window.location.href = 'intro.html';
                         return;
                     }
                 }
