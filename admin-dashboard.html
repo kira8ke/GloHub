@@ -163,7 +163,7 @@
         }
 
         .nav-item {
-            padding: 14px 20px;
+            padding: 8px 14px;
             border: none;
             background: none;
             text-align: left;
@@ -180,6 +180,7 @@
             gap: 15px;
             text-transform: uppercase;
             font-family: var(--font-display);
+            margin-bottom: 8px;
         }
 
         .nav-item .icon {
@@ -257,6 +258,10 @@
             right: 0;
             height: var(--mobile-nav-height);
             background: #8435DE;
+            border-radius: 40px;
+            right: 10px;
+            left: 10px;
+            bottom: 10px;
             border-top: 2px solid var(--border);
             display: flex;
             justify-content: space-around;
@@ -337,6 +342,8 @@
            MAIN CONTENT AREA
            ========================================== */
        .dashboard-content {
+            background-image: url("assets/gamecontainerbg.png");
+            background-size: cover;
             padding: 30px 20px;
             padding-bottom: calc(var(--mobile-nav-height) + 30px);
             overflow-y: auto;
@@ -1332,7 +1339,14 @@
              DESKTOP SIDEBAR NAVIGATION
              ========================================== -->
         <aside class="sidebar">
-            <div class="logo">Qitz!</div>
+            <div class="logo">
+                <span>
+                <img src="assets/logopiksi.png"
+                alt="logo"
+                style="width:100px; height:80px; object-fit:cover;">
+                   
+                </span>
+            </div>
             
         <nav class="sidebar-nav">
             <button class="nav-item active" data-tab="overview"
@@ -1368,16 +1382,6 @@
                     alt="Overview"
                     style="width:50px; height:50px; object-fit:cover; display:block;">
                     <span>Profile</span>
-                </button>
-                
-                <button class="nav-item hidden" data-tab="quiz-sessions">
-                    <span class="icon">❓</span>
-                    <span>Quiz Manager</span>
-                </button>
-                
-                <button class="nav-item hidden" data-tab="charades-sessions">
-                    <span class="icon">🎭</span>
-                    <span>Act It Out</span>
                 </button>
                 
                 <div class="nav-spacer"></div>
@@ -1428,13 +1432,23 @@
 
                     <div class="game-selection">
                         <div class="game-type-card" onclick="selectGame('quiz')">
-                            <span class="game-type-icon">❓</span>
+                            <span class="game-type-icon">
+                        <img src="assets/quizarena.png"
+                            alt="Overview"
+                            style="width:200px; height:200px; object-fit:cover; display:block;">
+                        
+                            </span>
                             <h3>Quiz Arena</h3>
                             <p>Test knowledge with multiple-choice questions. Perfect for trivia battles and educational challenges.</p>
                         </div>
 
                         <div class="game-type-card" onclick="selectGame('charades')">
-                            <span class="game-type-icon">🎭</span>
+                            <span class="game-type-icon">
+                            <img src="assets/actitout.png"
+                            alt="Overview"
+                            style="width:200px; height:200px; object-fit:cover; display:block;">
+                
+                            </span>
                             <h3>Act it Out</h3>
                             <p>Act it out! Create custom categories with flashcards for endless party fun.</p>
                         </div>
@@ -1543,7 +1557,7 @@
                         </div>
 
                         <div style="margin-top: 30px;">
-                            <button class="btn-primary btn-large">💾 Save Changes</button>
+                            <button class="btn-primary btn-large"> Save</button>
                         </div>
                     </div>
                 </div>
@@ -1585,8 +1599,8 @@
             <div id="quiz-editor" class="tab-content">
                 <div class="game-card">
                     <div style="margin-bottom: 25px; text-align: left;">
-                        <button class="btn-primary" style="height: 40px; width: 200px;" onclick="backToQuizSessions()">
-                            ← Back to Sessions
+                        <button class="btn-primary" style="height: 40px; width: 70px;" onclick="backToQuizSessions()">
+                            Back 
                         </button>
                     </div>
 
