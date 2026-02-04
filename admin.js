@@ -88,10 +88,15 @@ function checkAuth() {
 
     console.log('Regular admin authenticated');
 
+        const adminRole = getStoredItem('adminRole');
+        const isBypassMode = getStoredItem('isBypassMode') ==='true';
+
     return {
         adminCode: adminCode,
         clientId: clientId,
-        isSuperAdmin: false
+        isSuperAdmin: false,
+        effectiveRole: adminRole || 'admin',
+        isBypassMode: isBypassMode
     };
 }
 

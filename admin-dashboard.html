@@ -2531,11 +2531,19 @@
         }
 
         function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                // In production, this would handle actual logout
-                alert('Logged out successfully!');
-            }
-        }
+    if (confirm('Are you sure you want to logout?')) {
+        // Clear session storage
+        sessionStorage.removeItem('adminRole');
+        sessionStorage.removeItem('adminId');
+        sessionStorage.removeItem('adminEmail');
+        sessionStorage.removeItem('isBypassMode');
+        sessionStorage.removeItem('adminCode');
+        sessionStorage.removeItem('clientId');
+        
+        // Redirect to login page
+        window.location.href = 'admin-login.html';
+    }
+}
     </script>
 </body>
 </html>
