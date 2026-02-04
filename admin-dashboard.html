@@ -1334,24 +1334,39 @@
         <aside class="sidebar">
             <div class="logo">Qitz!</div>
             
-            <nav class="sidebar-nav">
-                <button class="nav-item active" data-tab="overview">
-                    <span class="icon">🏠</span>
-                    <span>Overview</span>
-                </button>
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-tab="overview"
+                style="display:flex; align-items:center; gap:10px;">
+                <img src="assets/home icon.png"
+                    alt="Overview"
+                    style="width:40px; height:40px; object-fit:cover; display:block;">
+                
+                <span>Overview</span>
+            </button>
+        </nav>
+
+
                 
                 <button class="nav-item" data-tab="sessions">
-                    <span class="icon">🎮</span>
+                <img src="assets/Untitled_design__23_-removebg-preview.png"
+                    alt="Overview"
+                    style="width:50px; height:50px; object-fit:contain; display:block;">
+                
                     <span>Sessions</span>
                 </button>
                 
                 <button class="nav-item" data-tab="leaderboard">
-                    <span class="icon">🏆</span>
+                <img src="assets/leaderboard.png"
+                    alt="Overview"
+                    style="width:50px; height:50px; object-fit:cover; display:block;">
+                
                     <span>Leaderboard</span>
                 </button>
                 
                 <button class="nav-item" data-tab="profile">
-                    <span class="icon">👤</span>
+                <img src="assets/profile.png"
+                    alt="Overview"
+                    style="width:50px; height:50px; object-fit:cover; display:block;">
                     <span>Profile</span>
                 </button>
                 
@@ -1539,32 +1554,21 @@
                  ========================================== -->
             <div id="quiz-sessions" class="tab-content">
                 <div class="game-card">
-<<<<<<< HEAD
                     <!-- Back navigation -->
-=======
+                     
                     <div class="game-card-header">
                         <h2> Quiz Arena</h2>
                         <p>Create and manage quiz sessions</p>
                     </div>
 
->>>>>>> 3c3d460cae7e1dd43a9768b82eb1082eb8f04efb
-                    <div style="margin-bottom: 25px; text-align: left;">
-                        <button class="btn-secondary" onclick="backToOverview()">
-                            ← Back to Overview
+                    <div class="game-card-header">
+                    <div style="display:flex; justify-content:flex-end; align-items:center;">
+                        <button class="btn-primary" style="height: 40px; width: 200px;" onclick="createNewQuizSession()">
+                            ➕ Create New Session
                         </button>
                     </div>
+                </div>
 
-                    <div class="game-card-header">
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-                            <div>
-                                <h2>Quiz Game Sessions</h2>
-                                <p>Manage your quiz sessions and questions</p>
-                            </div>
-                            <button class="btn-primary" onclick="createNewQuizSession()">
-                                ➕ Create New Session
-                            </button>
-                        </div>
-                    </div>
 
                     <div class="game-card-content">
                         <!-- Previous Sessions List -->
@@ -1581,7 +1585,7 @@
             <div id="quiz-editor" class="tab-content">
                 <div class="game-card">
                     <div style="margin-bottom: 25px; text-align: left;">
-                        <button class="btn-secondary" onclick="backToQuizSessions()">
+                        <button class="btn-primary" style="height: 40px; width: 200px;" onclick="backToQuizSessions()">
                             ← Back to Sessions
                         </button>
                     </div>
@@ -1598,28 +1602,11 @@
                             <input type="text" id="quizSessionName" placeholder="e.g., Friday Night Quiz" required>
                         </div>
 
-                        <!-- Theme Color Selection -->
-                        <div class="form-group">
-<<<<<<< HEAD
-                            <label>Choose Theme Color</label>
-                            <div class="color-theme-selector">
-                                <div class="color-option color-baby-purple" data-color="baby-purple" onclick="selectQuizColor('baby-purple')">
-                                     Purple
-                                </div>
-                                <div class="color-option color-baby-pink selected" data-color="baby-pink" onclick="selectQuizColor('baby-pink')">
-                                    Pink
-                                </div>
-                                <div class="color-option color-baby-blue" data-color="baby-blue" onclick="selectQuizColor('baby-blue')">
-                                    Blue
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Questions Section -->
                         <div style="margin-top: 30px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                                 <h3>Quiz Questions</h3>
-                                <button class="btn-primary" onclick="showAddQuizQuestion()">➕ Add Question</button>
+                                <button class="btn-primary" style="height: 40px; width: 200px;" onclick="showAddQuizQuestion()">➕ Add Question</button>
                             </div>
 
                             <!-- Add Question Form -->
@@ -1669,22 +1656,11 @@
                                 </div>
                             </div>
                         </div>
-=======
-                            <label>Time per Question (seconds)</label>
-                            <input type="number" id="timePerQuestion" placeholder="30" min="5" max="120">
-                        </div>
-
->>>>>>> 3c3d460cae7e1dd43a9768b82eb1082eb8f04efb
 
                         <!-- Save Session Button -->
                         <div style="margin-top: 30px; text-align: center;">
-<<<<<<< HEAD
                             <button class="btn-primary btn-large" onclick="saveQuizSession()">
                                 💾 Save Session & Generate Code
-=======
-                            <button class="btn-primary btn-large" onclick="createQuizSession()">
-                                 Create Quiz Session
->>>>>>> 3c3d460cae7e1dd43a9768b82eb1082eb8f04efb
                             </button>
                         </div>
                     </div>
@@ -1701,12 +1677,6 @@
                         <p>Create custom categories and flashcards</p>
                     </div>
 
-                    <div style="margin-bottom: 25px; text-align: left;">
-                        <button class="btn-secondary" onclick="backToOverview()">
-                            ← Back to Overview
-                        </button>
-                    </div>
-
                     <div class="game-card-content">
                         <div class="form-group">
                             <label>Game Name</label>
@@ -1721,7 +1691,7 @@
                         <div style="margin-top: 30px; margin-bottom: 25px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                                 <h3 style="font-family: var(--font-display); color: var(--text-bright); text-transform: uppercase;">Categories</h3>
-                                <button class="btn-primary" onclick="openCategoryModal()">➕ Add Custom Category</button>
+                                <button class="btn-primary" style="height: 40px; width: 200px;"  onclick="openCategoryModal()">➕ Add Custom Category</button>
                             </div>
 
                             <div style="display:flex; gap:20px; align-items:flex-start;">
@@ -1729,13 +1699,6 @@
                                     <div id="categoriesList" class="sessions-list">
                                         <p>Loading categories...</p>
                                     </div>
-                                </div>
-                                <div style="width:360px; background: rgba(0,0,0,0.12); padding:18px; border-radius:12px; margin-left:12px; border:1px solid var(--border);">
-                                    <h4 style="margin:0 0 8px;">Saved Charades Games</h4>
-                                    <div id="charadesGamesList">
-                                        <p style="color:var(--text-dim);">Loading games...</p>
-                                    </div>
-                                    <button class="btn-secondary" style="margin-top:12px; width:100%;" onclick="refreshCharadesGames()">🔄 Refresh</button>
                                 </div>
                             </div>
                         </div>
@@ -1751,27 +1714,53 @@
         </main>
 
         <!-- ==========================================
-             MOBILE BOTTOM NAVIGATION
+             MOBILE BOTTOM NAVIGATION     
              ========================================== -->
-        <nav class="mobile-nav">
-            <button class="mobile-nav-item active" data-tab="overview">
-                <span class="icon">🏠</span>
-                <span class="label">Home</span>
+            <nav class="mobile-nav">
+
+            <button class="mobile-nav-item active" data-tab="overview"
+                style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                
+                <span class="icon mobile-nav-icon">
+                <img src="assets/home icon.png"
+                    alt="Home"
+                    class="mobile-nav-icon"
+                    style="width:50px; height:50px; object-fit:contain; display:block;">
+                    </span>
             </button>
-            <button class="mobile-nav-item" data-tab="sessions">
-                <span class="icon">🎮</span>
-                <span class="label">Sessions</span>
+
+            <button class="mobile-nav-item" data-tab="sessions"
+                style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <span class="icon mobile-nav-icon">
+               <img src="assets/Untitled_design__23_-removebg-preview.png"
+                    alt="sessions"
+                    class="mobile-nav-icon"
+                    style="width:60px; height:60px; object-fit:contain; display:block;">
+                    </span>
             </button>
-            <button class="mobile-nav-item" data-tab="leaderboard">
-                <span class="icon">🏆</span>
-                <span class="label">Ranks</span>
+
+            <button class="mobile-nav-item" data-tab="leaderboard"
+                style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <span class="icon mobile-nav-icon">
+               <img src="assets/leaderboard.png"
+                    alt="leaderboard"
+                    class="mobile-nav-icon"
+                    style="width:100px; height:80px; object-fit:contain; display:block;">
+                    </span>
             </button>
-            <button class="mobile-nav-item" data-tab="profile">
-                <span class="icon">👤</span>
-                <span class="label">Profile</span>
+            <button class="mobile-nav-item" data-tab="profile"
+                style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                
+                <span class="icon mobile-nav-icon">
+                <img src="assets/profile.png"
+                    alt="leaderboard"
+                    class="mobile-nav-icon"
+                    style="width:60px; height:60px; object-fit:contain; display:block;">  
+                </span>
             </button>
+
         </nav>
-    </div>
+
 
     <!-- ==========================================
          GUIDE MODAL
@@ -1802,7 +1791,7 @@
             </div>
 
             <div style="margin-top: 30px; text-align: center;">
-                <button class="btn-primary" onclick="closeGuideModal()">Got It!</button>
+                <button class="btn-primary" style="height: 40px; width: 90px;" onclick="closeGuideModal()">Got It!</button>
             </div>
         </div>
     </div>
@@ -1820,27 +1809,12 @@
                 <input type="text" id="categoryName" placeholder="e.g., Movies, Animals">
             </div>
 
-            <div class="form-group">
-                <label>Category Color</label>
-                <div class="color-theme-selector">
-                    <div class="color-option color-baby-purple" onclick="selectCategoryColor('baby-purple')">
-                        Purple
-                    </div>
-                    <div class="color-option color-baby-pink selected" onclick="selectCategoryColor('baby-pink')">
-                        Pink
-                    </div>
-                    <div class="color-option color-baby-blue" onclick="selectCategoryColor('baby-blue')">
-                        Blue
-                    </div>
-                </div>
-            </div>
-
             <div style="margin-top: 30px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h3 style="font-family: var(--font-display); color: var(--text-bright);">
                         Flashcards (<span id="flashcardCount">0</span>/20)
                     </h3>
-                    <button class="btn-primary" onclick="showAddFlashcard()">➕ Add</button>
+                    <button class="btn-primary" style="height: 40px; width: 100px;"  onclick="showAddFlashcard()">➕ Add</button>
                 </div>
 
                 <div id="addFlashcardForm" class="hidden" style="background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
@@ -1848,8 +1822,8 @@
                         <input type="text" id="flashcardText" placeholder="Enter word or phrase">
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn-primary" onclick="saveFlashcard()">💾 Save</button>
-                        <button class="btn-secondary" onclick="cancelAddFlashcard()">✖ Cancel</button>
+                        <button class="btn-primary" style="height: 40px; width: 100px;"  onclick="saveFlashcard()"> Save</button>
+                        <button class="btn-primary" style="height: 40px; width: 150px;" onclick="cancelAddFlashcard()">✖ Cancel</button>
                     </div>
                 </div>
 
@@ -1862,8 +1836,8 @@
             </div>
 
             <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: flex-end;">
-                <button class="btn-secondary" onclick="closeCategoryModal()">Cancel</button>
-                <button class="btn-primary" onclick="saveCategoryChanges()">💾 Save Category</button>
+                <button class="btn-primary" style="height: 40px; width: 150px;"  onclick="closeCategoryModal()">Cancel</button>
+                <button class="btn-primary" style="height: 40px; width: 150px;"  onclick="saveCategoryChanges()"> Save Category</button>
             </div>
         </div>
     </div>
