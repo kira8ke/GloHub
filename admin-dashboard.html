@@ -256,7 +256,7 @@
             left: 0;
             right: 0;
             height: var(--mobile-nav-height);
-            background: linear-gradient(90deg, #3C0E70  0%, #8435DE 100%);
+            background: #8435DE;
             border-top: 2px solid var(--border);
             display: flex;
             justify-content: space-around;
@@ -271,7 +271,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, #3C0E70  0%, #8435DE 100%);
+            background: #8435DE;
             opacity: 0.5;
             filter: blur(2px);
         }
@@ -613,6 +613,11 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;      /* horizontal centering */
+            justify-content: center;  /* vertical centering */
+            text-align: center;
         }
 
         .game-type-card::before {
@@ -1071,7 +1076,7 @@
         .profile-header {
             text-align: center;
             padding: 40px;
-            background: linear-gradient(135deg, var(--bg-card), var(--bg-darker));
+            background: #8435DE;
             border-radius: 16px;
             border: 2px solid var(--border);
             margin-bottom: 30px;
@@ -1102,7 +1107,7 @@
 
         .profile-role {
             font-size: 16px;
-            color: var(--text-dim);
+            color: white;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
@@ -1357,7 +1362,7 @@
                 
                 <button class="nav-item hidden" data-tab="charades-sessions">
                     <span class="icon">🎭</span>
-                    <span>Charades</span>
+                    <span>Act It Out</span>
                 </button>
                 
                 <div class="nav-spacer"></div>
@@ -1376,54 +1381,31 @@
                  OVERVIEW TAB
                  ========================================== -->
             <div id="overview" class="tab-content active">
-                <div class="game-card">
-                    <div class="game-card-header">
-                        <h2> Command Center</h2>
-                        <p>Game Metrics</p>
-                    </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                           <div class="stat-icon">
-                            <img src="assets/gamepad.svg" alt="Game icon">
-                        </div>
-
-                            <div class="stat-value" id="totalGames">0</div>
-                            <div class="stat-label">Active Games</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">👥</div>
-                            <div class="stat-value" id="totalPlayers">0</div>
-                            <div class="stat-label">Total Players</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">⚡</div>
-                            <div class="stat-value" id="activeSessions">0</div>
-                            <div class="stat-label">Live Sessions</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">🏆</div>
-                            <div class="stat-value" id="topScore">0</div>
-                            <div class="stat-label">High Score</div>
-                        </div>
-                    </div>
-
-
-                        <div style="margin-top: 25px; text-align: center;">
-                            <button class="btn-primary btn-large" onclick="openGuideModal()">
-                                📖 Guide
-                            </button>
-                        </div>
-                  
-                </div>
 
                 <!-- Game Selection -->
                 <div class="game-card">
-                    <div style="margin-top: 25px; text-align: center;">
-                            <button class="btn-primary btn-large" onclick="openGuideModal()">
-                                📖 Guide
-                            </button>
-                        </div>
+      <div style="text-align: right;">
+                        <button
+                            onclick="openGuideModal()"
+                            style="
+                                width: 48px;
+                                height: 48px;
+                                border-radius: 50%;
+                                border: 2px solid white;
+                                cursor: pointer;
+                                background: transparent;
+                                color: white;
+                                font-size: 22px;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+                            "
+                            aria-label="Help"
+                        >
+                            ❔
+                        </button>
+                    </div>
                     <div class="game-card-header">
                         <h2> Select Game Mode</h2>
                         <p>Choose your arena</p>
@@ -1438,7 +1420,7 @@
 
                         <div class="game-type-card" onclick="selectGame('charades')">
                             <span class="game-type-icon">🎭</span>
-                            <h3>Charades Zone</h3>
+                            <h3>Act it Out</h3>
                             <p>Act it out! Create custom categories with flashcards for endless party fun.</p>
                         </div>
                     </div>
@@ -1451,7 +1433,7 @@
             <div id="sessions" class="tab-content">
                 <div class="game-card">
                     <div class="game-card-header">
-                        <h2>🎮 Active Sessions</h2>
+                        <h2> Active Sessions</h2>
                         <p>Live game monitoring</p>
                     </div>
 
@@ -1473,7 +1455,7 @@
             <div id="leaderboard" class="tab-content">
                 <div class="game-card">
                     <div class="game-card-header">
-                        <h2>🏆 Leaderboard</h2>
+                        <h2> Leaderboard</h2>
                         <p>Top Players</p>
                     </div>
 
@@ -1536,7 +1518,6 @@
 
                 <div class="game-card">
                     <div class="game-card-header">
-                        <h2>⚙️ Settings</h2>
                         <p>Customize your profile</p>
                     </div>
 
@@ -1544,17 +1525,6 @@
                         <div class="form-group">
                             <label>Display Name</label>
                             <input type="text" placeholder="Enter your name" value="Admin Player">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Select Avatar</label>
-                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-top: 15px;">
-                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">👨‍💼</div>
-                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">🎮</div>
-                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">⚡</div>
-                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">🔥</div>
-                                <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid var(--border); transition: all 0.3s ease;" onclick="this.style.transform = 'scale(1.2)'">💎</div>
-                            </div>
                         </div>
 
                         <div style="margin-top: 30px;">
@@ -1569,7 +1539,15 @@
                  ========================================== -->
             <div id="quiz-sessions" class="tab-content">
                 <div class="game-card">
+<<<<<<< HEAD
                     <!-- Back navigation -->
+=======
+                    <div class="game-card-header">
+                        <h2> Quiz Arena</h2>
+                        <p>Create and manage quiz sessions</p>
+                    </div>
+
+>>>>>>> 3c3d460cae7e1dd43a9768b82eb1082eb8f04efb
                     <div style="margin-bottom: 25px; text-align: left;">
                         <button class="btn-secondary" onclick="backToOverview()">
                             ← Back to Overview
@@ -1622,6 +1600,7 @@
 
                         <!-- Theme Color Selection -->
                         <div class="form-group">
+<<<<<<< HEAD
                             <label>Choose Theme Color</label>
                             <div class="color-theme-selector">
                                 <div class="color-option color-baby-purple" data-color="baby-purple" onclick="selectQuizColor('baby-purple')">
@@ -1690,11 +1669,22 @@
                                 </div>
                             </div>
                         </div>
+=======
+                            <label>Time per Question (seconds)</label>
+                            <input type="number" id="timePerQuestion" placeholder="30" min="5" max="120">
+                        </div>
+
+>>>>>>> 3c3d460cae7e1dd43a9768b82eb1082eb8f04efb
 
                         <!-- Save Session Button -->
                         <div style="margin-top: 30px; text-align: center;">
+<<<<<<< HEAD
                             <button class="btn-primary btn-large" onclick="saveQuizSession()">
                                 💾 Save Session & Generate Code
+=======
+                            <button class="btn-primary btn-large" onclick="createQuizSession()">
+                                 Create Quiz Session
+>>>>>>> 3c3d460cae7e1dd43a9768b82eb1082eb8f04efb
                             </button>
                         </div>
                     </div>
@@ -1707,7 +1697,7 @@
             <div id="charades-sessions" class="tab-content">
                 <div class="game-card">
                     <div class="game-card-header">
-                        <h2> Charades Builder</h2>
+                        <h2> ACT IT OUT</h2>
                         <p>Create custom categories and flashcards</p>
                     </div>
 
