@@ -3,149 +3,800 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Choose Your Avatar</title>
+  <title>Piksi Characters</title>
   <style>
-    :root{--bg:#120018;--card:#1e0a2a;--accent:#ff66c4;--text:#fff}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Helvetica,Arial}
-    body{background:linear-gradient(135deg,#120018,#2b0036);color:var(--text);display:flex;align-items:center;justify-content:center}
-    .wrap{width:100%;max-width:980px;padding:28px;box-sizing:border-box}
-    h1{font-size:22px;margin:0 0 18px;text-align:center}
+    :root {
+      --bg: #0a0015;
+      --card-bg: #1a1a2e;
+      --accent: #ff66c4;
+      --text: #fff;
+      --muted: rgba(255, 255, 255, 0.7);
+      --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
 
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:18px}
-    .avatar-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);padding:12px;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:transform 180ms ease,box-shadow 180ms ease}
-    .avatar-item:hover{transform:translateY(-6px);box-shadow:0 14px 30px rgba(0,0,0,0.35)}
-    .avatar-item:focus{outline:3px solid rgba(255,102,196,0.18)}
-    .avatar-item img{width:96px;height:96px;object-fit:contain;border-radius:10px;background:linear-gradient(180deg,#fff,#f6f6ff)}
-    .avatar-name{font-size:14px;color:var(--text);opacity:0.95}
-    .avatar-id{font-size:11px;color:rgba(255,255,255,0.6)}
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      height: 100%;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #8435DE;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    
+  /* Header */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* Changed from: justify-content: space-between; */
+  padding: 0 40px;
+  z-index: 100;
+  animation: slideDown 0.6s ease-out;
+}
 
-    .selected{border-color:var(--accent);box-shadow:0 8px 20px rgba(255,102,196,0.12)}
+ @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
 
-    @media (max-width:480px){.avatar-item img{width:78px;height:78px}}
+.logo-section {
+  position: absolute;  /* Add this */
+  left: 40px;  /* Add this */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-    .hint{margin-top:14px;text-align:center;color:rgba(255,255,255,0.7);font-size:13px}
+.logo-text {
+  font-size: 54px;  /* Increased from 24px */
+  font-weight: 700;
+  background: white;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.search-container {
+  position: absolute;  /* Add this */
+  right: 40px;  /* Add this */
+  margin: 0;  /* Changed from: margin: 0 40px; */
+  max-width: 500px;  /* Keep this */
+}
+    
+    .search-bar {
+      width: 300px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    
+    .search-bar::placeholder {
+      color: var(--muted);
+    }
+    
+    .search-bar:focus {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 102, 196, 0.1);
+    }
+    
+    /* Main Content */
+    .main-content {
+      margin-top: 80px;
+      height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+/* Character Carousel */
+.carousel-container {
+  position: relative;
+  height: 600px;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px 40px 100px 40px;
+  scrollbar-width: none;
+}
+    
+    .carousel-container::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .carousel {
+      display: flex;
+      gap: 30px;
+      height: 100%;
+      padding-left: 0;
+    }
+    
+    .character-card {
+      flex-shrink: 0;
+      width: 350px;
+      height: 480px;
+      background: none;
+      border-radius: 40px;
+      overflow: visible;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .character-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 24px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .character-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 60px rgba(255, 102, 196, 0.3);
+    }
+    
+    .character-card:hover::before {
+      opacity: 1;
+    }
+    
+    /* Character image - extends beyond card */
+    .character-image {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 350px;
+      height: 480px;
+      object-fit: contain;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
+    }
+    
+    .character-card:hover .character-image {
+      height: 420px;
+      transform: translateX(-50%) translateY(-10px);
+    }
+    
+    /* Card info */
+    .card-info {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      padding: 0 20px;
+      z-index: 2;
+    }
+    
+    .character-name {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #fff, #ff66c4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .character-role {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    /* Navigation Buttons */
+    .nav-buttons {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      display: flex;
+      gap: 12px;
+      z-index: 50;
+      animation: fadeInUp 0.6s ease-out 0.3s both;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .nav-btn {
+      width: 80px;
+      height: 80px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+    }
+    
+    .nav-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .nav-btn:active {
+      transform: scale(0.95);
+    }
+    
+    /* Expanded Character View */
+    .character-expanded {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(10, 0, 21, 0.98), rgba(45, 27, 78, 0.98));
+      backdrop-filter: blur(20px);
+      z-index: 200;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    
+    .character-expanded.active {
+      display: flex;
+      opacity: 1;
+    }
+    
+    .expanded-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+    }
+    
+    .expanded-left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-100px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .expanded-character-image {
+      max-width: 500px;
+      max-height: 80vh;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 60px rgba(255, 102, 196, 0.4));
+    }
+    
+    .expanded-right {
+      flex: 1;
+      max-width: 600px;
+      animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(100px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .expanded-name {
+      font-size: 56px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff, #ff66c4, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeIn 0.6s ease 0.2s both;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .expanded-role {
+      font-size: 18px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+      animation: fadeIn 0.6s ease 0.3s both;
+    }
+    
+    .expanded-description {
+      font-size: 18px;
+      line-height: 1.8;
+      color: var(--muted);
+      margin-bottom: 40px;
+      animation: fadeIn 0.6s ease 0.4s both;
+    }
+    
+    .select-character-btn {
+      padding: 18px 48px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(255, 102, 196, 0.3);
+      animation: fadeIn 0.6s ease 0.5s both;
+    }
+    
+    .select-character-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(255, 102, 196, 0.5);
+    }
+    
+    .select-character-btn:active {
+      transform: translateY(0);
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      width: 90px;
+      height: 50px;
+      background: none;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .header {
+        padding: 0 16px;
+        height: 64px;
+        background: none;
+        border-bottom: none;
+        justify-content: center;
+      }
+
+      .logo-section { position: static; }
+
+      .logo-text {
+        font-size: clamp(20px, 6vw, 30px);
+        font-weight: 700;
+      }
+
+      .search-container {
+        position: static;
+        margin: 0 10px;
+        width: clamp(160px, 40vw, 420px);
+      }
+
+      .search-bar {
+        font-size: clamp(13px, 3.2vw, 15px);
+        padding: 10px 14px;
+      }
+
+      .nav-buttons { display: none; }
+
+      /* Make cards larger and more 'hero' like */
+      .carousel-container {
+        padding: 28px 14px 120px;
+        height: calc(100vh - 64px);
+        transform: translateY(-28px);
+      }
+
+      .carousel { gap: 20px; }
+
+      .character-card {
+        width: min(76vw, 360px);
+        height: min(84vh, 560px);
+        border-radius: 28px;
+      }
+
+      .character-image {
+        width: min(82vw, 420px);
+        height: min(86vh, 520px);
+        bottom: -6px;
+      }
+
+      .character-card.hover .character-image { height: min(88vh, 520px); }
+
+      /* Expanded view tweaks */
+      .expanded-content { flex-direction: column; padding: 80px 20px 40px; overflow-y: auto; }
+      .expanded-left { margin-bottom: 30px; }
+      .expanded-character-image { max-width: 320px; max-height: 48vh; }
+      .expanded-name { font-size: 36px; }
+      .expanded-role { font-size: 14px; }
+      .expanded-description { font-size: 16px; }
+      .close-btn { top: 20px; right: 20px; }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Choose your avatar</h1>
-
-    <div id="avatarsGrid" class="grid" role="list">
-      <!-- Avatar entries: add more by duplicating an entry and updating data-id, data-name and img src -->
-
-      <div class="avatar-item" role="button" tabindex="0" data-id="avatar1" data-name="Starlight">
-        <img src="assets/Yellow Standing Character.png" alt="Starlight avatar">
-        <div class="avatar-name">Starlight</div>
-        <div class="avatar-id">avatar1</div>
-      </div>
-
-      <div class="avatar-item" role="button" tabindex="0" data-id="avatar2" data-name="Comet">
-        <img src="assets/Black_Standing_Character.png" alt="Comet avatar">
-        <div class="avatar-name">Comet</div>
-        <div class="avatar-id">avatar2</div>
-      </div>
-
-      <div class="avatar-item" role="button" tabindex="0" data-id="avatar3" data-name="Nova">
-        <img src="assets/Hero Section Character.png" alt="Nova avatar">
-        <div class="avatar-name">Nova</div>
-        <div class="avatar-id">avatar3</div>
-      </div>
-
-      <div class="avatar-item" role="button" tabindex="0" data-id="avatar4" data-name="Aurora">
-        <img src="assets/Dark Green Standing Character.png" alt="Aurora avatar">
-        <div class="avatar-name">Aurora</div>
-        <div class="avatar-id">avatar4</div>
-      </div>
-
-      <div class="avatar-item" role="button" tabindex="0" data-id="avatar5" data-name="Pixel">
-        <img src="assets/avatar5.png" alt="Pixel avatar">
-        <div class="avatar-name">Pixel</div>
-        <div class="avatar-id">avatar5</div>
-      </div>
-
-      <div class="avatar-item" role="button" tabindex="0" data-id="avatar6" data-name="Blossom">
-        <img src="assets/Baby Pink Standing Character.png" alt="Blossom avatar">
-        <div class="avatar-name">Blossom</div>
-        <div class="avatar-id">avatar6</div>
-      </div>
-
-      <div class="avatar-item" role="button" tabindex="0" data-id="avatar7" data-name="Orbit">
-        <img src="assets/Red Standing Character.png" alt="Orbit avatar">
-        <div class="avatar-name">Orbit</div>
-        <div class="avatar-id">avatar7</div>
-      </div>
-
-      <div class="avatar-item" role="button" tabindex="0" data-id="avatar8" data-name="Glint">
-        <img src="assets/avatar8.png" alt="Glint avatar">
-        <div class="avatar-name">Glint</div>
-        <div class="avatar-id">avatar8</div>
-      </div>
-
-      <div class="avatar-item" role="button" tabindex="0" data-id="avatar9" data-name="Echo">
-        <img src="assets/Purple Standing Character.png" alt="Echo avatar">
-        <div class="avatar-name">Echo</div>
-        <div class="avatar-id">avatar9</div>
-      </div>
-
-      <div class="avatar-item" role="button" tabindex="0" data-id="avatar10" data-name="Luna">
-        <img src="assets/Cyan Standing Character (2).png" alt="Luna avatar">
-        <div class="avatar-name">Luna</div>
-        <div class="avatar-id">avatar10</div>
-      </div>
-
-      <!-- More avatars can be added here: duplicate a .avatar-item block and update data-id, data-name and src -->
+  <!-- Header -->
+  <header class="header">
+      <div class="logo-text">Choose Your Avatar</div>
     </div>
+    
+<div class="search-container">
+    <input type="text"
+           class="search-bar"
+           id="searchBar"
+           placeholder="Search characters..."
+           style="
+               padding-left: 50px;
+               background-image: url('assets/searchicon.png');
+               background-repeat: no-repeat;
+               background-position: 12px center;
+               background-size: 45px 24px;
+           ">
+</div>
 
-    <div class="hint">Click an avatar to select it and continue</div>
+    <div style="width: 50px;"></div> <!-- Spacer for alignment -->
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="carousel-container" id="carouselContainer">
+      <div class="carousel" id="carousel">
+        <!-- Character cards will be inserted here -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-buttons">
+   <button class="nav-btn" id="prevBtn" aria-label="Previous character">&lt; Prev</button>
+    <button class="nav-btn" id="nextBtn" aria-label="Next character">Next &gt;</button>
+  </div>
+
+  <!-- Mobile overlay (mobile-only UI) -->
+  <div id="cardOverlay" class="card-overlay" aria-hidden="true" style="display:none;"></div>
+
+  <!-- Expanded Character View -->
+  <div class="character-expanded" id="expandedView" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Character details">
+    <div class="expanded-content">
+      <button class="close-btn" id="closeBtn" aria-label="Close details">× close</button>
+      
+      <div class="expanded-left">
+        <img src="" alt="" class="expanded-character-image" id="expandedImage">
+      </div>
+      
+      <div class="expanded-right">
+        <h1 class="expanded-name" id="expandedName"></h1>
+        <p class="expanded-role" id="expandedRole"></p>
+        <p class="expanded-description" id="expandedDescription"></p>
+        <button class="select-character-btn" id="selectBtn" aria-label="Select this character">Select Character</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const grid = document.getElementById('avatarsGrid');
+    // Character data
+    const characters = [
+           {
+        id: 'avatar7',
+        name: 'Orbit',
+        role: 'The Guardian',
+        description: 'Strong, protective, and loyal. Orbit stands firm in the face of adversity and always looks out for the team. A reliable force you can count on.',
+        image: 'assets/Red Standing Character.png',
+        cardBackground: 'assets/redcard.png'
+      },
+      {
+        id: 'avatar4',
+        name: 'Aurora',
+        role: 'The Harmonizer',
+        description: 'Aurora brings balance and peace to any situation. With a calm demeanor and wise perspective, this character helps others find their center and inner strength.',
+        image: 'assets/Dark Green Standing Character.png',
+        cardBackground: 'assets/darkgreencard.png'
+      },
+            {
+        id: 'avatar6',
+        name: 'Blossom',
+        role: 'The Nurturer',
+        description: 'Gentle, caring, and supportive. Blossom helps others grow and flourish, creating safe spaces where everyone can thrive and reach their full potential.',
+        image: 'assets/Baby Pink Standing Character.png',
+        cardBackground: 'assets/pinkcard.png'
+      },
+      {
+        id: 'avatar1',
+        name: 'Starlight',
+        role: 'The Illuminator',
+        description: 'Starlight radiates positive energy and brings light to even the darkest corners. With an optimistic spirit and endless creativity, this character transforms challenges into opportunities.',
+        image: 'assets/Yellow Standing Character.png',
+        cardBackground: 'assets/yellowcard.png'
+      },
+       {
+        id: 'avatar9',
+        name: 'Echo',
+        role: 'The Mystic',
+        description: 'Mysterious and intuitive, Echo connects with deeper truths and hidden meanings. Guides others through introspection and spiritual discovery.',
+        image: 'assets/Purple Standing Character.png',
+        cardBackground: 'assets/purplecard.png'
+      },
+      {
+        id: 'avatar2',
+        name: 'Comet',
+        role: 'The Speedster',
+        description: 'Fast, fierce, and fearless. Comet moves through challenges with lightning speed and precision. Always ready for action and never backing down from a challenge.',
+        image: 'assets/Black_Standing_Character.png',
+        cardBackground: 'assets/blackcard.png'
+      },
+      {
+        id: 'avatar3',
+        name: 'Nova',
+        role: 'The Explorer',
+        description: 'Curious and adventurous, Nova seeks new experiences and knowledge. A natural leader who inspires others to push beyond their limits and discover the unknown.',
+        image: 'assets/Hero Section Character.png',
+        cardBackground: 'assets/whitecard.png'
+      },
+      {
+        id: 'avatar10',
+        name: 'Luna',
+        role: 'The Dreamer',
+        description: 'Imaginative and visionary, Luna sees possibilities where others see limitations. Inspires creativity and helps turn dreams into reality.',
+        image: 'assets/Cyan Standing Character (2).png',
+        cardBackground: 'assets/ciancard.png'
+      },
+      {
+        id: 'avatar5',
+        name: 'Pixel',
+        role: 'The Innovator',
+        description: 'Tech-savvy and forward-thinking, Pixel blends digital creativity with practical solutions. Always at the cutting edge of innovation and technological advancement.',
+        image: 'assets/avatar5.png',
+        cardBackground: 'assets/pixel-bg.jpg'
+      },
+      {
+        id: 'avatar8',
+        name: 'Glint',
+        role: 'The Strategist',
+        description: 'Sharp-minded and analytical, Glint sees patterns others miss. Excels at planning, problem-solving, and turning complex situations into elegant solutions.',
+        image: 'assets/avatar8.png',
+        cardBackground: 'assets/glint-bg.jpg'
+      }
+    ];
 
-      // Delegate click to avatar items
-      grid.addEventListener('click', (ev) => {
-        const item = ev.target.closest('.avatar-item');
-        if (!item) return;
-        selectAvatar(item);
-      });
-
-      // Allow keyboard selection (Enter/Space)
-      grid.querySelectorAll('.avatar-item').forEach(item => {
-        item.addEventListener('keydown', (ev) => {
+    let filteredCharacters = [...characters];
+    
+    const carousel = document.getElementById('carousel');
+    const carouselContainer = document.getElementById('carouselContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const expandedView = document.getElementById('expandedView');
+    const closeBtn = document.getElementById('closeBtn');
+    const selectBtn = document.getElementById('selectBtn');
+    const searchBar = document.getElementById('searchBar');
+    let cardNodes = [];
+    let cardData = []; // precomputed positions for performance
+    
+    // Initialize carousel
+    function initCarousel() {
+      carousel.innerHTML = '';
+      filteredCharacters.forEach((char, index) => {
+        const card = document.createElement('div');
+        card.className = 'character-card';
+        // accessibility
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `${char.name}, ${char.role}`);
+        
+        // Apply background image
+        card.style.backgroundImage = `url('${char.cardBackground}')`;
+        card.style.backgroundSize = 'cover';
+        card.style.backgroundPosition = 'center';
+        
+        card.innerHTML = `
+          <img src="${char.image}" alt="${char.name}" class="character-image">
+          <div class="card-info">
+            <div class="character-name">${char.name}</div>
+            <div class="character-role">${char.role}</div>
+          </div>
+        `;
+        card.addEventListener('click', () => { lastFocusedElement = card; expandCharacter(index); });
+        card.addEventListener('keydown', (ev) => {
+          // Enter or Space opens expanded view
           if (ev.key === 'Enter' || ev.key === ' ') {
             ev.preventDefault();
-            selectAvatar(item);
+            lastFocusedElement = card;
+            expandCharacter(index);
+            return;
+          }
+          // Arrow navigation moves carousel and focus
+          if (ev.key === 'ArrowLeft') {
+            ev.preventDefault(); prev(); setTimeout(() => { focusAdjacentCard(index - 1); }, 220); return;
+          }
+          if (ev.key === 'ArrowRight') {
+            ev.preventDefault(); next(); setTimeout(() => { focusAdjacentCard(index + 1); }, 220); return;
           }
         });
+        carousel.appendChild(card);
       });
+      // cache node list and positions
+      cardNodes = Array.from(carousel.querySelectorAll('.character-card'));
+      computeCardData();
+    }
 
-      function selectAvatar(item) {
-        const id = item.dataset.id;
-        const name = item.dataset.name || '';
-        const img = item.querySelector('img');
-        const imageSrc = img ? img.src : '';
-        if (!id) return;
+    // track last focused element so we can restore focus after closing dialog
+    let lastFocusedElement = null;
 
-        // Save selection to sessionStorage
-        try { sessionStorage.setItem('selectedAvatarId', id); } catch (e) {}
-        if (name) {
-          try { sessionStorage.setItem('selectedAvatarName', name); } catch (e) {}
+    function focusAdjacentCard(idx) {
+      if (!cardNodes || cardNodes.length === 0) return;
+      const clamped = Math.max(0, Math.min(cardNodes.length - 1, idx));
+      const node = cardNodes[clamped];
+      if (node) node.focus();
+    }
+
+    function computeCardData() {
+      // Precompute card center X positions relative to page for quick lookups
+      cardData = cardNodes.map(c => {
+        const r = c.getBoundingClientRect();
+        return {
+          node: c,
+          left: c.offsetLeft,
+          width: c.offsetWidth,
+          center: c.offsetLeft + c.offsetWidth / 2
+        };
+      });
+    }
+    
+    // Navigation
+    function next() {
+      carouselContainer.scrollBy({
+        left: 310,
+        behavior: 'smooth'
+      });
+    }
+    
+    function prev() {
+      carouselContainer.scrollBy({
+        left: -310,
+        behavior: 'smooth'
+      });
+    }
+    
+    // Expand character view
+    function expandCharacter(index) {
+      const char = filteredCharacters[index];
+      document.getElementById('expandedImage').src = char.image;
+      document.getElementById('expandedImage').alt = char.name;
+      document.getElementById('expandedName').textContent = char.name;
+      document.getElementById('expandedRole').textContent = char.role;
+      document.getElementById('expandedDescription').textContent = char.description;
+      // set ARIA and show
+      expandedView.setAttribute('aria-hidden', 'false');
+      expandedView.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // focus the close button for keyboard users
+      setTimeout(() => { try { closeBtn.focus(); } catch (e) {} }, 60);
+
+      // Store current character for selection
+      selectBtn.onclick = () => selectCharacter(char);
+    }
+    
+    // Close expanded view
+    function closeExpanded() {
+      expandedView.classList.remove('active');
+      expandedView.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      // restore focus to last focused element
+      try {
+        if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+          lastFocusedElement.focus();
         }
-        if (imageSrc) {
-          try { sessionStorage.setItem('selectedAvatarImage', imageSrc); } catch (e) {}
-        }
-
-        // Visual feedback
-        document.querySelectorAll('.avatar-item').forEach(i => i.classList.remove('selected'));
-        item.classList.add('selected');
-
-        // Fade out then redirect
-        document.body.style.transition = 'opacity 240ms ease';
-        document.body.style.opacity = '0';
-        setTimeout(() => { window.location.href = 'avatar-intro.html'; }, 240);
+      } catch (e) {}
+    }
+    
+    // Select character
+    function selectCharacter(char) {
+      try {
+        sessionStorage.setItem('selectedAvatarId', char.id);
+        sessionStorage.setItem('selectedAvatarName', char.name);
+        sessionStorage.setItem('selectedAvatarImage', char.image);
+      } catch (e) {
+        console.error('SessionStorage error:', e);
       }
+      
+      document.body.style.transition = 'opacity 300ms ease';
+      document.body.style.opacity = '0';
+      
+      setTimeout(() => {
+        window.location.href = 'avatar-intro.html';
+      }, 300);
+    }
+    
+    // Search functionality
+    searchBar.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      filteredCharacters = characters.filter(char => 
+        char.name.toLowerCase().includes(searchTerm) ||
+        char.role.toLowerCase().includes(searchTerm)
+      );
+      initCarousel();
+      carouselContainer.scrollLeft = 0;
     });
+    
+    // Event listeners
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+    closeBtn.addEventListener('click', closeExpanded);
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (expandedView.classList.contains('active')) {
+        if (e.key === 'Escape') closeExpanded();
+        return;
+      }
+      
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') next();
+    });
+    
+    // Initialize
+    initCarousel();
   </script>
 </body>
 </html>
