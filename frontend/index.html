@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff69b4">
+    <title>GloHub - Where We Keep It Fun and Cute</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Mouse Follower -->
+    <div class="mouse-follower" id="mouseFollower"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">GloHub</h1>
+            <!-- Social Media Icons - Header -->
+            <div class="header-social">
+                <a href="https://instagram.com/YOUR_INSTAGRAM_HANDLE" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+                    <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                </a>
+                <a href="https://tiktok.com/@YOUR_TIKTOK_HANDLE" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="TikTok">
+                    <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+                    </svg>
+                </a>
+            </div>
+            <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <nav id="mobileNav">
+                 <a href="#games" onclick="closeMobileMenu()">Our Games</a>
+                <a href="#how-it-works" onclick="closeMobileMenu()">How It Works</a>
+                <a href="#about" onclick="closeMobileMenu()">About Us</a>
+                <div class="nav-social-mobile">
+                    <a href="https://www.instagram.com/glohubgames?igsh=MWNjdXd4aG83bzlwaA==" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+                        <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                    <a href="https://www.tiktok.com/@glohubgames?_r=1&_t=ZS-93cO1P0WSES" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="TikTok">
+                        <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+                        </svg>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <div class="menu-overlay" id="menuOverlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Enhanced Hero Section with Pulsating Hearts -->
+    <section class="hero-enhanced">
+
+        <div class="container">
+            <div class="hero-content-enhanced">
+                <h1 class="hero-main-headline">
+                   Your go-to hub for girly games, quizzes, and squad challenges.
+                </h1>
+                
+                <button class="btn-explore" onclick="scrollToFeatures()">
+                    <span style="position: relative; z-index: 1;">Explore the Fun →</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flagship Product Section - Galentine's Game -->
+    <section id="flagship" class="flagship-section">
+        <div class="container">
+            <div class="flagship-badge">
+                <span>The Product That Started It All</span>
+            </div>
+            <div class="flagship-card">
+            <div class="flagship-content">
+                <div class="flagship-visual">
+                    <div class="flagship-glow"></div>
+                    <img src="assets/galentinesgame.PNG" alt="Galentine's Game" class="flagship-image">
+                </div>
+                <div class="flagship-info">
+                    <h2 class="flagship-title">Galentine's Special</h2>
+                    <p class="flagship-tagline">The Ultimate Girls' Night Experience</p>
+                    <p class="flagship-description">
+                        <p class="flagship-description">
+                             Galentine’s Day plans? Girls’ night in? Just because? This is the ultimate 3‑in‑1 game made for besties! 
+                              Play quizzes, swap laughs, and dive into challenges that turn every moment into memories you’ll be reminiscing about for years.
+                        </p>
+
+                    <div class="flagship-features">
+                        <div class="flagship-feature">
+                            <span class="about-icon"></span>
+                            <span>Unlimited Custom Quizzes</span>
+                        </div>
+                        <div class="flagship-feature">
+                            <span class="about-icon"></span>
+                            <span>Play with Your Whole Squad</span>
+                        </div>
+                        <div class="flagship-feature">
+                            <span class="about-icon"></span>
+                            <span>Live Leaderboards & Scores</span>
+                        </div>
+                    </div>
+                    <button class="btn-flagship" onclick="window.location.href='galentines.html'">
+                        Play Now
+                        
+                    </button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    
+
+    <!-- Flow-Based How It Works -->
+    <section id="how-it-works" class="how-it-works-flow">
+        <div class="container">
+            <h2 class="section-title">Your Journey to Fun</h2>
+            
+            <div class="flow-path">
+                <div class="flow-step" data-step="1">
+                    <div class="flow-icon" style= "background-color:#3BAEFC; color:white">1</div>
+                    <div class="flow-content">
+                        <h3>Pick Your Game</h3>
+                        <p>Choose from Galentine's Game, Spin-to-Win, or explore our upcoming releases!</p>
+                    </div>
+                    
+                </div>
+
+                <div class="flow-step" data-step="2">
+                    <div class="flow-icon" style= "background-color:var(--primary); color:white;">2</div>
+                    <div class="flow-content">
+                        <h3>Learn How to Play</h3>
+                        <p>Quick, easy-to-follow instructions. You'll be a pro in minutes!</p>
+                    </div>
+                </div>
+
+                <div class="flow-step" data-step="3">
+                    <div class="flow-icon" style= "background-color:#F98918; color:white;">3</div>
+                    <div class="flow-content">
+                        <h3>One-Time Purchase</h3>
+                        <p>Lifetime access. No subscriptions, no hidden fees!</p>
+                    </div>
+                </div>
+
+                <div class="flow-step" data-step="4">
+                    <div class="flow-icon" style= "background-color: #46A24A; color:white;">4</div>
+                    <div class="flow-content">
+                        <h3>Play & Enjoy!</h3>
+                        <p>Share the room code with your girls and let the fun begin!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Games Section (Replaces Pricing) -->
+    <section id="games" class="games-section">
+        <div class="container">
+            <h2 class="section-title">Our Games Collection</h2>
+            
+            <div class="games-grid">
+                <!-- Galentine's Game - Clickable -->
+                <div class="game-card clickable" onclick="window.location.href='galentines.html'">
+                    <div class="game-image-wrapper"> 
+                    </div>
+                    <div class="game-info">
+                        <h3>Galentine's Special</h3>
+                        <a href="galentines.html">
+                         <button class="game-btn">Play</button>
+                        </a>
+
+                    </div>
+                </div>
+
+                <!-- Upcoming Game 1 - Blurred -->
+                <div class="game-card upcoming">
+                    <div class="game-image-wrapper blurred">
+                        <div class="game-badge coming-soon">Coming Soon</div>
+                        <div class="blur-overlay">
+                        </div>
+                    </div>
+                    <div class="game-info">
+                        <h3>Truth or Dare Deluxe</h3>
+                    </div>
+                </div>
+
+                <!-- Upcoming Game 2 - Blurred -->
+                <div class="game-card upcoming">
+                    <div class="game-image-wrapper blurred">
+                        <div class="game-badge coming-soon">Coming Soon</div>
+                        <div class="blur-overlay">
+                        </div>
+                    </div>
+                    <div class="game-info">
+                        <h3>Vibe Check Creator</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+     <!-- About / Why GloHub Exists -->
+    <section class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-visual">
+                        <img src="assets/GirlsPic.jpg" alt="Girls forming heart" class="about-image" />
+                </div>
+                <div class="about-text">
+                    <h2 class="section-title">Why GloHub Exists</h2>
+                    
+                    <p class="about-description">
+                        We created GloHub because we noticed something: there weren't enough spaces online that celebrated femininity while also being genuinely fun and empowering. Too many "girls' apps" felt either too serious or too childish.
+                    </p>
+                    <p class="about-description">
+                        GloHub is different. We're here for the ladies who want to rock  AND be powerful. Who love cute aesthetics AND meaningful connections. Who want to have fun with their friends without compromising on quality or authenticity.
+                    </p>
+                    <div class="about-features">
+                        <div class="about-feature">
+                            <span class="about-icon"></span>
+                            <div>
+                                <h4>Unapologetically Feminine</h4>
+                                <p>Pink, cute, and proud of it!</p>
+                            </div>
+                        </div>
+                        <div class="about-feature">
+                            <span class="about-icon"></span>
+                            <div>
+                                <h4>Genuinely Empowering</h4>
+                                <p>Built by women, for women</p>
+                            </div>
+                        </div>
+                        <div class="about-feature">
+                            <span class="about-icon"></span>
+                            <div>
+                                <h4>Always Evolving</h4>
+                                <p>New games and features coming soon</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Reviews Section -->
+    <section class="reviews-section">
+        <div class="container">
+            <h2 class="section-title">What Girls Are Saying</h2>
+            
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="review-text">"We used this for my sister's bridal shower and everyone was OBSESSED! The quiz game had us all in tears from laughing. 10/10 would recommend!"</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#B481F4" viewBox="0 0 24 24"> <circle cx="12" cy="8" r="4"/> <path d="M12 14c-5 0-9 2.5-9 5v1h18v-1c0-2.5-4-5-9-5z"/> </svg>
+                        </div>
+                        <div class="reviewer-info">
+                            <p class="reviewer-name">Sarah M.</p>
+                            <p class="reviewer-tag">Bridal Party Host</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="review-text">"The avatar creator is SO cute! My girls and I spent an hour just customizing our dolls before we even started playing. Worth every shilling!"</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#B481F4" viewBox="0 0 24 24"> <circle cx="12" cy="8" r="4"/> <path d="M12 14c-5 0-9 2.5-9 5v1h18v-1c0-2.5-4-5-9-5z"/> </svg>  
+                        </div>
+                        <div class="reviewer-info">
+                            <p class="reviewer-name">Priya K.</p>
+                            <p class="reviewer-tag">Squad Leader</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="review-text">"Finally! A party game that's not cringey and actually made for us. The vibe is immaculate and setup was so easy. We play every weekend now!"</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#B481F4" viewBox="0 0 24 24"> <circle cx="12" cy="8" r="4"/> <path d="M12 14c-5 0-9 2.5-9 5v1h18v-1c0-2.5-4-5-9-5z"/> </svg>
+                        </div>
+                        <div class="reviewer-info">
+                            <p class="reviewer-name">Aisha N.</p>
+                            <p class="reviewer-tag">Weekend Warrior</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <!-- Social Media Icons - Footer -->
+            <div class="footer-social">
+                <a href="https://www.instagram.com/glohubgames?igsh=MWNjdXd4aG83bzlwaA==" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+                    <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                </a>
+                <a href="https://www.tiktok.com/@glohubgames?_r=1&_t=ZS-93cO1P0WSES" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="TikTok">
+                    <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+                    </svg>
+                </a>
+            </div>
+            <p>Made with love for all the amazing girls out there</p>
+            <p>&copy; 2026 GloHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" onclick="scrollToTop()">
+        <span>↑</span>
+    </button>
+
+    <script src="supabase.js"></script>
+    <script src="client.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
