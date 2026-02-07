@@ -121,6 +121,10 @@ nav {
     font-weight: bold;
     color: #8A2BE2;
     font-family: var(--font-handwritten);
+<<<<<<< HEAD
+=======
+    transform: translateX(-30px)
+>>>>>>> nigel/main
 }
 
 nav {
@@ -193,7 +197,11 @@ nav a:hover {
     position: relative;
     z-index: 2;
     text-align: center;
+<<<<<<< HEAD
     max-width: 900px;
+=======
+    max-width: 1500px;
+>>>>>>> nigel/main
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -220,6 +228,7 @@ nav a:hover {
     }
 }
 
+<<<<<<< HEAD
 .btn-explore {
     margin-top: 40px; /* spacing below headline */
     margin-bottom: 150px;
@@ -260,6 +269,8 @@ nav a:hover {
     border: none;
     background-color: #B67BEF;
 }
+=======
+>>>>>>> nigel/main
 
 /* ==========================================
    FLAGSHIP PRODUCT SECTION
@@ -730,6 +741,7 @@ nav a:hover {
 .game-badge.coming-soon {
     background: linear-gradient(135deg, var(--primary), var(--accent));
     color: white;
+<<<<<<< HEAD
 }
 
 .blur-overlay {
@@ -745,6 +757,11 @@ nav a:hover {
     justify-content: center;
     z-index: 1;
 }
+=======
+    backdrop-filter: blur(1px);
+}
+
+>>>>>>> nigel/main
 
 .preview-text {
     text-align: center;
@@ -1150,6 +1167,13 @@ nav a:hover {
         display: block;
         color: #8A2BE2;
     }
+<<<<<<< HEAD
+=======
+
+    .logo{
+        margin-left: 30px;
+    }
+>>>>>>> nigel/main
     
   nav {
     position: fixed;
@@ -1194,6 +1218,14 @@ nav a:hover {
         background: url(assets/hero-bg-mobile.gif) no-repeat center center;
         background-size: cover;
          }
+<<<<<<< HEAD
+=======
+
+         .section-title {
+        font-size: 36px;
+        margin-bottom: 40px;
+    }
+>>>>>>> nigel/main
     
     .float-3d {
         font-size: 30px;
@@ -2496,8 +2528,13 @@ a.btn-large {
     }
 
     .section-title {
+<<<<<<< HEAD
         font-size: 28px;
         margin-bottom: 30px;
+=======
+        font-size: 42px;
+        margin-bottom: 40px;
+>>>>>>> nigel/main
     }
 
     .features-grid {
@@ -3126,8 +3163,13 @@ a.btn-large {
     }
 
     .section-title {
+<<<<<<< HEAD
         font-size: 22px;
         margin-bottom: 20px;
+=======
+        font-size: 42px;
+        margin-bottom: 40px;
+>>>>>>> nigel/main
     }
 
     .features-grid {
