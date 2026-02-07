@@ -79,6 +79,36 @@
             .auth-logo { font-size: 36px; }
             .auth-card { padding: 20px; }
         }
+
+        /* ===== Cinematic Page Transition ===== */
+        #transitionOverlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #ff4fd8, #120018 70%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+
+        #transitionOverlay.active {
+            opacity: 1;
+        }
+
+        .portal-glow {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at center, rgba(255,79,216,0.6), transparent 60%);
+            animation: portalPulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes portalPulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.6; }
+        }
+
     </style>
 </head>
 <body class="auth-page">
@@ -205,7 +235,7 @@
                         }
 
                         // Redirect to intro page (preserve existing role logic)
-                        window.location.href = 'intro.html';
+                        transitionTo('avatar-select.html');
                         return;
                     }
 
@@ -225,7 +255,7 @@
                         }
 
                         // Redirect to intro page (preserve existing role logic)
-                        window.location.href = 'intro.html';
+                        transitionTo('avatar-select.html');
                         return;
                     }
                 }
@@ -247,106 +277,38 @@
             });
             }
 
-            const serviceClient = require('../supabase/service-client');
-
-            module.exports = async (req, res) => {
+            function showError(message, timeout = 6000) {
+            const errorMsg = document.getElementById('errorMessage');
             try {
-                const { code } = req.body;
-                if (!code) return res.status(400).json({ success: false, message: 'code required' });
-
-                // Try to create the service client; if it's not configured return a graceful response
-                let supabase;
-                try {
-                supabase = serviceClient.getClient();
-                } catch (e) {
-                console.error('Supabase service client not configured', e);
-                return res.json({ success: false, message: 'service_unavailable' });
+                errorMsg.textContent = message;
+                errorMsg.style.display = 'block';
+                errorMsg.style.color = '#fff';
+                errorMsg.style.background = 'rgba(255,0,0,0.12)';
+                errorMsg.style.padding = '8px 12px';
+                errorMsg.style.borderRadius = '6px';
+                errorMsg.style.marginTop = '12px';
+                if (timeout > 0) {
+                setTimeout(() => { errorMsg.style.display = 'none'; }, timeout);
                 }
-
-                // ✅ NEW: First check the admins table (unified table for all admin types)
-                const { data: admin, error: adminError } = await supabase
-                .from('admins')
-                .select('*')
-                .eq('admin_code', code)
-                .eq('is_active', true)
-                .maybeSingle();
-
-                if (admin) {
-                // ✅ Determine effective role based on can_bypass
-                const effectiveRole = admin.can_bypass === true ? 'admin' : admin.role;
-
-                // If bypass mode OR if it's a superadmin, return super role
-                if (admin.role === 'superadmin' && !admin.can_bypass) {
-                    return res.json({
-                    success: true,
-                    role: 'super',
-                    id: admin.id,
-                    name: admin.name || 'Super Admin',
-                    code: admin.admin_code,
-                    isBypassMode: false
-                    });
-                }
-
-                // Regular admin or bypass mode
-                return res.json({
-                    success: true,
-                    role: 'client',
-                    id: admin.id,
-                    email: admin.email,
-                    code: admin.admin_code,
-                    client_id: admin.client_id,
-                    effectiveRole: effectiveRole,
-                    isBypassMode: admin.can_bypass === true
-                });
-                }
-
-                // ✅ FALLBACK: Check legacy super_admins table (if it still exists)
-                const { data: superAdmin } = await supabase
-                .from('super_admins')
-                .select('id, name, super_code, is_active')
-                .eq('super_code', code)
-                .eq('is_active', true)
-                .maybeSingle();
-
-                if (superAdmin) {
-                return res.json({
-                    success: true,
-                    role: 'super',
-                    id: superAdmin.id,
-                    name: superAdmin.name,
-                    code: superAdmin.super_code,
-                    isBypassMode: false
-                });
-                }
-
-                // ✅ FALLBACK: Check legacy clients table (if it still exists)
-                const { data: client } = await supabase
-                .from('clients')
-                .select('id, admin_email, admin_code, email')
-                .eq('admin_code', code)
-                .maybeSingle();
-
-                if (client) {
-                const email = client.admin_email || client.email || null;
-                return res.json({
-                    success: true,
-                    role: 'client',
-                    id: client.id,
-                    email: email,
-                    code: client.admin_code,
-                    effectiveRole: 'admin',
-                    isBypassMode: false
-                });
-                }
-
-                return res.json({ success: false, message: 'Invalid admin code' });
-            } catch (err) {
-                console.error('verify-admin error', err);
-                res.status(500).json({ success: false, message: 'server error' });
+            } catch (e) {
+                console.error('showError failed', e);
             }
-            };
+            }
+
+            function transitionTo(url) {
+            const overlay = document.getElementById('transitionOverlay');
+            overlay.classList.add('active');
+
+            setTimeout(() => {
+                window.location.href = url;
+            }, 900);
+        }
+
             </script>
 
-        
+        <div id="transitionOverlay">
+    <div class="portal-glow"></div>
+</div>
+
 </body>
 </html>
