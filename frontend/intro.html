@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Welcome</title>
+  <style>
+    :root{--bg:#120018;--card:#1e0a2a;--text:#fff;--muted:rgba(255,255,255,0.8)}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Helvetica,Arial}
+    body{background:#8435DE;display:flex;align-items:center;justify-content:center;color:var(--text)}
+    .container{width:100%;max-width:720px;padding:32px;box-sizing:border-box;text-align:center}
+
+    .stage{background:transparent;padding:28px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:22px}
+
+    /* simple SVG face styling */
+    .hero{width:220px;height:220px;display:block}
+    .svg-wrap{transform:translateY(20px);opacity:0;animation:heroIn 600ms ease-out forwards}
+
+    @keyframes heroIn{to{transform:translateY(0);opacity:1}}
+
+    /* speech bubble with image background */
+    .bubble-wrap{position:relative;margin-top:20px}
+    .bubble{
+      position:relative;
+      padding:20px 30px;
+      max-width:520px;
+      display:inline-block;
+      opacity:0;
+    }
+    
+    .bubble-image{
+      position:absolute;
+      top:0;
+      left:0;
+      width:200px;
+      height:50px;
+      object-fit:cover;
+      z-index:1;
+    }
+    
+    .bubble-text{
+      position:relative;
+      z-index:2;
+      font-size:18px;
+      font-weight:600;
+      color:#111;
+      min-height:1.5em;
+    }
+    
+    .bubble-text::after{
+      content:'|';
+      animation:blink 0.7s infinite;
+      margin-left:2px;
+    }
+    
+    .bubble-text.typing-complete::after{
+      display:none;
+    }
+
+    @keyframes blink{
+      0%, 50%{opacity:1}
+      51%, 100%{opacity:0}
+    }
+
+    .bubble.show{animation:bubbleIn 500ms cubic-bezier(.2,.9,.3,1) forwards}
+    @keyframes bubbleIn{to{opacity:1}}
+
+    .muted{color:var(--muted);font-size:14px;margin-top:20px}
+
+    /* small responsive tweak */
+    @media (max-width:480px){
+      .hero{width:160px;height:160px}
+      .bubble-text{font-size:16px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="stage">
+
+        <div class="bubble-wrap">
+        <div id="greetingBubble" class="bubble" aria-live="polite">
+          <img class="bubble-image" src="assets/chat-bubble.png" alt="">
+          <p id="greetingText" class="bubble-text"></p>
+        </div>
+      </div>
+
+      <div class="svg-wrap" aria-hidden="true">
+         <!-- PNG image replacing the SVG -->
+        <img class="hero" src="assets/Hero Section Character.png" alt="Lead character" role="img">
+      </div>
+
+      <div class="muted">Preparing your avatar selector…</div>
+    </div>
+  </div>
+
+  <script>
+    // Read admin name from sessionStorage; fallback to 'Admin'
+    (function(){
+      const raw = sessionStorage.getItem('adminDisplayName') || sessionStorage.getItem('name') || 'Admin';
+      const name = raw.trim() || 'Admin';
+      const textEl = document.getElementById('greetingText');
+      const bubble = document.getElementById('greetingBubble');
+      
+      const fullText = `Welcome ${name}, choose your character`;
+      let currentIndex = 0;
+      
+      // Show bubble first
+      setTimeout(() => {
+        bubble.classList.add('show');
+        
+        // Start typing after bubble appears
+        setTimeout(() => {
+          const typeInterval = setInterval(() => {
+            if (currentIndex < fullText.length) {
+              textEl.textContent += fullText[currentIndex];
+              currentIndex++;
+            } else {
+              clearInterval(typeInterval);
+              textEl.classList.add('typing-complete');
+              
+              // Wait 2 more seconds after typing completes, then navigate
+              setTimeout(() => {
+                document.body.style.transition = 'opacity 300ms ease';
+                document.body.style.opacity = '0';
+                setTimeout(() => {
+                  window.location.href = 'avatar-select.html';
+                }, 300);
+              }, 2000);
+            }
+          }, 80); // 80ms per character - adjust for faster/slower typing
+        }, 300);
+      }, 450);
+    })();
+  </script>
+</body>
+</html>

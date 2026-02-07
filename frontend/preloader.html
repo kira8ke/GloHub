@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff69b4">
+    <title>GloHub Kiss Transition</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+
+        #kissTransition {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #ff1493, #ff69b4, #ffb6d9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: kiss-reveal 1.5s ease forwards;
+        }
+
+        /* Exit state */
+        #kissTransition.exit {
+            animation: kiss-hide 1.5s ease forwards;
+        }
+
+        .kiss-emoji {
+            font-size: clamp(100px, 30vw, 300px);
+            animation: kiss-pop-in 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* Exit animation for emoji */
+        .kiss-emoji.exit {
+            animation: kiss-pop-out 1.2s ease forwards;
+        }
+
+        /* ENTRY */
+        @keyframes kiss-reveal {
+            from {
+                clip-path: circle(0% at 50% 50%);
+            }
+            to {
+                clip-path: circle(150% at 50% 50%);
+            }
+        }
+
+        @keyframes kiss-pop-in {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.2) rotate(15deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        /* EXIT (reverse feel) */
+        @keyframes kiss-hide {
+            from {
+                clip-path: circle(150% at 50% 50%);
+            }
+            to {
+                clip-path: circle(0% at 50% 50%);
+            }
+        }
+
+        @keyframes kiss-pop-out {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            40% {
+                transform: scale(1.2) rotate(-10deg);
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="kissTransition">
+        <div class="kiss-emoji" id="kiss">💋</div>
+    </div>
+
+    <script>
+        const transition = document.getElementById("kissTransition");
+        const kiss = document.getElementById("kiss");
+
+        // Start exit animation after entry completes
+        setTimeout(() => {
+            transition.classList.add("exit");
+            kiss.classList.add("exit");
+        }, 1800);
+
+        // Redirect after exit animation
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 3200);
+    </script>
+
+</body>
+</html>
