@@ -10,25 +10,51 @@ if (joinForm) {
         const username = document.getElementById('username').value.trim();
         
         try {
-            // Check if session exists
-            const { data: session, error } = await supabase
-                .from('sessions')
-                .select('*')
-                .eq('join_code', code)
-                .single();
+            let session = null;
+            let isSuperAdmin = false;
 
-            if (error || !session) {
-                showError('Invalid game code. Please check and try again.');
-                return;
+            // Check if code length > 6 (super admin bypass code)
+            if (code.length > 6) {
+                // Query super_admins table
+                const { data: superAdminData, error: superAdminError } = await supabase
+                    .from('super_admins')
+                    .select('*')
+                    .eq('super_code', code)
+                    .single();
+
+                if (superAdminError || !superAdminData) {
+                    showError('Invalid super admin code. Please check and try again.');
+                    return;
+                }
+
+                // Super admin found
+                session = superAdminData;
+                isSuperAdmin = true;
+            } else {
+                // Standard game code (6 characters or less)
+                const { data: sessionData, error: sessionError } = await supabase
+                    .from('sessions')
+                    .select('*')
+                    .eq('join_code', code)
+                    .single();
+
+                if (sessionError || !sessionData) {
+                    showError('Invalid game code. Please check and try again.');
+                    return;
+                }
+
+                session = sessionData;
+                isSuperAdmin = false;
             }
 
             // Store session info
             sessionStorage.setItem('sessionId', session.id);
             sessionStorage.setItem('joinCode', code);
             sessionStorage.setItem('username', username);
+            sessionStorage.setItem('isSuperAdmin', isSuperAdmin.toString());
             
             // Redirect to avatar customizer
-            window.location.href = 'avatar-customizer.html';
+            window.location.href = 'avatar-select.html';
             
         } catch (err) {
             console.error('Join game error:', err);

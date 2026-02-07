@@ -116,12 +116,12 @@
 
       // After animations complete and a short pause, redirect
       setTimeout(() => {
-        document.body.style.transition = 'opacity 300ms ease';
+        document.body.style.transition = 'opacity 1000ms ease';
         document.body.style.opacity = '0';
         setTimeout(() => {
           window.location.href = 'admin-dashboard.html';
         }, 300);
-      }, 2400); // Allow animations to play
+      }, 5000); // Allow animations to play
     })();
   </script>
 </body>
