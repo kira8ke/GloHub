@@ -566,7 +566,9 @@
         role: 'The Guardian',
         description: 'Strong, protective, and loyal. Orbit stands firm in the face of adversity and always looks out for the team. A reliable force you can count on.',
         image: 'assets/Red Standing Character.png',
-        cardBackground: 'assets/redcard.png'
+        cardBackground: 'assets/redcard.png',
+        expandedBackground: '#AF0002'
+        
       },
       {
         id: 'avatar4',
@@ -574,7 +576,8 @@
         role: 'The Harmonizer',
         description: 'Aurora brings balance and peace to any situation. With a calm demeanor and wise perspective, this character helps others find their center and inner strength.',
         image: 'assets/Dark Green Standing Character.png',
-        cardBackground: 'assets/darkgreencard.png'
+        cardBackground: 'assets/darkgreencard.png',
+        expandedBackground: '#241D00'
       },
             {
         id: 'avatar6',
@@ -582,7 +585,8 @@
         role: 'The Nurturer',
         description: 'Gentle, caring, and supportive. Blossom helps others grow and flourish, creating safe spaces where everyone can thrive and reach their full potential.',
         image: 'assets/Baby Pink Standing Character.png',
-        cardBackground: 'assets/pinkcard.png'
+        cardBackground: 'assets/pinkcard.png',
+        expandedBackground: '#E25B6C'
       },
       {
         id: 'avatar1',
@@ -590,7 +594,8 @@
         role: 'The Illuminator',
         description: 'Starlight radiates positive energy and brings light to even the darkest corners. With an optimistic spirit and endless creativity, this character transforms challenges into opportunities.',
         image: 'assets/Yellow Standing Character.png',
-        cardBackground: 'assets/yellowcard.png'
+        cardBackground: 'assets/yellowcard.png',
+        expandedBackground: '#FCCD0D'
       },
        {
         id: 'avatar9',
@@ -598,7 +603,8 @@
         role: 'The Mystic',
         description: 'Mysterious and intuitive, Echo connects with deeper truths and hidden meanings. Guides others through introspection and spiritual discovery.',
         image: 'assets/Purple Standing Character.png',
-        cardBackground: 'assets/purplecard.png'
+        cardBackground: 'assets/purplecard.png',
+        expandedBackground: '#650478'
       },
       {
         id: 'avatar2',
@@ -606,7 +612,8 @@
         role: 'The Speedster',
         description: 'Fast, fierce, and fearless. Comet moves through challenges with lightning speed and precision. Always ready for action and never backing down from a challenge.',
         image: 'assets/Black_Standing_Character.png',
-        cardBackground: 'assets/blackcard.png'
+        cardBackground: 'assets/blackcard.png',
+        expandedBackground: '#1B1714'
       },
       {
         id: 'avatar3',
@@ -614,7 +621,8 @@
         role: 'The Explorer',
         description: 'Curious and adventurous, Nova seeks new experiences and knowledge. A natural leader who inspires others to push beyond their limits and discover the unknown.',
         image: 'assets/Hero Section Character.png',
-        cardBackground: 'assets/whitecard.png'
+        cardBackground: 'assets/whitecard.png',
+        expandedBackground: '#A8979F'
       },
       {
         id: 'avatar10',
@@ -622,7 +630,8 @@
         role: 'The Dreamer',
         description: 'Imaginative and visionary, Luna sees possibilities where others see limitations. Inspires creativity and helps turn dreams into reality.',
         image: 'assets/Cyan Standing Character (2).png',
-        cardBackground: 'assets/ciancard.png'
+        cardBackground: 'assets/ciancard.png',
+        expandedBackground: '#00A7BA'
       },
       {
         id: 'avatar5',
@@ -630,7 +639,8 @@
         role: 'The Innovator',
         description: 'Tech-savvy and forward-thinking, Pixel blends digital creativity with practical solutions. Always at the cutting edge of innovation and technological advancement.',
         image: 'assets/avatar5.png',
-        cardBackground: 'assets/pixel-bg.jpg'
+        cardBackground: 'assets/pixel-bg.jpg',
+        expandedBackground: '#241D00'
       },
       {
         id: 'avatar8',
@@ -638,7 +648,8 @@
         role: 'The Strategist',
         description: 'Sharp-minded and analytical, Glint sees patterns others miss. Excels at planning, problem-solving, and turning complex situations into elegant solutions.',
         image: 'assets/avatar8.png',
-        cardBackground: 'assets/glint-bg.jpg'
+        cardBackground: 'assets/glint-bg.jpg',
+        expandedBackground: '#241D00'
       }
     ];
 
@@ -750,7 +761,11 @@
       document.getElementById('expandedDescription').textContent = char.description;
       // set ARIA and show
       expandedView.setAttribute('aria-hidden', 'false');
-      expandedView.classList.add('active');
+      expandedView.style.background = char.expandedBackground || 
+  'linear-gradient(135deg, rgba(10, 0, 21, 0.98), rgba(45, 27, 78, 0.98))';
+
+expandedView.classList.add('active');
+
       document.body.style.overflow = 'hidden';
 
       // focus the close button for keyboard users
