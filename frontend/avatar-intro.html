@@ -79,50 +79,7 @@
     </div>
   </div>
 
-  <!-- Import dialogue module -->
-  <script type="module">
-    import { getAvatar, interpolate } from './dialogue.js';
-
-    (async function() {
-      // Read selection from sessionStorage
-      const avatarId = sessionStorage.getItem('selectedAvatarId') || 'avatar1';
-      const adminName = sessionStorage.getItem('adminDisplayName') || 'Admin';
-
-      // Get avatar data
-      const avatar = getAvatar(avatarId);
-      if (!avatar) {
-        console.warn('Avatar not found, redirecting...');
-        window.location.href = 'admin-dashboard.html';
-        return;
-      }
-
-      // Populate avatar display
-      document.getElementById('avatarImage').src = avatar.image;
-      document.getElementById('avatarImage').alt = `${avatar.name} avatar`;
-
-      // Set avatar name labels
-      const nameLabels = document.querySelectorAll('[id^="avatarNameLabel"]');
-      nameLabels.forEach(label => {
-        label.textContent = avatar.name;
-      });
-
-      // Dialogue messages
-      const intro1 = `Nice to meet you ${adminName}`;
-      const intro2 = `Let's set up the game, shall we?`;
-
-      // Populate bubbles (they animate in via CSS)
-      document.getElementById('bubble1').textContent = intro1;
-      document.getElementById('bubble2').textContent = intro2;
-
-      // After animations complete and a short pause, redirect
-      setTimeout(() => {
-        document.body.style.transition = 'opacity 1000ms ease';
-        document.body.style.opacity = '0';
-        setTimeout(() => {
-          window.location.href = 'admin-dashboard.html';
-        }, 300);
-      }, 5000); // Allow animations to play
-    })();
-  </script>
+  <!-- Import routing module -->
+  <script type="module" src="./avatar-intro.js"></script>
 </body>
 </html>

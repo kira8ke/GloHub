@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Charades Wait Room - GloHub</title>
+  <style>
+    :root{--bg:#120018;--card:#1e0a2a;--accent:#ff66c4;--text:#fff;--muted:rgba(255,255,255,0.8)}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Helvetica,Arial}
+    body{background:linear-gradient(135deg,#120018,#2b0036);display:flex;align-items:center;justify-content:center;color:var(--text);padding:20px}
+    
+    .container{width:100%;max-width:800px;padding:40px;box-sizing:border-box;text-align:center;background:linear-gradient(135deg,rgba(30,10,42,0.8),rgba(58,0,77,0.8));border-radius:20px;border:2px solid var(--accent)}
+    
+    h1{font-size:40px;margin:0 0 10px 0;background:linear-gradient(135deg,#ff66c4,#ff99dd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    
+    .room-info{color:var(--muted);font-size:14px;margin-bottom:30px}
+    
+    .game-code{font-size:32px;color:var(--accent);font-weight:700;font-family:monospace;letter-spacing:3px}
+    
+    .players-section{margin:40px 0;text-align:left}
+    
+    .players-label{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:15px}
+    
+    .players-list{background:rgba(0,0,0,0.3);border-radius:12px;padding:20px;min-height:100px;max-height:300px;overflow-y:auto}
+    
+    .player-item{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,102,196,0.1);border-left:3px solid var(--accent);border-radius:8px;margin-bottom:10px;animation:slideIn 300ms ease}
+    
+    @keyframes slideIn{
+      from{opacity:0;transform:translateX(-20px)}
+      to{opacity:1;transform:translateX(0)}
+    }
+    
+    .player-avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:18px}
+    
+    .player-name{flex:1;font-weight:600;color:var(--text)}
+    
+    .player-status{font-size:12px;color:var(--muted)}
+    
+    .empty-state{text-align:center;color:var(--muted);padding:40px 20px}
+    
+    .empty-state-icon{font-size:48px;margin-bottom:10px}
+    
+    .waiting-indicator{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--accent);margin:20px 0}
+    
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.5s ease-in-out infinite}
+    
+    .dot:nth-child(1){animation-delay:0s}
+    .dot:nth-child(2){animation-delay:0.3s}
+    .dot:nth-child(3){animation-delay:0.6s}
+    
+    @keyframes pulse{
+      0%,100%{opacity:0.3;transform:scale(1)}
+      50%{opacity:1;transform:scale(1.2)}
+    }
+    
+    .admin-controls{background:rgba(255,102,196,0.15);border:2px solid var(--accent);border-radius:12px;padding:20px;margin-top:30px;display:none}
+    
+    .admin-controls.visible{display:block}
+    
+    .admin-label{font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:15px;font-weight:700}
+    
+    .btn-start{background:linear-gradient(135deg,#ff66c4,#ff99dd);color:var(--bg);border:none;padding:15px 40px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:all 300ms ease;width:100%;text-transform:uppercase;letter-spacing:1px}
+    
+    .btn-start:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,102,196,0.4)}
+    
+    .btn-start:disabled{opacity:0.5;cursor:not-allowed}
+    
+    .error{color:#ff6b6b;margin:20px 0;padding:15px;background:rgba(255,107,107,0.1);border-radius:8px}
+    
+    @media (max-width:600px){
+      .container{padding:20px}
+      h1{font-size:28px}
+      .game-code{font-size:24px}
+      .players-list{max-height:200px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎭 Charades Game Wait Room</h1>
+    <p class="room-info">Game starting soon...</p>
+    
+    <div class="game-code" id="gameCodeDisplay">LOADING...</div>
+    
+    <div class="players-section">
+      <div class="players-label">Players Ready (<span id="playerCount">0</span>)</div>
+      <div class="players-list" id="playersList">
+        <div class="empty-state">
+          <div class="empty-state-icon">⏳</div>
+          <p>Waiting for players to join...</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="waiting-indicator">
+      <span>Waiting for all players</span>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    
+    <!-- Admin Controls -->
+    <div class="admin-controls" id="adminControls">
+      <div class="admin-label">Admin Controls</div>
+      <button class="btn-start" id="startGameBtn" onclick="startGame()">Start Game Now</button>
+    </div>
+    
+    <div class="error" id="errorMessage" style="display:none;"></div>
+  </div>
+
+  <script type="module">
+    // Session validation
+    const sessionId = sessionStorage.getItem('sessionId');
+    const joinCode = sessionStorage.getItem('joinCode');
+    const username = sessionStorage.getItem('username');
+    const isSuperAdmin = sessionStorage.getItem('isSuperAdmin') === 'true';
+
+    if (!sessionId || !joinCode || !username) {
+      document.getElementById('errorMessage').textContent = 'Session invalid. Redirecting...';
+      document.getElementById('errorMessage').style.display = 'block';
+      setTimeout(() => window.location.href = 'join-game.html', 2000);
+    } else {
+      // Display game code
+      document.getElementById('gameCodeDisplay').textContent = joinCode;
+      
+      // Show admin controls if super admin
+      if (isSuperAdmin) {
+        document.getElementById('adminControls').classList.add('visible');
+      }
+      
+      // Load players list
+      loadPlayersList();
+      
+      // Poll for player updates every 2 seconds
+      setInterval(loadPlayersList, 2000);
+    }
+
+    async function loadPlayersList() {
+      try {
+        const { data: players, error } = await supabase
+          .from('players')
+          .select('*')
+          .eq('session_id', sessionId)
+          .order('joined_at', { ascending: true });
+
+        if (error) {
+          console.error('Error loading players:', error);
+          return;
+        }
+
+        const playersList = document.getElementById('playersList');
+        const playerCount = document.getElementById('playerCount');
+
+        if (!players || players.length === 0) {
+          playersList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>Waiting for players to join...</p></div>';
+          playerCount.textContent = '0';
+          return;
+        }
+
+        playerCount.textContent = players.length;
+        playersList.innerHTML = players.map((player, index) => `
+          <div class="player-item">
+            <div class="player-avatar">${player.username?.charAt(0).toUpperCase() || '?'}</div>
+            <div class="player-name">${player.username || 'Unknown Player'}</div>
+            <div class="player-status">✓ Ready</div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Error in loadPlayersList:', err);
+      }
+    }
+  </script>
+
+  <script>
+    function startGame() {
+      const btn = document.getElementById('startGameBtn');
+      btn.disabled = true;
+      btn.textContent = 'Starting...';
+      
+      // Store start time and redirect
+      sessionStorage.setItem('gameStartTime', new Date().toISOString());
+      
+      // Redirect to charades game
+      setTimeout(() => {
+        window.location.href = 'spin-game.html';
+      }, 500);
+    }
+  </script>
+</body>
+</html>
