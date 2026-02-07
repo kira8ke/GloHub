@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="apple-mobile-web-app-capable" content="true">
     <meta name="theme-color" content="#ff69b4">
-<<<<<<< HEAD
-    <title>Galentine Quiz - GalentineHub</title>
-    <link rel="stylesheet" href="styles.css">
-=======
-    <title>Piksy Quiz - GloHub</title>
+    <title>Piksi Quiz - GloHub</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         /* Game Flow Styles */
@@ -478,7 +474,6 @@
             }
         }
     </style>
->>>>>>> nigel/main
 </head>
 <body class="game-page">
     <div class="game-container">
@@ -495,16 +490,6 @@
             <h2>Waiting for the quiz to start...</h2>
             <p>Get ready to show what you know!</p>
             <div class="lobby-players" id="lobbyPlayers"></div>
-<<<<<<< HEAD
-        </div>
-
-        <!-- Quiz Game -->
-        <div id="quizGame" class="quiz-game" style="display: none;">
-            <div class="question-container">
-                <div class="question-header">
-                    <span class="question-number" id="questionNumber">Question 1</span>
-                    <span class="question-timer" id="questionTimer">30s</span>
-=======
             <button class="ready-button" id="readyBtn" onclick="toggleReady()">I'm Ready!</button>
         </div>
 
@@ -514,7 +499,6 @@
                 <div class="question-header">
                     <span class="question-number" id="questionNumber">Question 1</span>
                     <span class="question-timer" id="questionTimer">10s</span>
->>>>>>> nigel/main
                 </div>
                 
                 <h2 class="question-text" id="questionText"></h2>
@@ -527,24 +511,6 @@
             </div>
         </div>
 
-<<<<<<< HEAD
-        <!-- Leaderboard -->
-        <div id="leaderboard" class="leaderboard" style="display: none;">
-            <h2>Leaderboard</h2>
-            <div id="leaderboardList" class="leaderboard-list"></div>
-            <button class="btn-primary" onclick="nextQuestion()">Next Question →</button>
-        </div>
-
-        <!-- Final Results -->
-        <div id="finalResults" class="final-results" style="display: none;">
-            <h2>Game Over!</h2>
-            <h3>Final Standings</h3>
-            <div id="finalLeaderboard" class="leaderboard-list"></div>
-            <button class="btn-primary" onclick="backToLobby()">Back to Lobby</button>
-        </div>
-    </div>
-
-=======
         <!-- Final Results -->
         <div id="finalResults">
             <h2>Game Over!</h2>
@@ -575,7 +541,6 @@
         <div class="podium-container" id="podiumContainer"></div>
     </div>
 
->>>>>>> nigel/main
     <script src="supabase.js"></script>
     <script src="quiz.js"></script>
 </body>

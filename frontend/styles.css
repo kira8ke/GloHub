@@ -121,10 +121,7 @@ nav {
     font-weight: bold;
     color: #8A2BE2;
     font-family: var(--font-handwritten);
-<<<<<<< HEAD
-=======
     transform: translateX(-30px)
->>>>>>> nigel/main
 }
 
 nav {
@@ -197,11 +194,7 @@ nav a:hover {
     position: relative;
     z-index: 2;
     text-align: center;
-<<<<<<< HEAD
-    max-width: 900px;
-=======
     max-width: 1500px;
->>>>>>> nigel/main
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -228,49 +221,6 @@ nav a:hover {
     }
 }
 
-<<<<<<< HEAD
-.btn-explore {
-    margin-top: 40px; /* spacing below headline */
-    margin-bottom: 150px;
-    padding: 15px 30px;
-    font-size: 20px;
-    background: transparent;
-    color: white;
-    border-radius: 50px;
-    border: 2px solid white;
-    font-weight: 500;
-    cursor: pointer;
-    box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);
-    animation: fadeInScale 1.6s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-explore::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-
-.btn-explore:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-.btn-explore:hover {
-    color:white;
-    border: none;
-    background-color: #B67BEF;
-}
-=======
->>>>>>> nigel/main
 
 /* ==========================================
    FLAGSHIP PRODUCT SECTION
@@ -741,27 +691,9 @@ nav a:hover {
 .game-badge.coming-soon {
     background: linear-gradient(135deg, var(--primary), var(--accent));
     color: white;
-<<<<<<< HEAD
-}
-
-.blur-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(2px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-}
-=======
     backdrop-filter: blur(1px);
 }
 
->>>>>>> nigel/main
 
 .preview-text {
     text-align: center;
@@ -1167,13 +1099,10 @@ nav a:hover {
         display: block;
         color: #8A2BE2;
     }
-<<<<<<< HEAD
-=======
 
     .logo{
         margin-left: 30px;
     }
->>>>>>> nigel/main
     
   nav {
     position: fixed;
@@ -1218,14 +1147,11 @@ nav a:hover {
         background: url(assets/hero-bg-mobile.gif) no-repeat center center;
         background-size: cover;
          }
-<<<<<<< HEAD
-=======
 
          .section-title {
         font-size: 36px;
         margin-bottom: 40px;
     }
->>>>>>> nigel/main
     
     .float-3d {
         font-size: 30px;
@@ -2528,13 +2454,8 @@ a.btn-large {
     }
 
     .section-title {
-<<<<<<< HEAD
-        font-size: 28px;
-        margin-bottom: 30px;
-=======
         font-size: 42px;
         margin-bottom: 40px;
->>>>>>> nigel/main
     }
 
     .features-grid {
@@ -3163,13 +3084,8 @@ a.btn-large {
     }
 
     .section-title {
-<<<<<<< HEAD
-        font-size: 22px;
-        margin-bottom: 20px;
-=======
         font-size: 42px;
         margin-bottom: 40px;
->>>>>>> nigel/main
     }
 
     .features-grid {

@@ -12,6 +12,7 @@ if (joinForm) {
         try {
             let session = null;
             let isSuperAdmin = false;
+            let gameType = null;
 
             // Check if code length > 6 (super admin bypass code)
             if (code.length > 6) {
@@ -31,20 +32,35 @@ if (joinForm) {
                 session = superAdminData;
                 isSuperAdmin = true;
             } else {
-                // Standard game code (6 characters or less)
-                const { data: sessionData, error: sessionError } = await supabase
-                    .from('sessions')
+                // Standard game code (6 characters)
+                // Check quiz_sessions first
+                const { data: quizSession, error: quizError } = await supabase
+                    .from('quiz_sessions')
                     .select('*')
-                    .eq('join_code', code)
+                    .eq('game_code', code)
                     .single();
 
-                if (sessionError || !sessionData) {
-                    showError('Invalid game code. Please check and try again.');
-                    return;
-                }
+                if (quizSession && !quizError) {
+                    session = quizSession;
+                    gameType = 'quiz';
+                    isSuperAdmin = false;
+                } else {
+                    // Check charades_games
+                    const { data: charadesGame, error: charadesError } = await supabase
+                        .from('charades_games')
+                        .select('*')
+                        .eq('game_code', code)
+                        .single();
 
-                session = sessionData;
-                isSuperAdmin = false;
+                    if (charadesGame && !charadesError) {
+                        session = charadesGame;
+                        gameType = 'charades';
+                        isSuperAdmin = false;
+                    } else {
+                        showError('Invalid game code. Please check and try again.');
+                        return;
+                    }
+                }
             }
 
             // Store session info
@@ -52,6 +68,9 @@ if (joinForm) {
             sessionStorage.setItem('joinCode', code);
             sessionStorage.setItem('username', username);
             sessionStorage.setItem('isSuperAdmin', isSuperAdmin.toString());
+            if (gameType) {
+                sessionStorage.setItem('gameType', gameType);
+            }
             
             // Redirect to avatar customizer
             window.location.href = 'avatar-select.html';

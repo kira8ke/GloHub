@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-// Quiz Game Logic
-=======
 // Quiz Game Logic - Complete Flow Implementation
->>>>>>> nigel/main
 
 let currentSession = null;
 let questions = [];
@@ -11,16 +7,6 @@ let playerScore = 0;
 let timeLeft = 10;
 let timer = null;
 let hasAnswered = false;
-<<<<<<< HEAD
-
-document.addEventListener('DOMContentLoaded', async () => {
-    const session = checkPlayerSession();
-    if (!session) return;
-    
-    // Display player info
-    document.getElementById('playerName').textContent = `${session.username}`;
-    document.getElementById('gameCode').textContent = `Code: ${session.sessionId}`;
-=======
 let playerReady = false;
 let allPlayers = [];
 let gameStarted = false;
@@ -63,15 +49,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Display player info
     document.getElementById('playerName').textContent = `Player: ${session.username}`;
     document.getElementById('gameCode').textContent = `Code: ${session.joinCode}`;
->>>>>>> nigel/main
     
     // Load session data
     await loadSessionData(session.sessionId);
     
     // Show lobby initially
     showLobby();
-<<<<<<< HEAD
-=======
     
     // Simulate loading player list (in real app, this would come from Supabase realtime)
     await loadPlayersList();
@@ -83,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             // startGameCountdown(); // Uncomment when admin trigger is ready
         }
     }, 10000);
->>>>>>> nigel/main
 });
 
 async function loadSessionData(sessionId) {
@@ -114,29 +96,6 @@ async function loadSessionData(sessionId) {
         
     } catch (error) {
         console.error('Error loading session:', error);
-<<<<<<< HEAD
-    }
-}
-
-function showLobby() {
-    document.getElementById('lobby').style.display = 'block';
-    document.getElementById('quizGame').style.display = 'none';
-    document.getElementById('leaderboard').style.display = 'none';
-    document.getElementById('finalResults').style.display = 'none';
-    
-    // In a real app, you'd wait for admin to start game
-    // For now, auto-start after 3 seconds
-    setTimeout(() => {
-        if (questions.length > 0) {
-            startQuiz();
-        } else {
-            document.getElementById('lobby').innerHTML = `
-                <h2>No questions available</h2>
-                <p>The admin hasn't added any questions yet.</p>
-            `;
-        }
-    }, 3000);
-=======
         questions = generateDemoQuestions(); // Fallback to demo questions
     }
 }
@@ -242,7 +201,6 @@ function startGameCountdown() {
             startQuiz();
         }
     }, 1000);
->>>>>>> nigel/main
 }
 
 function startQuiz() {
@@ -250,9 +208,6 @@ function startQuiz() {
     playerScore = 0;
     
     document.getElementById('lobby').style.display = 'none';
-<<<<<<< HEAD
-    document.getElementById('quizGame').style.display = 'block';
-=======
     document.getElementById('quizGame').style.display = 'flex';
     document.getElementById('finalResults').style.display = 'none';
     
@@ -260,18 +215,13 @@ function startQuiz() {
         showFinalResults();
         return;
     }
->>>>>>> nigel/main
     
     loadQuestion();
 }
 
 function loadQuestion() {
     if (currentQuestionIndex >= questions.length) {
-<<<<<<< HEAD
-        showFinalResults();
-=======
         showPodium();
->>>>>>> nigel/main
         return;
     }
     
@@ -312,11 +262,7 @@ function startTimer() {
                 showCorrectAnswer();
                 setTimeout(() => {
                     currentQuestionIndex++;
-<<<<<<< HEAD
-                    showLeaderboard();
-=======
                     showFeedback(false, false);
->>>>>>> nigel/main
                 }, 2000);
             }
         }
@@ -334,20 +280,6 @@ async function selectAnswer(selectedIndex) {
     
     if (isCorrect) {
         playerScore += 100;
-<<<<<<< HEAD
-
-         // ADD CELEBRATION EFFECT
-        if (window.gameAnimations) {
-            window.gameAnimations.celebrateWithConfetti();
-        }
-    } else {
-        // ADD SHAKE EFFECT FOR WRONG ANSWER
-        const feedback = document.getElementById('answerFeedback');
-        if (window.gameAnimations && feedback) {
-            window.gameAnimations.shakeElement(feedback);
-        }
-=======
->>>>>>> nigel/main
     }
     
     // Visual feedback
@@ -361,23 +293,13 @@ async function selectAnswer(selectedIndex) {
         }
     });
     
-<<<<<<< HEAD
-    // Show feedback
-=======
     // Show answer feedback
->>>>>>> nigel/main
     const feedback = document.getElementById('answerFeedback');
     feedback.style.display = 'block';
     feedback.textContent = isCorrect ? 
         'Correct! +100 points!' : 
         'Oops! Better luck next time!';
     feedback.style.background = isCorrect ? '#4caf50' : '#f44336';
-<<<<<<< HEAD
-    feedback.style.color = 'white';
-    feedback.style.padding = '15px';
-    feedback.style.borderRadius = '10px';
-=======
->>>>>>> nigel/main
     
     // Save response
     try {
@@ -386,11 +308,7 @@ async function selectAnswer(selectedIndex) {
             .insert([
                 {
                     session_id: currentSession.id,
-<<<<<<< HEAD
-                    user_id: sessionStorage.getItem('userId'),
-=======
                     user_id: sessionStorage.getItem('userId') || 'anonymous',
->>>>>>> nigel/main
                     question_id: question.id,
                     answer: selectedIndex,
                     is_correct: isCorrect
@@ -400,17 +318,10 @@ async function selectAnswer(selectedIndex) {
         console.error('Error saving response:', error);
     }
     
-<<<<<<< HEAD
-    // Move to next question after delay
-    setTimeout(() => {
-        currentQuestionIndex++;
-        showLeaderboard();
-=======
     // Move to next question with feedback
     setTimeout(() => {
         currentQuestionIndex++;
         showFeedback(isCorrect, true);
->>>>>>> nigel/main
     }, 2000);
 }
 
@@ -427,63 +338,6 @@ function showCorrectAnswer() {
     
     const feedback = document.getElementById('answerFeedback');
     feedback.style.display = 'block';
-<<<<<<< HEAD
-    feedback.textContent = 'Time\'s up!';
-    feedback.style.background = '#ff9800';
-    feedback.style.color = 'white';
-    feedback.style.padding = '15px';
-    feedback.style.borderRadius = '10px';
-}
-
-async function showLeaderboard() {
-    document.getElementById('quizGame').style.display = 'none';
-    document.getElementById('leaderboard').style.display = 'block';
-    
-    // In a real multiplayer game, you'd load all players' scores
-    // For now, just show current player
-    const leaderboardList = document.getElementById('leaderboardList');
-    leaderboardList.innerHTML = `
-                <div class="leaderboard-item">
-            <div>
-                <strong>${sessionStorage.getItem('username')}</strong>
-            </div>
-            <div style="font-size: 20px; font-weight: bold; color: #ff69b4;">
-                ${playerScore} points
-            </div>
-        </div>
-    `;
-}
-
-function nextQuestion() {
-    document.getElementById('leaderboard').style.display = 'none';
-    document.getElementById('quizGame').style.display = 'block';
-    loadQuestion();
-}
-
-function showFinalResults() {
-    document.getElementById('quizGame').style.display = 'none';
-    document.getElementById('leaderboard').style.display = 'none';
-    document.getElementById('finalResults').style.display = 'block';
-    
-    const finalLeaderboard = document.getElementById('finalLeaderboard');
-    finalLeaderboard.innerHTML = `
-            <div class="leaderboard-item" style="background: linear-gradient(135deg, #ffd700, #fff4cc); padding: 30px;">
-            <div>
-                <strong style="font-size: 24px;">${sessionStorage.getItem('username')}</strong>
-                <div style="font-size: 14px; margin-top: 10px;">You're amazing!</div>
-            </div>
-            <div style="font-size: 32px; font-weight: bold; color: #ff69b4;">
-                ${playerScore} points
-            </div>
-        </div>
-    `;
-}
-
-function backToLobby() {
-    currentQuestionIndex = 0;
-    playerScore = 0;
-    showLobby();
-=======
     feedback.textContent = "Time's up!";
     feedback.style.background = '#ff9800';
 }
@@ -600,5 +454,4 @@ function leaveGame() {
     
     // Redirect to join game
     window.location.href = 'join-game.html';
->>>>>>> nigel/main
 }

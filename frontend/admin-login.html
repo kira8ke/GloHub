@@ -277,27 +277,6 @@
             });
             }
 
-<<<<<<< HEAD
-=======
-            function showError(message, timeout = 6000) {
-            const errorMsg = document.getElementById('errorMessage');
-            try {
-                errorMsg.textContent = message;
-                errorMsg.style.display = 'block';
-                errorMsg.style.color = '#fff';
-                errorMsg.style.background = 'rgba(255,0,0,0.12)';
-                errorMsg.style.padding = '8px 12px';
-                errorMsg.style.borderRadius = '6px';
-                errorMsg.style.marginTop = '12px';
-                if (timeout > 0) {
-                setTimeout(() => { errorMsg.style.display = 'none'; }, timeout);
-                }
-            } catch (e) {
-                console.error('showError failed', e);
-            }
-            }
-
->>>>>>> nigel/main
             function transitionTo(url) {
             const overlay = document.getElementById('transitionOverlay');
             overlay.classList.add('active');
