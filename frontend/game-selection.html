@@ -7,21 +7,21 @@
   <style>
     :root{--bg:#120018;--card:#1e0a2a;--accent:#ff66c4;--text:#fff;--muted:rgba(255,255,255,0.8)}
     html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Helvetica,Arial}
-    body{background:linear-gradient(135deg,#120018,#2b0036);display:flex;align-items:center;justify-content:center;color:var(--text);padding:20px}
+    body{background:#8435DE;display:flex;align-items:center;justify-content:center;color:var(--text);padding:20px}
     
-    .container{width:100%;max-width:900px;padding:40px;box-sizing:border-box;text-align:center}
+    .container{width:100%;max-width:900px;padding:40px;box-sizing:border-box;text-align:center; background-color: #8435DE;}
     
-    h1{font-size:48px;margin:0 0 20px 0;background:linear-gradient(135deg,#ff66c4,#ff99dd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    h1{font-size:48px;margin:0 0 20px 0;background:white;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     
     .subtitle{color:var(--muted);font-size:18px;margin-bottom:60px;letter-spacing:0.5px}
     
     .games-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:40px}
     
-    .game-card{background:linear-gradient(135deg,rgba(255,102,196,0.1),rgba(255,153,221,0.1));border:2px solid var(--accent);border-radius:20px;padding:40px;cursor:pointer;transition:all 300ms ease;position:relative;overflow:hidden}
+    .game-card{background:#3C0E70;border-radius:20px;padding:40px;cursor:pointer;transition:all 300ms ease;position:relative;overflow:hidden}
     
     .game-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,0.1));opacity:0;transition:opacity 300ms ease}
     
-    .game-card:hover{transform:translateY(-10px);border-color:#ff99dd;background:linear-gradient(135deg,rgba(255,102,196,0.2),rgba(255,153,221,0.2));box-shadow:0 20px 40px rgba(255,102,196,0.3)}
+    .game-card:hover{transform:translateY(-10px);box-shadow:0 20px 40px rgba(255,102,196,0.3)}
     
     .game-card:hover::before{opacity:1}
     
@@ -31,7 +31,7 @@
     
     .game-description{color:var(--muted);font-size:15px;line-height:1.6;margin:0}
     
-    .btn-back{background:rgba(255,102,196,0.2);color:var(--accent);border:2px solid var(--accent);padding:12px 24px;border-radius:12px;font-size:14px;cursor:pointer;transition:all 300ms ease;font-weight:600;text-decoration:none;display:inline-block}
+    .btn-back{background:#3C0E70;color:white;padding:12px 24px;border-radius:30px;font-size:14px;cursor:pointer;transition:all 300ms ease;font-weight:600;text-decoration:none;display:inline-block}
     
     .btn-back:hover{background:var(--accent);color:var(--bg)}
     
@@ -48,7 +48,7 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" style="background-color: #8435DE;">
     <h1>Choose Game to Inspect</h1>
     <p class="subtitle">Select a game type to start managing</p>
     
