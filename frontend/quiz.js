@@ -40,18 +40,29 @@ const motivationalPhrases = [
 ];
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const session = checkPlayerSession();
-    if (!session) {
+    const sessionData = checkPlayerSession();
+    if (!sessionData) {
         window.location.href = 'join-game.html';
         return;
     }
     
+    // Get player info from session storage
+    const username = sessionStorage.getItem('username');
+    const joinCode = sessionStorage.getItem('joinCode');
+    const userId = sessionStorage.getItem('userId');
+    
     // Display player info
-    document.getElementById('playerName').textContent = `Player: ${session.username}`;
-    document.getElementById('gameCode').textContent = `Code: ${session.joinCode}`;
+    if (username) document.getElementById('playerName').textContent = `Player: ${username}`;
+    if (joinCode) document.getElementById('gameCode').textContent = `Code: ${joinCode}`;
     
     // Load session data
-    await loadSessionData(session.sessionId);
+    const sessionId = sessionStorage.getItem('sessionId');
+    if (sessionId) {
+        await loadSessionData(sessionId);
+    } else {
+        // Fallback to demo questions if no session
+        questions = generateDemoQuestions();
+    }
     
     // Show lobby initially
     showLobby();
@@ -59,40 +70,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Simulate loading player list (in real app, this would come from Supabase realtime)
     await loadPlayersList();
     
-    // Simulate admin starting game after 10 seconds (for demo)
-    // In real app, this would be triggered by admin action via Supabase
-    setTimeout(() => {
-        if (!gameStarted) {
-            // startGameCountdown(); // Uncomment when admin trigger is ready
-        }
-    }, 10000);
+    // Listen for admin start game trigger (via Supabase realtime in production)
+    setupGameStartListener();
 });
 
 async function loadSessionData(sessionId) {
     try {
-        const { data: sessionData } = await supabase
-            .from('sessions')
-            .select('*, clients(*)')
-            .eq('id', sessionId)
-            .single();
+        // Get session details from storage if available
+        const gameType = sessionStorage.getItem('gameType');
         
-        if (!sessionData) {
-            showNotification('Session not found', 'error');
-            return;
+        if (gameType === 'quiz') {
+            // Load questions for quiz session
+            const { data: questionsData } = await supabase
+                .from('questions')
+                .select('*')
+                .eq('quiz_session_id', sessionId)
+                .order('id', { ascending: true });
+            
+            questions = questionsData || [];
         }
         
-        currentSession = sessionData;
+        // If no questions found, use demo questions
+        if (questions.length === 0) {
+            questions = generateDemoQuestions();
+        }
         
-        // Load questions for this client
-        const { data: questionsData } = await supabase
-            .from('questions')
-            .select('*')
-            .eq('client_id', sessionData.client_id);
-        
-        questions = questionsData || [];
-        
-        // Shuffle questions
+        // Shuffle questions for randomness
         questions = questions.sort(() => Math.random() - 0.5);
+        
+        currentSession = { id: sessionId };
         
     } catch (error) {
         console.error('Error loading session:', error);
@@ -127,8 +133,21 @@ function generateDemoQuestions() {
 async function loadPlayersList() {
     // Simulate loading players (would be from Supabase in real app)
     const username = sessionStorage.getItem('username');
+    const avatarConfig = sessionStorage.getItem('avatarConfig');
+    
+    // Parse avatar config if available
+    let currentPlayerAvatar = '👑';
+    try {
+        if (avatarConfig) {
+            const config = JSON.parse(avatarConfig);
+            currentPlayerAvatar = config.emoji || '👑';
+        }
+    } catch (e) {
+        console.log('Could not parse avatar config');
+    }
+    
     allPlayers = [
-        { name: username, avatar: '👑', ready: false, isCurrentPlayer: true, score: 0 },
+        { name: username || 'Player', avatar: currentPlayerAvatar, ready: false, isCurrentPlayer: true, score: 0 },
         { name: 'Alex', avatar: '💕', ready: false, isCurrentPlayer: false, score: 0 },
         { name: 'Jordan', avatar: '💖', ready: false, isCurrentPlayer: false, score: 0 },
         { name: 'Casey', avatar: '✨', ready: false, isCurrentPlayer: false, score: 0 }
@@ -166,6 +185,27 @@ function toggleReady() {
     }
     
     renderLobbyPlayers();
+}
+
+// Setup listener for admin starting the game
+function setupGameStartListener() {
+    // In a production app, this would listen to Supabase realtime
+    // For now, we'll use a simple polling mechanism or allow admin to trigger
+    // This can be triggered by admin dashboard or simulated with a button
+    
+    // Listen for custom event that admin dashboard might trigger
+    window.addEventListener('gameStarted', () => {
+        if (!gameStarted) {
+            startGameCountdown();
+        }
+    });
+    
+    // For demo purposes, uncomment to auto-start after 15 seconds
+    // setTimeout(() => {
+    //     if (!gameStarted) {
+    //         startGameCountdown();
+    //     }
+    // }, 15000);
 }
 
 function showLobby() {
@@ -280,6 +320,8 @@ async function selectAnswer(selectedIndex) {
     
     if (isCorrect) {
         playerScore += 100;
+        // Update current player's score in allPlayers
+        allPlayers[0].score = playerScore;
     }
     
     // Visual feedback
@@ -303,17 +345,23 @@ async function selectAnswer(selectedIndex) {
     
     // Save response
     try {
-        await supabase
-            .from('responses')
-            .insert([
-                {
-                    session_id: currentSession.id,
-                    user_id: sessionStorage.getItem('userId') || 'anonymous',
-                    question_id: question.id,
-                    answer: selectedIndex,
-                    is_correct: isCorrect
-                }
-            ]);
+        const sessionId = sessionStorage.getItem('sessionId');
+        const userId = sessionStorage.getItem('userId');
+        const question_id = question.id;
+        
+        if (sessionId && userId) {
+            await supabase
+                .from('responses')
+                .insert([
+                    {
+                        session_id: sessionId,
+                        user_id: userId,
+                        question_id: question_id,
+                        selected_option: selectedIndex,
+                        is_correct: isCorrect
+                    }
+                ]);
+        }
     } catch (error) {
         console.error('Error saving response:', error);
     }
@@ -368,41 +416,81 @@ function showFeedback(isCorrect, answered) {
         if (currentQuestionIndex >= questions.length) {
             showPodium();
         } else {
-            document.getElementById('quizGame').style.display = 'flex';
-            loadQuestion();
+            // Show leaderboard between questions
+            showBetweenQuestionsLeaderboard();
         }
     }, 3000);
+}
+
+// Show leaderboard after each question
+function showBetweenQuestionsLeaderboard() {
+    document.getElementById('quizGame').style.display = 'none';
+    document.getElementById('leaderboard').style.display = 'flex';
+    
+    const leaderboardContainer = document.getElementById('betweenQuestionsLeaderboard');
+    
+    // Sort players by score
+    const sortedPlayers = [...allPlayers].sort((a, b) => b.score - a.score);
+    
+    leaderboardContainer.innerHTML = sortedPlayers.map((player, index) => `
+        <div class="leaderboard-item" style="${player.isCurrentPlayer ? 'background: linear-gradient(135deg, #ffd700, #fff4cc); border-left-color: #ffd700;' : ''}">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="font-size: 20px;">${player.avatar}</span>
+                <div>
+                    <strong>${player.name}</strong>
+                    <div style="font-size: 12px; color: rgba(255,255,255,0.7);">${player.isCurrentPlayer ? '(You)' : ''}</div>
+                </div>
+            </div>
+            <div class="leaderboard-score">${player.score}</div>
+        </div>
+    `).join('');
+}
+
+// Move to next question
+function nextQuestion() {
+    document.getElementById('leaderboard').style.display = 'none';
+    document.getElementById('quizGame').style.display = 'flex';
+    loadQuestion();
 }
 
 // Show top 3 podium before full results
 function showPodium() {
     document.getElementById('quizGame').style.display = 'none';
+    document.getElementById('leaderboard').style.display = 'none';
     document.getElementById('finalResults').style.display = 'none';
     document.getElementById('podiumScreen').style.display = 'flex';
     
+    // Simulate other players' final scores
+    allPlayers.forEach((player, index) => {
+        if (index > 0) {
+            player.score = Math.floor(Math.random() * playerScore);
+        }
+    });
+    
     // Sort players by score
-    const rankedPlayers = [
-        { name: sessionStorage.getItem('username'), score: playerScore, avatar: '👑' },
-        { name: 'Alex', score: Math.floor(Math.random() * playerScore), avatar: '💕' },
-        { name: 'Jordan', score: Math.floor(Math.random() * playerScore), avatar: '💖' }
-    ].sort((a, b) => b.score - a.score);
+    const rankedPlayers = [...allPlayers].sort((a, b) => b.score - a.score).slice(0, 3);
     
     const podium = document.getElementById('podiumContainer');
     
+    // Ensure we have 3 positions even if fewer players
+    const pos1 = rankedPlayers[0] || { name: 'Player 1', score: 0, avatar: '👑' };
+    const pos2 = rankedPlayers[1] || { name: 'Player 2', score: 0, avatar: '💕' };
+    const pos3 = rankedPlayers[2] || { name: 'Player 3', score: 0, avatar: '💖' };
+    
     podium.innerHTML = `
         <div class="podium-position">
-            <div class="podium-avatar">${rankedPlayers[1]?.avatar || '💕'}</div>
-            <div class="podium-name">${rankedPlayers[1]?.name || 'Player 2'}</div>
+            <div class="podium-avatar">${pos2.avatar}</div>
+            <div class="podium-name">${pos2.name}</div>
             <div class="podium-rank rank-2">2nd</div>
         </div>
         <div class="podium-position">
-            <div class="podium-avatar">${rankedPlayers[0].avatar}</div>
-            <div class="podium-name">${rankedPlayers[0].name}</div>
+            <div class="podium-avatar">${pos1.avatar}</div>
+            <div class="podium-name">${pos1.name}</div>
             <div class="podium-rank rank-1">🏆 1st</div>
         </div>
         <div class="podium-position">
-            <div class="podium-avatar">${rankedPlayers[2]?.avatar || '💖'}</div>
-            <div class="podium-name">${rankedPlayers[2]?.name || 'Player 3'}</div>
+            <div class="podium-avatar">${pos3.avatar}</div>
+            <div class="podium-name">${pos3.name}</div>
             <div class="podium-rank rank-3">3rd</div>
         </div>
     `;
@@ -417,20 +505,16 @@ function showPodium() {
 // Show full leaderboard
 function showFinalResults() {
     document.getElementById('quizGame').style.display = 'none';
+    document.getElementById('leaderboard').style.display = 'none';
     document.getElementById('podiumScreen').style.display = 'none';
     document.getElementById('finalResults').style.display = 'flex';
     
     const finalLeaderboard = document.getElementById('finalLeaderboard');
     
-    // Create leaderboard with all players
-    const leaderboard = [
-        { name: sessionStorage.getItem('username'), score: playerScore, avatar: '👑' },
-        { name: 'Alex', score: Math.floor(Math.random() * 400), avatar: '💕' },
-        { name: 'Jordan', score: Math.floor(Math.random() * 400), avatar: '💖' },
-        { name: 'Casey', score: Math.floor(Math.random() * 400), avatar: '✨' }
-    ].sort((a, b) => b.score - a.score);
+    // Sort all players by score
+    const finalRanking = [...allPlayers].sort((a, b) => b.score - a.score);
     
-    finalLeaderboard.innerHTML = leaderboard.map((player, index) => `
+    finalLeaderboard.innerHTML = finalRanking.map((player, index) => `
         <div class="leaderboard-item" style="${index === 0 ? 'background: linear-gradient(135deg, #ffd700, #fff4cc); border-left-color: #ffd700;' : ''}">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <span style="font-size: 20px;">${player.avatar}</span>

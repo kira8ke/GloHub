@@ -351,8 +351,16 @@ async function saveAvatarAndProceed() {
         // Show loading screen
         showLoadingScreen();
         
+        // Determine emoji based on doll and vibe
+        const emojis = ['👑', '💕', '💖', '✨', '🌸', '💅', '👰', '💃', '🦋', '💫', '🌟', '💖', '🎀', '💄', '👸', '💝', '🌷', '💐', '🎭', '🌺'];
+        const emoji = emojis[avatarConfig.dollId - 1] || '👑';
+        
         // Save to session storage first
-        sessionStorage.setItem('avatarConfig', JSON.stringify(avatarConfig));
+        const configWithEmoji = {
+            ...avatarConfig,
+            emoji: emoji
+        };
+        sessionStorage.setItem('avatarConfig', JSON.stringify(configWithEmoji));
         
         // Create or update user in database
         const { data: user, error } = await supabase
@@ -360,12 +368,12 @@ async function saveAvatarAndProceed() {
             .upsert([
                 {
                     username: session.username,
-                    avatar_config: avatarConfig,
+                    avatar_config: configWithEmoji,
                     role: 'player',
                     session_id: session.sessionId
                 }
             ], {
-                onConflict: 'id',
+                onConflict: 'username',
                 ignoreDuplicates: false
             })
             .select()
@@ -379,7 +387,9 @@ async function saveAvatarAndProceed() {
         }
         
         // Store user ID
-        sessionStorage.setItem('userId', user.id);
+        if (user && user.id) {
+            sessionStorage.setItem('userId', user.id);
+        }
         
         // Redirect to game after animation
         setTimeout(() => {
@@ -388,6 +398,10 @@ async function saveAvatarAndProceed() {
         
     } catch (error) {
         console.error('Error saving avatar:', error);
+        hideLoadingScreen();
+        showNotification('Failed to save avatar. Please try again.', 'error');
+    }
+}
         hideLoadingScreen();
         showNotification('Failed to save avatar. Please try again.', 'error');
     }

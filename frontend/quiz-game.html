@@ -5,19 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="apple-mobile-web-app-capable" content="true">
     <meta name="theme-color" content="#ff69b4">
-<<<<<<< HEAD
-    <title>Piksy Quiz - GloHub</title>
-=======
     <title>Piksi Quiz - GloHub</title>
->>>>>>> refs/remotes/origin/main
     <link rel="stylesheet" href="styles.css">
     <style>
         /* Game Flow Styles */
+        .game-page{
+            background: #1C1C1C;
+        }
         .game-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background: linear-gradient(135deg, #120018, #2b0036, #3a004d);
+            background: #8435DE;
         }
 
         .game-header {
@@ -45,6 +44,7 @@
             flex: 1;
             padding: 40px;
             text-align: center;
+            background-color: #3C0E70;
         }
 
         #lobby h2 {
@@ -75,11 +75,10 @@
             flex-direction: column;
             align-items: center;
             gap: 10px;
-            padding: 15px;
-            background: rgba(255, 102, 196, 0.1);
+            padding: 8px;
+            background: transparent;
             border-radius: 15px;
             min-width: 100px;
-            border: 2px solid rgba(255, 102, 196, 0.3);
             transition: all 0.3s ease;
             position: relative;
         }
@@ -442,6 +441,42 @@
             color: #ff69b4;
         }
 
+        /* Between Questions Leaderboard */
+        .between-questions-leaderboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .between-questions-leaderboard h2 {
+            font-size: 36px;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        .next-question-button {
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #ff4fd8, #7b2cff);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 79, 216, 0.6);
+        }
+
+        .next-question-button:hover {
+            background: #ff4fd8;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 79, 216, 0.8);
+        }
+
         .leave-button {
             margin-top: 30px;
             padding: 12px 30px;
@@ -482,7 +517,6 @@
 <body class="game-page">
     <div class="game-container">
         <header class="game-header">
-            <h1>Galentine Quiz</h1>
             <div class="game-info">
                 <span id="playerName"></span>
                 <span id="gameCode"></span>
@@ -491,9 +525,9 @@
 
         <!-- Waiting Lobby -->
         <div id="lobby" class="lobby">
+            <div class="lobby-players" id="lobbyPlayers"></div>
             <h2>Waiting for the quiz to start...</h2>
             <p>Get ready to show what you know!</p>
-            <div class="lobby-players" id="lobbyPlayers"></div>
             <button class="ready-button" id="readyBtn" onclick="toggleReady()">I'm Ready!</button>
         </div>
 
@@ -513,6 +547,13 @@
 
                 <div id="answerFeedback" class="answer-feedback" style="display: none;"></div>
             </div>
+        </div>
+
+        <!-- Between Questions Leaderboard -->
+        <div id="leaderboard" class="between-questions-leaderboard" style="display: none;">
+            <h2>Current Standings</h2>
+            <div id="betweenQuestionsLeaderboard" class="leaderboard-list"></div>
+            <button class="next-question-button" onclick="nextQuestion()">Next Question</button>
         </div>
 
         <!-- Final Results -->
