@@ -67,6 +67,10 @@
     
     .error{color:#ff6b6b;margin:20px 0;padding:15px;background:rgba(255,107,107,0.1);border-radius:8px}
     
+    .super-admin-section{background:rgba(123,44,255,0.15);border:2px solid #7b2cff;border-radius:12px;padding:20px;text-align:center}
+    
+    .super-admin-badge{font-size:16px;font-weight:700;color:#c77dff;text-transform:uppercase;letter-spacing:1px}
+    
     @media (max-width:600px){
       .container{padding:20px}
       h1{font-size:28px}
@@ -99,6 +103,17 @@
       <div class="dot"></div>
     </div>
     
+    <!-- Super Admin Badge & Controls -->
+    <div class="super-admin-section" id="superAdminSection" style="display:none; margin-top: 30px;">
+      <div class="super-admin-badge">👑 Super Admin Mode</div>
+      <p style="font-size: 14px; color: rgba(255, 255, 255, 0.7); margin: 10px 0;">
+        You have access to all game pages and controls for testing purposes.
+      </p>
+      <button class="btn-start" id="skipToGameBtn" style="background: linear-gradient(135deg, #7b2cff, #c77dff); margin-top: 15px;">
+        Skip to Quiz Game
+      </button>
+    </div>
+    
     <!-- Admin Controls -->
     <div class="admin-controls" id="adminControls">
       <div class="admin-label">Admin Controls</div>
@@ -126,6 +141,14 @@
       // Show admin controls if super admin
       if (isSuperAdmin) {
         document.getElementById('adminControls').classList.add('visible');
+        
+        // Show super admin section
+        document.getElementById('superAdminSection').style.display = 'block';
+        
+        // Add skip button click handler
+        document.getElementById('skipToGameBtn').addEventListener('click', () => {
+          window.location.href = 'quiz-game.html';
+        });
       }
       
       // Load players list

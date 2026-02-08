@@ -5,12 +5,16 @@ const bodyParser = require('body-parser');
 const verifyAdmin = require('./auth/verify-admin');
 const paystackWebhook = require('./payments/paystack-webhook');
 const serviceClient = require('./supabase/service-client');
+const charadesRouter = require('./charades/game-manager');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Register charades game router
+app.use('/charades', charadesRouter);
 
 // Health - check basic server and Supabase availability
 app.get('/health', async (req, res) => {
