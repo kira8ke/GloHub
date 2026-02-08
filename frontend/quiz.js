@@ -66,7 +66,76 @@ document.addEventListener('DOMContentLoaded', async () => {
             // startGameCountdown(); // Uncomment when admin trigger is ready
         }
     }, 10000);
+
+    // Show Super Admin "Next" button if applicable
+    try {
+        const isSuper = sessionStorage.getItem('isSuperAdmin') === 'true';
+        const nextBtn = document.getElementById('superNextBtn');
+        if (isSuper && nextBtn) {
+            nextBtn.style.display = 'block';
+            nextBtn.addEventListener('click', superAdminNext);
+        }
+    } catch (e) { console.warn('Unable to init super next button', e); }
 });
+
+// Advance through game screens for Super Admin testing
+function superAdminNext() {
+    // If lobby visible -> start countdown
+    const lobby = document.getElementById('lobby');
+    const countdown = document.getElementById('countdownOverlay');
+    const quizGame = document.getElementById('quizGame');
+    const feedback = document.getElementById('feedbackScreen');
+    const podium = document.getElementById('podiumScreen');
+    const final = document.getElementById('finalResults');
+
+    if (lobby && getComputedStyle(lobby).display !== 'none') {
+        startGameCountdown();
+        return;
+    }
+
+    if (countdown && getComputedStyle(countdown).display !== 'none') {
+        // Force finish countdown and start quiz
+        countdown.style.display = 'none';
+        startQuiz();
+        return;
+    }
+
+    if (quizGame && getComputedStyle(quizGame).display !== 'none') {
+        // Skip current question and go to next (no feedback)
+        clearInterval(timer);
+        currentQuestionIndex++;
+        if (currentQuestionIndex >= questions.length) {
+            showPodium();
+        } else {
+            loadQuestion();
+        }
+        return;
+    }
+
+    if (feedback && getComputedStyle(feedback).display !== 'none') {
+        // Immediately perform post-feedback transition
+        feedback.style.display = 'none';
+        if (currentQuestionIndex >= questions.length) {
+            showPodium();
+        } else {
+            document.getElementById('quizGame').style.display = 'flex';
+            loadQuestion();
+        }
+        return;
+    }
+
+    if (podium && getComputedStyle(podium).display !== 'none') {
+        podium.style.display = 'none';
+        document.getElementById('finalResults').style.display = 'flex';
+        return;
+    }
+
+    if (final && getComputedStyle(final).display !== 'none') {
+        // Cycle back to lobby for further inspection
+        showLobby();
+        return;
+    }
+}
 
 async function loadSessionData(sessionId) {
     try {

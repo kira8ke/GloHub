@@ -11,6 +11,7 @@ import { getAvatar, interpolate } from './dialogue.js';
     const joinCode = sessionStorage.getItem('joinCode');
     const sessionId = sessionStorage.getItem('sessionId');
     const isSuperAdmin = sessionStorage.getItem('isSuperAdmin') === 'true';
+    const loginSource = sessionStorage.getItem('loginSource'); // NEW: Track where they logged in from
 
     // Get avatar data
     const avatar = getAvatar(avatarId);
@@ -33,22 +34,29 @@ import { getAvatar, interpolate } from './dialogue.js';
     // Dialogue messages
     const intro1 = `Nice to meet you ${username}`;
     const intro2 = isSuperAdmin 
-      ? `Let's choose a game to inspect!` 
+      ? (loginSource === 'admin-login' ? `Welcome to the admin dashboard!` : `Let's choose a game to inspect!`)
       : `Let's join the game!`;
 
     // Populate bubbles
     document.getElementById('bubble1').textContent = intro1;
     document.getElementById('bubble2').textContent = intro2;
 
-    // Determine routing destination
+    // Determine routing destination - CHECK LOGIN SOURCE FIRST
     let redirectUrl = '';
 
-    if (isSuperAdmin) {
-      // Super Admin: Redirect to game selection page
+    // MOST IMPORTANT: Check loginSource FIRST - this determines flow regardless of other flags
+    if (loginSource === 'admin-login') {
+      // Came from admin login page → ALWAYS go to Admin Dashboard
+      redirectUrl = 'admin-dashboard.html';
+    } else if (loginSource === 'join-game' && isSuperAdmin) {
+      // Came from join-game with super admin code → Game Selection to choose which game
       redirectUrl = 'game-selection.html';
-    } else {
-      // Regular Player: Determine game type based on join code
+    } else if (loginSource === 'join-game') {
+      // Regular player joining a game → Determine game type (quiz or charades)
       redirectUrl = await determineGameTypeAndRedirect(joinCode, sessionId);
+    } else {
+      // Fallback - unknown login source, default to join game page
+      redirectUrl = 'join-game.html';
     }
 
     // After animations complete, redirect

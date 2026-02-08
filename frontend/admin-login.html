@@ -275,7 +275,9 @@
                 localStorage.setItem(key, value);
                 } catch {}
             });
+             sessionStorage.setItem('loginSource', 'admin-login');
             }
+            
 
             function transitionTo(url) {
             const overlay = document.getElementById('transitionOverlay');

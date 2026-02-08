@@ -140,8 +140,20 @@ function showNotification(message, type = 'success') {
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
 
-    const bgColor = type === 'success' ? '#4caf50' : type === 'super' ? 'linear-gradient(135deg, gold, #ffd700)' : '#f44336';
-    const textColor = type === 'super' ? '#000' : 'white';
+    let bgColor, textColor;
+    if (type === 'success') {
+        bgColor = '#4caf50';
+        textColor = 'white';
+    } else if (type === 'warning') {
+        bgColor = '#ff9800';
+        textColor = 'white';
+    } else if (type === 'super') {
+        bgColor = 'linear-gradient(135deg, gold, #ffd700)';
+        textColor = '#000';
+    } else {
+        bgColor = '#f44336';
+        textColor = 'white';
+    }
 
     notification.style.cssText = `
         position: fixed;
@@ -787,6 +799,16 @@ async function saveCharadesGame() {
 
     const emptyCats = charadesCategories.filter(c => !c.flashcards || c.flashcards.length === 0);
     if (emptyCats.length > 0)             { showNotification('All categories must have at least one flashcard', 'error'); return; }
+
+    // Warning: Check if category count might be insufficient
+    if (charadesCategories.length < 10) {
+        const warning = `⚠️ You have only ${charadesCategories.length} categories. ` +
+                       `Consider adding more categories if you expect more than ${charadesCategories.length} players. ` +
+                       `Each player should ideally get a unique category during gameplay.`;
+        console.warn(warning);
+        // Still allow game creation but show this warning
+        showNotification(warning, 'warning');
+    }
 
     try {
         let gameClientId = currentClientId;

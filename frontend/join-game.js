@@ -64,10 +64,12 @@ if (joinForm) {
             }
 
             // Store session info
+            sessionStorage.setItem('loginSource', 'join-game');
             sessionStorage.setItem('sessionId', session.id);
             sessionStorage.setItem('joinCode', code);
             sessionStorage.setItem('username', username);
             sessionStorage.setItem('isSuperAdmin', isSuperAdmin.toString());
+    
             if (gameType) {
                 sessionStorage.setItem('gameType', gameType);
             }
