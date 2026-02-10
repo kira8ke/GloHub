@@ -169,13 +169,11 @@ function handleWebSocketMessage(data) {
             console.log('Connection established for player:', payload.playerId);
             gameState.playerId = payload.playerId;
             break;
-
-        case 'GAME_STATE_UPDATE':
-            handleGameStateUpdate(payload);
+        case 'wheelScreen':
+            showScreen('preparationScreen');
             break;
-
-        case 'WHEEL_SPINNING':
-            startWheelAnimation(payload.players);
+        case 'preparationScreen':
+            showScreen('gameplayScreen');
             break;
 
         case 'PLAYER_SELECTED':
@@ -215,54 +213,7 @@ function handleWebSocketMessage(data) {
             break;
 
         default:
-            console.warn('Unknown WebSocket message type:', type);
-    }
-}
-
-/**
- * Fetch current game state from backend
- */
-async function fetchGameState() {
-    try {
-        const response = await fetch(`/charades/game/${gameState.gameCode}/state`);
-        const data = await response.json();
-
-        if (!data.success) {
-            console.error('Failed to fetch game state:', data.error);
-            return;
-        }
-
-        // Update local state
-        gameState.gameStatus = data.game.status;
-        gameState.players = {};
-
-        data.players.forEach(player => {
-            gameState.players[player.id] = player;
-        });
-
-        // Set player ID if not set
-        if (!gameState.playerId) {
-            gameState.playerId = data.players.find(p => p.name === gameState.playerName)?.id;
-        }
-
-        // Update UI based on status
-        if (data.game.status === 'waiting') {
-            showWaitingRoom();
-        } else if (data.game.status === 'in_progress') {
-            if (data.current_round) {
-                if (data.current_round.status === 'in_progress') {
-                    // Determine what screen to show
-                    const isCurrentPlayer = data.current_round.selected_player_id === gameState.playerId;
-                    if (isCurrentPlayer) {
-                        showPreparationScreen();
-                    } else {
-                        showOtherPlayerWaitingScreen();
-                    }
-                }
-            }
-        }
-    } catch (err) {
-        console.error('Error fetching game state:', err);
+            showScreen('waitingRoom');
     }
 }
 
@@ -864,42 +815,31 @@ function handleDeviceOrientation(event) {
         return;
     }
 
-    if (gameState.currentState !== 'PLAYING' || !gameState.isPlaying) {
-        return;
-    }
+    screen.style.display = 'flex';
+    gameState.currentScreen = screenName;
 
-    // Store initial tilt for comparison
-    if (startBeta === null) {
-        startBeta = event.beta;
-    }
+    // 🔑 ALWAYS restore admin UI after transitions
+    updateSuperAdminButton();
 }
 
-function handleDeviceMotion(event) {
-    if (gameState.currentState !== 'PLAYING' || !gameState.isPlaying) {
-        return;
+/****************************
+ * INITIALIZATION
+ ****************************/
+function initGame() {
+    if (superNextBtn && gameState.isSuperAdmin) {
+        superNextBtn.addEventListener('click', superAdminNextCharades);
     }
 
-    const now = Date.now();
-    if (now - lastActionTime < ACTION_COOLDOWN) {
-        return; // Cooldown active
-    }
-
-    const accelY = event.acceleration?.y || 0;
-    const accelZ = event.acceleration?.z || 0;
-
-    // Detect tilt DOWN (positive Y and Z) = correct answer
-    if (accelY > 10 && accelZ > 5) {
-        lastActionTime = now;
-        submitAction('correct');
-    }
-    // Detect tilt UP (negative Y) = wrong answer or pass
-    else if (accelY < -10) {
-        lastActionTime = now;
-        submitAction('wrong');
-    }
+    updateSuperAdminButton();
+    showScreen('waitingRoom');
 }
 
-async function submitAction(action) {
+document.addEventListener('DOMContentLoaded', initGame);
+
+/****************************
+ * WAIT ROOM – PLAYER LIST
+ ****************************/
+async function loadPlayersList() {
     try {
         const response = await fetch(`/charades/player/${gameState.playerId}/action`, {
             method: 'POST',
@@ -988,88 +928,21 @@ async function fetchFinalResults() {
             return;
         }
 
-        // Display leaderboard
-        const leaderboardList = document.getElementById('leaderboardList');
-        leaderboardList.innerHTML = data.leaderboard.map((item, index) => `
-            <div class="leaderboard-item">
-                <div class="leaderboard-rank${index < 3 ? ` rank-${index + 1}` : ''}">
-                    ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
+        playerCount.textContent = players.length.toString();
+        playersList.innerHTML = players.map(player => `
+            <div class="player-item">
+                <div class="player-avatar">
+                    ${player.username?.charAt(0).toUpperCase() || '?'}
                 </div>
-                <div class="leaderboard-avatar">${getAvatarEmoji(item.avatar_id)}</div>
-                <div class="leaderboard-info">
-                    <div class="leaderboard-name">${item.name}</div>
+                <div class="player-name">
+                    ${player.username || 'Unknown Player'}
                 </div>
-                <div class="leaderboard-score">${item.score}</div>
+                <div class="player-status">✓ Ready</div>
             </div>
         `).join('');
 
-        // Store emotion data
-        window.emotionData = data.leaderboard;
     } catch (err) {
-        console.error('Error fetching final results:', err);
-    }
-}
-
-function showPodiumScreen(podium) {
-    hideAllScreens();
-    document.getElementById('podiumScreen').style.display = 'flex';
-    
-    const podiumStage = document.getElementById('podiumStage');
-    podiumStage.innerHTML = '';
-
-    // Display top 3
-    podium.slice(0, 3).forEach((player, index) => {
-        const rank = index + 1;
-        const medals = ['🥇', '🥈', '🥉'];
-        
-        const html = `
-            <div class="podium-position rank-${rank}">
-                <div class="podium-rank-box">
-                    <div class="podium-medal">${medals[index]}</div>
-                    <div class="podium-avatar-large">${getAvatarEmoji(player.avatar_id)}</div>
-                    <div class="podium-name">${player.name}</div>
-                    <div class="podium-score">${player.score} pts</div>
-                </div>
-            </div>
-        `;
-        
-        podiumStage.innerHTML += html;
-    });
-}
-
-function showEmotionScreen() {
-    hideAllScreens();
-    document.getElementById('emotionScreen').style.display = 'flex';
-
-    // Find this player's emotion data
-    const playerData = window.emotionData?.find(p => p.name === gameState.playerName);
-    
-    if (playerData) {
-        const emotion = playerData.emotion;
-        const rank = playerData.rank;
-        const totalPlayers = window.emotionData.length;
-
-        let emoji = '😊';
-        let message = '';
-        let caption = '';
-
-        if (emotion === 'happy') {
-            emoji = '🎉';
-            message = `Outstanding performance! You're in the top ${Math.ceil(totalPlayers * 0.2)} players!`;
-            caption = `Rank: ${rank}/${totalPlayers} | Score: ${playerData.score}`;
-        } else if (emotion === 'neutral') {
-            emoji = '😊';
-            message = `Great effort! You played well this round.`;
-            caption = `Rank: ${rank}/${totalPlayers} | Score: ${playerData.score}`;
-        } else {
-            emoji = '😔';
-            message = `Better luck next time! You'll get them next round!`;
-            caption = `Rank: ${rank}/${totalPlayers} | Score: ${playerData.score}`;
-        }
-
-        document.getElementById('emotionFace').textContent = emoji;
-        document.getElementById('emotionMessage').textContent = message;
-        document.getElementById('emotionCaption').textContent = caption;
+        console.error('loadPlayersList failed:', err);
     }
 }
 

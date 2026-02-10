@@ -917,21 +917,12 @@
 </head>
 <body class="game-page">
     <div class="charades-container">
-        <header class="game-header">
-            <h1>🎭 Charades Game</h1>
-            <div class="game-info">
-                <span>Player: <strong id="playerNameDisplay"></strong></span>
-                <span>Code: <strong id="gameCodeDisplay"></strong></span>
-            </div>
-        </header>
+       
 
         <div class="game-content">
             <!-- WAITING ROOM SCREEN -->
             <div id="waitingRoom">
-                <h2 class="waiting-title">🎭 Charades Game</h2>
-                
-                <div class="waiting-info">Players Ready: <span id="playerReadyCount">0</span></div>
-                
+                <h2 class="waiting-title">Waiting for Act It Out to start...</h2>
                 <div class="players-ready-list" id="playersReadyList"></div>
                 
                 <p class="spin-instruction">Waiting for all players to be ready...</p>
@@ -959,7 +950,7 @@
             <!-- PREPARATION SCREEN (only for selected player) -->
             <div id="preparationScreen">
                 <div class="prep-card">
-                    <h2 class="prep-instruction">Get Ready! 🎬</h2>
+                    <h2 class="prep-instruction">Get Ready! </h2>
                     
                     <div class="countdown-large" id="countdownDisplay">5</div>
                     
@@ -1043,6 +1034,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Super Admin Next Button (hidden for regular players) -->
+                <button id="superNextBtnCharades" class="leave-button" style="position:fixed;bottom:20px;right:20px;display:none;z-index:2000;">Next</button>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
