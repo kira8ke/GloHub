@@ -15,6 +15,7 @@ let gameState = {
     isSuperAdmin: false,
     isCurrentPlayer: false,
     score: 0,
+    isReady: false,
     gameStatus: 'waiting', // waiting, in_progress, finished
     currentState: 'WAITING', // WAITING, WHEEL_SPINNING, PLAYER_SELECTED, PREPARING, PLAYING, ROUND_COMPLETE, GAME_FINISHED
     players: {},
@@ -29,6 +30,8 @@ let deviceOrientationListener = null;
 let accelerometerListener = null;
 let lastActionTime = 0;
 const ACTION_COOLDOWN = 800; // ms between accepted actions
+
+let gameStateInterval = null;
 
 let timerInterval = null;
 let countdownInterval = null;
@@ -267,6 +270,12 @@ async function fetchGameState() {
  * Set up DOM event listeners
  */
 function setupEventListeners() {
+    // Ready button listener
+    const readyBtn = document.getElementById('readyButton');
+    if (readyBtn) {
+        readyBtn.addEventListener('click', togglePlayerReady);
+    }
+
     // Device orientation for preparation detection only
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         // iOS 13+ requires permission
@@ -312,6 +321,123 @@ async function requestDevicePermissions() {
     }
 }
 
+/**
+ * Toggle player ready status
+ */
+async function togglePlayerReady() {
+    try {
+        const response = await fetch(`/charades/player/${gameState.playerId}/ready`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                game_code: gameState.gameCode,
+                is_ready: !gameState.isReady
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            gameState.isReady = !gameState.isReady;
+            updateReadyButton();
+            updatePlayersList();
+            
+            // Check if all players are ready
+            checkAllPlayersReady();
+        }
+    } catch (err) {
+        console.error('Error toggling ready status:', err);
+    }
+}
+
+/**
+ * Update ready button appearance
+ */
+function updateReadyButton() {
+    const btn = document.getElementById('readyButton');
+    if (btn) {
+        if (gameState.isReady) {
+            btn.textContent = '✓ Ready!';
+            btn.classList.add('ready');
+        } else {
+            btn.textContent = 'Ready to Play';
+            btn.classList.remove('ready');
+        }
+    }
+}
+
+/**
+ * Check if all players are ready and show admin start button if so
+ */
+function checkAllPlayersReady() {
+    const players = Object.values(gameState.players);
+    const allReady = players.length > 0 && players.every(p => p.is_ready);
+    
+    const adminControls = document.getElementById('adminControls');
+    const startBtn = document.getElementById('startGameBtn');
+    
+    if (allReady && gameState.isSuperAdmin) {
+        adminControls.classList.add('visible');
+        startBtn.disabled = false;
+    } else {
+        adminControls.classList.remove('visible');
+    }
+}
+
+/**
+ * Start the charades game (admin only)
+ */
+async function startCharadesGame() {
+    try {
+        const startBtn = document.getElementById('startGameBtn');
+        startBtn.disabled = true;
+        startBtn.textContent = 'Starting...';
+
+        const response = await fetch(`/charades/game/${gameState.gameCode}/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                admin_id: gameState.playerId
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            // Initiate wheel spin after a short delay
+            setTimeout(() => spinTheWheel(), 500);
+        } else {
+            startBtn.disabled = false;
+            startBtn.textContent = 'Start Game';
+        }
+    } catch (err) {
+        console.error('Error starting game:', err);
+        const startBtn = document.getElementById('startGameBtn');
+        startBtn.disabled = false;
+        startBtn.textContent = 'Start Game';
+    }
+}
+
+/**
+ * Trigger wheel spin
+ */
+async function spinTheWheel() {
+    try {
+        const response = await fetch(`/charades/game/${gameState.gameCode}/spin`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                admin_id: gameState.playerId
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            showWheelScreen();
+        }
+    } catch (err) {
+        console.error('Error spinning wheel:', err);
+    }
+}
+
 // =====================================================
 // SCREEN TRANSITIONS
 // =====================================================
@@ -333,6 +459,19 @@ function showWaitingRoom() {
     stopAllIntervals();
     document.getElementById('waitingRoom').style.display = 'flex';
     updatePlayersList();
+    
+    // Poll for game state updates every 2 seconds in waiting room
+    gameStateInterval = setInterval(() => {
+        fetchGameState();
+    }, 2000);
+    
+    // Initialize admin controls if user is super admin
+    const adminControls = document.getElementById('adminControls');
+    if (gameState.isSuperAdmin && adminControls) {
+        checkAllPlayersReady();
+    } else if (adminControls) {
+        adminControls.classList.remove('visible');
+    }
 }
 
 async function showWheelScreen() {
@@ -379,6 +518,16 @@ function showGameplayScreen() {
 async function showLeaderboardScreen() {
     hideAllScreens();
     gameState.currentState = 'GAME_FINISHED';
+    
+    // Check if 3+ players have played
+    const playersWhoPlayed = Object.values(gameState.players).filter(p => p.has_played).length;
+    
+    if (playersWhoPlayed < 3) {
+        // Return to waiting room if less than 3 players have played
+        showWaitingRoom();
+        return;
+    }
+    
     document.getElementById('leaderboardScreen').style.display = 'flex';
     stopGameTimer();
     
@@ -404,6 +553,8 @@ function handleGameStateUpdate(payload) {
 
     // Update UI based on status
     if (payload.game.status === 'waiting') {
+        updatePlayersList();
+        checkAllPlayersReady();
         showWaitingRoom();
     }
 }
@@ -481,6 +632,15 @@ function handleRoundComplete(payload) {
 async function handleGameFinished(payload) {
     console.log('Game finished:', payload);
     stopGameTimer();
+    
+    // Check if 3+ players have played
+    const playersWhoPlayed = Object.values(gameState.players).filter(p => p.has_played).length;
+    
+    // If less than 3 players have played, go back to waiting room instead of leaderboard
+    if (playersWhoPlayed < 3) {
+        setTimeout(() => showWaitingRoom(), 2000);
+        return;
+    }
     
     // Show leaderboard first
     await showLeaderboardScreen();
@@ -803,6 +963,10 @@ function stopAllIntervals() {
         clearInterval(countdownInterval);
         countdownInterval = null;
     }
+    if (gameStateInterval) {
+        clearInterval(gameStateInterval);
+        gameStateInterval = null;
+    }
 }
 
 function updateTimerDisplay(timeRemaining) {
@@ -916,12 +1080,16 @@ function showEmotionScreen() {
 function updatePlayersList() {
     const playersList = document.getElementById('playersReadyList');
     const players = Object.values(gameState.players);
+    const readyCount = players.filter(p => p.is_ready).length;
+
+    document.getElementById('playerReadyCount').textContent = readyCount;
 
     playersList.innerHTML = players.map(player => `
         <div class="player-avatar-item${player.id === gameState.playerId ? ' active' : ''}">
             <div class="mini-avatar">${getAvatarEmoji(player.avatar_id)}</div>
             <div class="player-name-small">${player.name}</div>
-            <div class="pulse-indicator"></div>
+            <div class="player-status">${player.is_ready ? '✓ Ready' : 'Waiting'}</div>
+            ${player.is_ready ? '<div class="pulse-indicator"></div>' : ''}
         </div>
     `).join('');
 }
@@ -943,13 +1111,21 @@ async function endRound() {
         const response = await fetch(`/charades/game/${gameState.gameCode}/round-end`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ admin_id: gameState.isSuperAdmin })
+            body: JSON.stringify({ admin_id: gameState.playerId })
         });
 
         const data = await response.json();
         if (data.all_played) {
-            // Game is finished
-            showLeaderboardScreen();
+            // Game is finished - check if 3+ players have played
+            const playersWhoPlayed = Object.values(gameState.players).filter(p => p.has_played).length;
+            
+            if (playersWhoPlayed >= 3) {
+                // Show leaderboard
+                showLeaderboardScreen();
+            } else {
+                // Less than 3 players, return to waiting room
+                showWaitingRoom();
+            }
         } else {
             // Return to waiting room
             showWaitingRoom();

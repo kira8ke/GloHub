@@ -55,41 +55,57 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             width: 100%;
             text-align: center;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .waiting-title {
-            font-size: 36px;
+            font-size: 32px;
             color: #fff;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            font-weight: 600;
         }
 
         .players-ready-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+            width: 100%;
             max-width: 600px;
             padding: 20px;
             background: rgba(255, 102, 196, 0.1);
-            border-radius: 15px;
+            border-radius: 12px;
             border: 2px solid rgba(255, 102, 196, 0.3);
-            max-height: 300px;
+            max-height: 250px;
             overflow-y: auto;
         }
 
         .player-avatar-item {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            border: 2px solid rgba(255, 102, 196, 0.3);
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 102, 196, 0.1);
+            border-left: 3px solid #ff69b4;
+            border-radius: 8px;
             transition: all 0.3s ease;
+            animation: slideIn 300ms ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .player-avatar-item.active {
@@ -98,24 +114,30 @@
         }
 
         .mini-avatar {
-            width: 70px;
-            height: 70px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background: linear-gradient(135deg, #ff69b4, #7b2cff);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 24px;
             color: white;
             font-weight: bold;
+            flex-shrink: 0;
         }
 
         .player-name-small {
+            flex: 1;
             font-size: 14px;
             color: #fff;
-            text-align: center;
-            word-break: break-word;
-            max-width: 90px;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .player-status {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .pulse-indicator {
@@ -124,13 +146,108 @@
             height: 8px;
             background: #4caf50;
             border-radius: 50%;
-            animation: pulse 1.5s ease-in-out infinite;
-            margin-top: 5px;
+            animation: pulse-anim 1.5s ease-in-out infinite;
+            margin-left: 8px;
+            flex-shrink: 0;
         }
 
-        @keyframes pulse {
+        @keyframes pulse-anim {
             0%, 100% { opacity: 0.3; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .spin-instruction {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 20px 0;
+        }
+
+        .waiting-info {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .ready-button {
+            background: linear-gradient(135deg, #ff66c4, #ff99dd);
+            color: #120018;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 300ms ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .ready-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 102, 196, 0.4);
+        }
+
+        .ready-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .ready-button.ready {
+            background: #4caf50;
+        }
+
+        .admin-controls {
+            background: rgba(255, 102, 196, 0.15);
+            border: 2px solid #ff66c4;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+
+        .admin-controls.visible {
+            display: block;
+        }
+
+        .admin-label {
+            font-size: 12px;
+            color: #ff66c4;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #ff66c4, #ff99dd);
+            color: #120018;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 300ms ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 102, 196, 0.4);
+        }
+
+        .btn-start:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         /* =============== WHEEL SPIN SCREEN =============== */
@@ -811,9 +928,20 @@
         <div class="game-content">
             <!-- WAITING ROOM SCREEN -->
             <div id="waitingRoom">
-                <h2 class="waiting-title">Waiting for the game to start...</h2>
+                <h2 class="waiting-title">🎭 Charades Game</h2>
+                
+                <div class="waiting-info">Players Ready: <span id="playerReadyCount">0</span></div>
+                
                 <div class="players-ready-list" id="playersReadyList"></div>
-                <div class="spin-instruction">Get ready for the wheel! 🎡</div>
+                
+                <p class="spin-instruction">Waiting for all players to be ready...</p>
+                
+                <button class="ready-button" id="readyButton">Ready to Play</button>
+                
+                <div class="admin-controls" id="adminControls">
+                    <div class="admin-label">⭐ Admin Controls</div>
+                    <button class="btn-start" id="startGameBtn" onclick="startCharadesGame()">Start Game</button>
+                </div>
             </div>
 
             <!-- WHEEL SPIN SCREEN -->
@@ -876,7 +1004,7 @@
                 <div class="action-icons">
                     <div class="action-item" id="correctAction">
                         <div class="action-emoji">👇</div>
-                        <div class="action-label">TILT DOWN<br>Correct (+5)</div>
+                        <div class="action-label">TILT DOWN<br>Correct (+10)</div>
                     </div>
                     <div class="action-item" id="wrongAction">
                         <div class="action-emoji">👆</div>

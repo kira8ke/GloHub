@@ -143,6 +143,7 @@ async function sendGameState(ws, gameCode, playerId) {
           avatar_id: p.avatar_id,
           score: p.score,
           has_played: p.has_played,
+          is_ready: p.is_ready || false,
           status: p.status
         })),
         current_round: currentRound,

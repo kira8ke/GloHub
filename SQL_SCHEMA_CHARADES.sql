@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS charades_players (
     avatar_id VARCHAR(50),
     score INT DEFAULT 0,
     has_played BOOLEAN DEFAULT false,
+    is_ready BOOLEAN DEFAULT false,
     status VARCHAR(50) DEFAULT 'waiting',
     -- waiting, active, preparing, playing, finished
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -154,6 +154,7 @@ router.post('/join', async (req, res) => {
         avatar_id: avatar_id,
         score: 0,
         has_played: false,
+        is_ready: false,
         status: 'waiting'
       })
       .select()
@@ -173,6 +174,7 @@ router.post('/join', async (req, res) => {
         avatar_id: avatar_id,
         score: 0,
         has_played: false,
+        is_ready: false,
         status: 'waiting'
       };
     }
@@ -254,6 +256,7 @@ router.get('/game/:gameCode/state', async (req, res) => {
         avatar_id: p.avatar_id,
         score: p.score,
         has_played: p.has_played,
+        is_ready: p.is_ready || false,
         status: p.status
       })),
       current_round: currentRound
@@ -549,7 +552,7 @@ router.post('/player/:playerId/action', async (req, res) => {
     }
 
     // Calculate score change
-    const scoreChange = action === 'correct' ? 5 : -2;
+    const scoreChange = action === 'correct' ? 10 : -2;
 
     // Update player score
     const newScore = player.score + scoreChange;
@@ -721,6 +724,57 @@ router.get('/game/:gameCode/final-results', async (req, res) => {
     });
   } catch (err) {
     console.error('Error in GET /charades/game/:gameCode/final-results:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+/**
+ * POST /charades/player/:playerId/ready
+ * Player marks themselves as ready
+ */
+router.post('/player/:playerId/ready', async (req, res) => {
+  try {
+    const playerId = req.params.playerId;
+    const { game_code, is_ready } = req.body;
+
+    const client = serviceClient.getClient();
+
+    // Get player
+    const { data: player, error: playerError } = await client
+      .from('charades_players')
+      .select('*')
+      .eq('id', playerId)
+      .single();
+
+    if (playerError || !player) {
+      return res.status(404).json({ error: 'Player not found' });
+    }
+
+    // Update player ready status
+    const { error: updateError } = await client
+      .from('charades_players')
+      .update({ is_ready: is_ready })
+      .eq('id', playerId);
+
+    if (updateError) {
+      console.error('Error updating ready status:', updateError);
+      return res.status(500).json({ error: 'Failed to update status' });
+    }
+
+    // Update in-memory state
+    const state = gameState.get(game_code.toUpperCase());
+    if (state && state.players[playerId]) {
+      state.players[playerId].is_ready = is_ready;
+    }
+
+    res.json({
+      success: true,
+      player_id: playerId,
+      is_ready: is_ready,
+      message: 'Ready status updated'
+    });
+  } catch (err) {
+    console.error('Error in POST /charades/player/:playerId/ready:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
