@@ -39,6 +39,44 @@
             color: #fff;
         }
 
+        /* ===== Quiz Header (Title + Progress) ===== */
+.quiz-top-header {
+    padding: 20px 24px 10px;
+    text-align: center;
+    background: transparent;
+    position: relative;
+    z-index: 100;
+}
+
+.quiz-title {
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 12px;
+}
+
+.quiz-progress-bar {
+    width: 100%;
+    max-width: 600px;
+    height: 20px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 2px solid white;
+}
+
+
+.quiz-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3C0E70, #ffd1ea);
+    transition: width 0.4s ease;
+    border-radius: 30px;
+}
+
+
         /* Lobby Styles */
         #lobby {
             display: flex;
@@ -105,7 +143,6 @@
 
         .player-card.ready {
             border-color: #4caf50;
-            background: rgba(76, 175, 80, 0.1);
         }
 
         .player-avatar-mini {
@@ -116,9 +153,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 24px;
+            overflow: hidden;     /* container is the mask */
+            flex-shrink: 0;
+        }
+
+        .player-avatar-mini img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* show entire image */
+            padding: 6px;        /* safe breathing room */
+            box-sizing: border-box;
+            border-radius: 0;    /* 🔑 do NOT round the image */
+        }
+
+
+        .player-avatar-mini svg {
+            width: 100%;
+            height: 100%;
         }
 
         .player-name {
@@ -153,13 +204,12 @@
         .ready-button {
             padding: 15px 40px;
             font-size: 18px;
-            background: linear-gradient(135deg, #ff4fd8, #7b2cff);
+            background: #3C0E70;
             color: white;
             border: none;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(255, 79, 216, 0.6);
         }
 
         .ready-button:hover {
@@ -402,6 +452,20 @@
             justify-content: center;
             font-size: 50px;
             border: 3px solid #fff;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .podium-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .podium-avatar svg {
+            width: 100%;
+            height: 100%;
         }
 
         .podium-name {
@@ -483,18 +547,17 @@
         .next-question-button {
             margin-top: 30px;
             padding: 12px 30px;
-            background: linear-gradient(135deg, #ff4fd8, #7b2cff);
+            background: #3C0E70;
             color: white;
             border: none;
             border-radius: 25px;
             cursor: pointer;
             font-size: 16px;
             transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(255, 79, 216, 0.6);
         }
 
         .next-question-button:hover {
-            background: #ff4fd8;
+            background: #3C0E70;
             transform: scale(1.05);
             box-shadow: 0 0 30px rgba(255, 79, 216, 0.8);
         }
@@ -502,7 +565,7 @@
         .leave-button {
             margin-top: 30px;
             padding: 12px 30px;
-            background: #ff69b4;
+            background: #471B78;
             color: white;
             border: none;
             border-radius: 25px;
@@ -578,7 +641,14 @@
 </head>
 <body class="game-page">
     <div class="game-container">
-      
+            <!-- Quiz Header -->
+        <div class="quiz-top-header" id="quizHeader" style="display:none;">
+            <div class="quiz-title">QUIZ</div>
+            <div class="quiz-progress-bar">
+                <div class="quiz-progress-fill" id="quizProgressFill"></div>
+            </div>
+        </div>
+
 
         <!-- Super Admin Next Button (hidden for regular players) -->
         <button id="superNextBtn" class="leave-button" style="position:fixed;bottom:20px;right:20px;display:none;z-index:2000;">Next</button>
@@ -586,10 +656,6 @@
         <!-- Waiting Lobby -->
         <div id="lobby" class="lobby">
             <div class="lobby-players" id="lobbyPlayers"></div>
-             <div class="game-info">
-                <span id="playerName"></span>
-                <span id="gameCode"></span>
-            </div>
             <h2>Waiting for the quiz to start...</h2>
             <p>Get ready to show what you know!</p>
             <button class="ready-button" id="readyBtn" onclick="toggleReady()">I'm Ready!</button>
@@ -637,8 +703,9 @@
     <!-- Feedback Screen -->
     <div id="feedbackScreen">
         <div class="feedback-content">
-            <div class="feedback-avatar">
-                <span id="feedbackAvatarEmoji">😊</span>
+            <div class="feedback-avatar" id="feedbackAvatarContainer">
+                <img id="feedbackAvatarImage" src="" alt="Your avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                <img id="feedbackAvatarExpression" src="" alt="" style="position:absolute; width:100%; height:100%; border-radius:50%; object-fit:contain;">
                 <div class="expression" id="feedbackExpression">✨</div>
             </div>
             <div class="feedback-message" id="feedbackMessage">Great job!</div>
@@ -652,22 +719,91 @@
 
     <script src="supabase.js"></script>
     <script src="quiz.js"></script>
-    <script>
-        function showScreen(screenId) {
-            // Hide all game screens
-            document.getElementById('lobby').style.display = 'none';
-            document.getElementById('quizGame').style.display = 'none';
-            document.getElementById('leaderboard').style.display = 'none';
-            document.getElementById('finalResults').style.display = 'none';
-            
-            // Show the requested screen
-            document.getElementById(screenId).style.display = 'flex';
+<script>
+    function showScreen(screenId) {
+        // Hide all game screens
+        document.getElementById('lobby').style.display = 'none';
+        document.getElementById('quizGame').style.display = 'none';
+        document.getElementById('leaderboard').style.display = 'none';
+        document.getElementById('finalResults').style.display = 'none';
+
+        // Show the requested screen
+        document.getElementById(screenId).style.display = 'flex';
+
+        // Show / hide quiz header automatically
+        if (screenId === 'quizGame') {
+            showQuizHeader(true);
+        } else {
+            showQuizHeader(false);
         }
-        
-        // Initialize: show the lobby/waiting room on load
-        document.addEventListener('DOMContentLoaded', function() {
-            showScreen('lobby');
+    }
+
+    // Initialize lobby on load
+    document.addEventListener('DOMContentLoaded', function () {
+        showScreen('lobby');
+        initQuestionObserver();
+    });
+
+    /* ================================
+       Quiz Header Controls
+    ================================= */
+
+    function showQuizHeader(show) {
+        const header = document.getElementById('quizHeader');
+        if (!header) return;
+        header.style.display = show ? 'block' : 'none';
+    }
+
+    function updateQuizProgress(currentQuestion, totalQuestions) {
+        const fill = document.getElementById('quizProgressFill');
+        if (!fill || !totalQuestions) return;
+
+        const percent = Math.min(
+            (currentQuestion / totalQuestions) * 100,
+            100
+        );
+
+        fill.style.width = percent + '%';
+    }
+
+    /* ==========================================
+       AUTO-PROGRESS BASED ON #questionNumber
+       ------------------------------------------
+       Supports:
+       "Question 3"
+       "Question 3 of 10"
+       "Q3 / 10"
+    ========================================== */
+
+    function initQuestionObserver() {
+        const questionEl = document.getElementById('questionNumber');
+        if (!questionEl) return;
+
+        const observer = new MutationObserver(() => {
+            const text = questionEl.textContent;
+
+            // Extract numbers from text
+            const numbers = text.match(/\d+/g);
+            if (!numbers || numbers.length === 0) return;
+
+            const current = parseInt(numbers[0], 10);
+            const total = numbers.length > 1
+                ? parseInt(numbers[1], 10)
+                : null;
+
+            if (current && total) {
+                updateQuizProgress(current, total);
+            }
         });
-    </script>
+
+        observer.observe(questionEl, {
+            childList: true,
+            characterData: true,
+            subtree: true
+        });
+    }
+</script>
+
+
 </body>
 </html>
