@@ -1405,9 +1405,20 @@ body {
             <div class="pricing-badge">MOST POPULAR</div>
             <h3 id="pricingTitle">Galentine's Game Night</h3>
             <div class="pricing-amount">
-                <div class="original-price" id="originalPrice">KES 249</div>
-                <div class="price" style="font-size: 45px;color: #8435DE;">KES 199 <span id="finalPrice" style="font-size: 28px;font-weight: 500;color: #A1A4A6;">/month</span></div>
+        <div style="display:flex; align-items:center; gap:10px; justify-content:center;">
+            <div class="price" style="font-size:45px; color:#8435DE;">
+            <span id="mainPrice">KES 199</span> 
+            <span style="font-size:28px; font-weight:500; color:#A1A4A6;">/month</span>
             </div>
+
+            <!-- Currency conversion control -->
+            <div style="display:flex; gap:10px; align-items:center;">
+            <label for="currencySelect" style="color:#6b0f66; font-weight:700;">Show price in</label>
+            <select id="currencySelect" style="padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); background:white; color:#2b0036;"></select>
+            </div>
+        </div>
+        </div>
+
             
             <form id="paymentForm" onsubmit="handlePayment(event); return false;">
                 <div class="form-group">
@@ -1608,7 +1619,68 @@ body {
         document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('newGetGameBtn');
         if (btn) btn.addEventListener('click', openGameModal);
+        
+        // Load currency list and initialize conversion
+        if (sb) {
+            try {
+                loadCurrencies();
+            } catch (e) {
+                console.warn('Currency init failed', e);
+            }
+        }
         });
+        
+        // ===== Currency conversion logic =====
+        const BASE_AMOUNT_KES = 199; // price to convert
+
+        async function loadCurrencies() {
+            // Expecting table `currencies` with columns: iso_code, currency_name, symbol, rate_per_kes
+            const { data, error } = await sb.from('currencies').select('iso_code,currency_name,symbol,rate_per_kes').order('iso_code', { ascending: true });
+            const sel = document.getElementById('currencySelect');
+            if (error || !data) {
+                console.warn('Failed to load currencies', error);
+                if (sel) {
+                    sel.innerHTML = '<option value="KES" selected>KES</option>';
+                }
+                updateConvertedDisplay({ iso_code: 'KES', symbol: 'KES', rate_per_kes: 1 });
+                return;
+            }
+
+            // Ensure KES is present; if not, add it
+            let hasKES = data.some(c => c.iso_code === 'KES');
+            if (!hasKES) {
+                data.unshift({ iso_code: 'KES', currency_name: 'Kenyan Shilling', symbol: 'KES', rate_per_kes: 1 });
+            }
+
+            if (!sel) return;
+            sel.innerHTML = data.map(c => `<option value="${c.iso_code}" data-rate="${c.rate_per_kes}" data-symbol="${c.symbol || c.iso_code}">${c.iso_code} - ${c.currency_name}</option>`).join('');
+
+            // Listen for selection changes
+            sel.addEventListener('change', () => {
+                const opt = sel.options[sel.selectedIndex];
+                const rate = parseFloat(opt.getAttribute('data-rate')) || 0;
+                const symbol = opt.getAttribute('data-symbol') || opt.value;
+                updateConvertedDisplay({ iso_code: opt.value, symbol, rate_per_kes: rate });
+            });
+
+            // Select default (KES) and update display
+            const defaultOpt = Array.from(sel.options).find(o => o.value === 'KES') || sel.options[0];
+            if (defaultOpt) {
+                sel.value = defaultOpt.value;
+                const rate = parseFloat(defaultOpt.getAttribute('data-rate')) || 1;
+                const symbol = defaultOpt.getAttribute('data-symbol') || defaultOpt.value;
+                updateConvertedDisplay({ iso_code: defaultOpt.value, symbol, rate_per_kes: rate });
+            }
+        }
+
+        function updateConvertedDisplay(currency) {
+            const mainPriceEl = document.getElementById('mainPrice');
+            // rate_per_kes is amount of target currency per 1 KES
+            const rate = Number(currency.rate_per_kes) || 0;
+            const amount = (BASE_AMOUNT_KES * rate);
+            const formatted = amount === 0 ? '--' : `${currency.symbol} ${Number(amount).toFixed(2)}`;
+            if (mainPriceEl) mainPriceEl.textContent = formatted;
+        }
         </script>
 
 </body>
