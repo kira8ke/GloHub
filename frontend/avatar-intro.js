@@ -3,6 +3,9 @@
 
 import { getAvatar, interpolate } from './dialogue.js';
 
+// Use global Supabase client loaded from supabase.js
+const supabase = window.supabaseClient;
+
 (async function() {
   try {
     // Read selection from sessionStorage
@@ -44,19 +47,31 @@ import { getAvatar, interpolate } from './dialogue.js';
     // Determine routing destination - CHECK LOGIN SOURCE FIRST
     let redirectUrl = '';
 
+    // Log the routing decision for debugging
+    console.log('Avatar intro routing decision:', {
+      loginSource,
+      isSuperAdmin,
+      joinCode,
+      sessionId
+    });
+
     // MOST IMPORTANT: Check loginSource FIRST - this determines flow regardless of other flags
     if (loginSource === 'admin-login') {
       // Came from admin login page → ALWAYS go to Admin Dashboard
       redirectUrl = 'admin-dashboard.html';
+      console.log('✅ Routing to admin-dashboard (from admin-login)');
     } else if (loginSource === 'join-game' && isSuperAdmin) {
       // Came from join-game with super admin code → Game Selection to choose which game
       redirectUrl = 'game-selection.html';
+      console.log('✅ Routing to game-selection (super admin from join-game)');
     } else if (loginSource === 'join-game') {
       // Regular player joining a game → Determine game type (quiz or charades)
       redirectUrl = await determineGameTypeAndRedirect(joinCode, sessionId);
+      console.log('✅ Routing to game wait room:', redirectUrl);
     } else {
       // Fallback - unknown login source, default to join game page
       redirectUrl = 'join-game.html';
+      console.log('⚠️ Unknown login source, defaulting to join-game');
     }
 
     // After animations complete, redirect
@@ -66,7 +81,7 @@ import { getAvatar, interpolate } from './dialogue.js';
       setTimeout(() => {
         window.location.href = redirectUrl;
       }, 300);
-    }, 5000); // Allow animations to play
+    }, 10000); // Allow animations to play (increased from 5s to 10s for smoother transition)
 
   } catch (err) {
     console.error('Avatar intro error:', err);

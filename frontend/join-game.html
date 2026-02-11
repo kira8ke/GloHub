@@ -8,6 +8,15 @@
     <title>Join Game - GalentineHub</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        body.page-transition {
+            animation: pageTransitionOut 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        @keyframes pageTransitionOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(20px); }
+        }
+    </style>
+    <style>
         /* Reuse admin auth visual style so join page matches admin login */
         .auth-page {
             display: flex;
@@ -133,7 +142,7 @@
                         placeholder="Enter your game code" 
                         required
                         maxlength="50"
-                        style="text-transform: uppercase; text-align: center; width: 400px">
+                        style="text-transform: uppercase; text-align: center; width: 400px; color:#2b0036">
                 </div>
                 
                 <div class="form-group">
@@ -142,7 +151,8 @@
                         id="username" 
                         placeholder="What should we call you?" 
                         required
-                        maxlength="20">
+                        maxlength="20"
+                        style="text-align: center; width: 400px; color:#2b0036">>
                 </div>
 
                 <button type="submit" class="btn-large">Enter</button>

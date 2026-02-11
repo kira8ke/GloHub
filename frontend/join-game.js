@@ -74,8 +74,11 @@ if (joinForm) {
                 sessionStorage.setItem('gameType', gameType);
             }
             
-            // Redirect to avatar customizer
-            window.location.href = 'avatar-select.html';
+            // Redirect to avatar customizer with smooth transition
+            document.body.classList.add('page-transition');
+            setTimeout(() => {
+                window.location.href = 'avatar-select.html';
+            }, 600);
             
         } catch (err) {
             console.error('Join game error:', err);

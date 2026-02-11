@@ -915,6 +915,111 @@ function updateTimerDisplay(timeRemaining) {
 }
 
 // =====================================================
+// PODIUM SCREEN (Character Avatars)
+// =====================================================
+
+async function showPodiumScreen(podiumData) {
+    hideAllScreens();
+    document.getElementById('podiumScreen').style.display = 'flex';
+    
+    // Get top 3 players from podiumData or gameState
+    const rankedPlayers = podiumData || 
+        Object.values(gameState.players)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 3);
+    
+    // Ensure we have 3 positions even if fewer players
+    const positions = [
+        rankedPlayers[0] || { name: 'Player 1', score: 0, avatar_id: '1' },
+        rankedPlayers[1] || { name: 'Player 2', score: 0, avatar_id: '2' },
+        rankedPlayers[2] || { name: 'Player 3', score: 0, avatar_id: '3' }
+    ];
+    
+    const podiumStage = document.getElementById('podiumStage');
+    podiumStage.innerHTML = `
+        <div class="podium-position rank-2">
+            <div class="podium-rank-box">
+                <div class="podium-medal">🥈</div>
+                <div class="podium-avatar-large">${createCharacterDisplay(positions[1].avatar_id)}</div>
+                <div class="podium-name">${positions[1].name}</div>
+                <div class="podium-score">${positions[1].score} pts</div>
+            </div>
+        </div>
+        <div class="podium-position rank-1">
+            <div class="podium-rank-box">
+                <div class="podium-medal">🏆</div>
+                <div class="podium-avatar-large">${createCharacterDisplay(positions[0].avatar_id)}</div>
+                <div class="podium-name">${positions[0].name}</div>
+                <div class="podium-score">${positions[0].score} pts</div>
+            </div>
+        </div>
+        <div class="podium-position rank-3">
+            <div class="podium-rank-box">
+                <div class="podium-medal">🥉</div>
+                <div class="podium-avatar-large">${createCharacterDisplay(positions[2].avatar_id)}</div>
+                <div class="podium-name">${positions[2].name}</div>
+                <div class="podium-score">${positions[2].score} pts</div>
+            </div>
+        </div>
+    `;
+}
+
+function createCharacterDisplay(avatarId) {
+    // Return emoji avatar for now (can be upgraded to SVG character later)
+    const emojiMap = {
+        '1': '😊', '2': '😍', '3': '😎', '4': '🤩', '5': '😘',
+        '6': '🥰', '7': '😌', '8': '🤔', '9': '😄', '10': '🤣',
+        '11': '😻', '12': '🐶', '13': '🐱', '14': '🦁', '15': '🐯',
+        '16': '🦄', '17': '🌟', '18': '💫', '19': '✨', '20': '🎀'
+    };
+    return emojiMap[avatarId] || '😊';
+}
+
+// =====================================================
+// EMOTION SCREEN
+// =====================================================
+
+function showEmotionScreen() {
+    hideAllScreens();
+    document.getElementById('emotionScreen').style.display = 'flex';
+    
+    // Get player's current score
+    const playerScore = gameState.score || 0;
+    const maxScore = 500; // Assume max possible score is around 500
+    const percentage = (playerScore / maxScore) * 100;
+    
+    // Determine emotion and message based on score
+    let emotion = '😊';
+    let message = 'Nice try!';
+    let caption = '';
+    
+    if (percentage >= 80) {
+        emotion = '🏆';
+        message = 'You were AMAZING!';
+        caption = 'Top tier performance!';
+    } else if (percentage >= 60) {
+        emotion = '🎉';
+        message = 'Great job!';
+        caption = 'You did awesome!';
+    } else if (percentage >= 40) {
+        emotion = '😊';
+        message = 'Good effort!';
+        caption = 'You got some great guesses in!';
+    } else {
+        emotion = '💪';
+        message = 'Keep practicing!';
+        caption = 'You\'ll get better next time!';
+    }
+    
+    document.getElementById('emotionFace').textContent = emotion;
+    document.getElementById('emotionMessage').textContent = message;
+    document.getElementById('emotionCaption').textContent = caption;
+    
+    // Return to waiting room after 4 seconds
+    setTimeout(() => showWaitingRoom(), 4000);
+}
+
+// =====================================================
 // FINAL SCREENS
 // =====================================================
 
@@ -928,21 +1033,24 @@ async function fetchFinalResults() {
             return;
         }
 
-        playerCount.textContent = players.length.toString();
-        playersList.innerHTML = players.map(player => `
-            <div class="player-item">
-                <div class="player-avatar">
-                    ${player.username?.charAt(0).toUpperCase() || '?'}
+        // Render leaderboard
+        const leaderboardList = document.getElementById('leaderboardList');
+        const sortedPlayers = Object.values(gameState.players)
+            .sort((a, b) => b.score - a.score);
+        
+        leaderboardList.innerHTML = sortedPlayers.map((player, index) => `
+            <div class="leaderboard-item">
+                <div class="leaderboard-rank">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}</div>
+                <div class="leaderboard-avatar">${createCharacterDisplay(player.avatar_id)}</div>
+                <div class="leaderboard-info">
+                    <div class="leaderboard-name">${player.name}</div>
                 </div>
-                <div class="player-name">
-                    ${player.username || 'Unknown Player'}
-                </div>
-                <div class="player-status">✓ Ready</div>
+                <div class="leaderboard-score">${player.score}</div>
             </div>
         `).join('');
 
     } catch (err) {
-        console.error('loadPlayersList failed:', err);
+        console.error('fetchFinalResults failed:', err);
     }
 }
 

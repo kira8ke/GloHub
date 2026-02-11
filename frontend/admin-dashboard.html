@@ -1934,6 +1934,9 @@
 
         // Setup navigation listeners
         document.addEventListener('DOMContentLoaded', () => {
+            // CRITICAL: Validate admin session before loading dashboard
+            validateAdminSession();
+
             // Desktop sidebar navigation
             document.querySelectorAll('.sidebar .nav-item').forEach(item => {
                 item.addEventListener('click', () => {
@@ -1958,6 +1961,28 @@
             updateDashboardStats();
             loadDefaultCategories();
         });
+
+        // ==========================================
+        // SESSION VALIDATION
+        // ==========================================
+        function validateAdminSession() {
+            // Check required session fields for admin access
+            const role = sessionStorage.getItem('role');
+            const adminId = sessionStorage.getItem('id');
+            const loginSource = sessionStorage.getItem('loginSource');
+
+            // Must have come from admin-login AND have a valid role
+            if (loginSource !== 'admin-login' || !role || !adminId) {
+                console.warn('Invalid admin session - redirecting to login');
+                // Clear all session data
+                sessionStorage.clear();
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            // Valid session - dashboard loads normally
+            console.log('Admin session validated:', { role, adminId });
+        }
 
         // ==========================================
         // MODAL FUNCTIONS
