@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#ff69b4">
     <title>Galentine's Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
 
@@ -29,19 +30,26 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: hidden;
+    width: 100%;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #fff5f8 0%, #ffe0ed 50%, #ffb6d9 100%);
     color: var(--text);
     overflow-x: hidden;
     min-height: 100vh;
+    width: 100%;
+    max-width: 100vw;
 }
 
 /* ==========================================
    GAMIFIED HEADER
    ========================================== */
 .game-header {
-    padding: 15px 20px;
+    padding: clamp(10px, 3vw, 20px) clamp(10px, 4vw, 20px);
     position: absolute;
     top: 0;
     left: 0;
@@ -50,6 +58,7 @@ body {
     background: transparent;
     backdrop-filter: none;
     box-shadow: none;
+    overflow-x: hidden;
 }
 
 .game-header::before {
@@ -63,28 +72,33 @@ body {
     align-items: center;
     position: relative;
     z-index: 2;
+    min-height: 30px;
 }
 
 .game-nav {
     margin-left: auto;
     display: flex;
-    gap: 20px;
+    gap: clamp(8px, 2vw, 20px);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .game-nav-btn {
     background: linear-gradient(135deg, rgba(255, 79, 216, 0.15), rgba(123, 44, 255, 0.15));
     color: white;
-    padding: 10px 20px;
+    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 20px);
     border-radius: 25px;
     text-decoration: none;
     font-weight: 700;
-    font-size: 14px;
+    font-size: clamp(11px, 2vw, 14px);
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     border: 2px solid rgba(255, 105, 180, 0.3);
     backdrop-filter: blur(6px);
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .game-nav-btn::before {
@@ -109,78 +123,6 @@ body {
     transform: translateY(-1px);
 }
 
-/* Hamburger Menu */
-.hamburger-menu {
-    display: none;
-    flex-direction: column;
-    gap: 6px;
-    position: relative;
-    z-index: 3;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 8px;
-}
-
-.hamburger-menu span {
-    width: 28px;
-    height: 3px;
-    background: white;
-    border-radius: 3px;
-    transition: all 0.3s ease;
-}
-
-.hamburger-menu.active span:nth-child(1) {
-    transform: rotate(45deg) translate(10px, 10px);
-}
-
-.hamburger-menu.active span:nth-child(2) {
-    opacity: 0;
-}
-
-.hamburger-menu.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(8px, -8px);
-}
-
-/* Mobile Menu */
-.mobile-nav {
-    display: none;
-    position: absolute;
-    top: 70px;
-    right: 20px;
-    background: linear-gradient(135deg, rgba(18, 0, 24, 0.95), rgba(43, 0, 54, 0.95));
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 105, 180, 0.2);
-    border-radius: 15px;
-    padding: 20px 0;
-    min-width: 200px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-}
-
-.mobile-nav.active {
-    display: flex;
-    flex-direction: column;
-}
-
-.mobile-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 14px 25px;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    border-left: 3px solid transparent;
-    display: block;
-}
-
-.mobile-nav a:hover {
-    background: rgba(255, 79, 216, 0.2);
-    color: var(--primary);
-    border-left-color: var(--primary);
-    padding-left: 35px;
-}
-
 .game-logo {
     display: flex;
     align-items: center;
@@ -196,14 +138,15 @@ body {
     font-size: clamp(32px, 5vw, 48px);
 }
 
-
 /* ==========================================
-   HERO SECTION WITH FLOATING AVATARS
+   IMPROVED HERO SECTION - DYNAMIC & RESPONSIVE
    ========================================== */
+
+/* Desktop: Full height, centered layout */
 .hero-game {
     position: relative;
     min-height: 100vh;
-    height: 100vh;
+    height: auto;
     padding-top: 0;
     background:
         radial-gradient(circle at 20% 30%, #ff4fd8 0%, transparent 40%),
@@ -212,27 +155,31 @@ body {
     overflow: hidden;
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 100vw;
 }
 
-
-
 .hero-game-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding-top: 120px;
-    padding-bottom: 40px;
+    padding: clamp(80px, 15vw, 100px) clamp(15px, 4vw, 40px) clamp(30px, 8vw, 60px);
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 40px;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(30px, 5vw, 60px);
     align-items: center;
     position: relative;
     z-index: 1;
-    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
 }
-
 
 .hero-content {
     text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: auto;
 }
 
 .hero-badge {
@@ -248,16 +195,17 @@ body {
 }
 
 .hero-title {
-    color: #fff;
-    text-shadow:
-        0 0 10px rgba(255,255,255,0.3),
-        0 0 30px rgba(255,79,216,0.6);
-    margin-bottom: 30px;
+    font-size: clamp(48px, 12vw, 140px);
+    font-family: 'Dancing Script', cursive;
+    color: #ff69b4;
+    margin-bottom: clamp(20px, 5vw, 40px);
+    line-height: 1.1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
-
 .hero-subtitle {
-    font-size: clamp(18px, 3vw, 24px);
+    font-size: clamp(16px, 3vw, 24px);
     color: var(--text-light);
     margin-bottom: 30px;
     line-height: 1.6;
@@ -313,14 +261,19 @@ body {
 .hero-visual {
     position: relative;
     perspective: 1000px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(200px, 50vh, 500px);
 }
 
 .hero-visual img {
-    width: 100%;
-    max-width: 500px;
+    max-width: 100%;
+    width: clamp(150px, 100%, 500px);
     height: auto;
     filter: drop-shadow(0 20px 60px rgba(255,79,216,0.6));
     animation: float 6s ease-in-out infinite;
+    object-fit: contain;
 }
 
 @keyframes float {
@@ -328,19 +281,24 @@ body {
     50% { transform: translateY(-20px) rotateY(5deg); }
 }
 
-/* GAME PREVIEW CARD */
+/* ==========================================
+   GAME PREVIEW CARD - RAISED AVATARS
+   ========================================== */
 .game-preview-card {
     background: linear-gradient(135deg, rgba(18, 0, 24, 0.8), rgba(43, 0, 54, 0.8));
     backdrop-filter: blur(10px);
     border: 2px solid rgba(255,105,180,0.2);
     border-radius: 30px;
-    padding: 40px;
+    padding: 50px 40px;
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.5),
         inset 0 0 50px rgba(255,79,216,0.1);
     position: relative;
     overflow: hidden;
-    min-height: 500px;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .game-preview-card::before {
@@ -353,7 +311,8 @@ body {
 
 .floating-avatars {
     position: relative;
-    height: 450px;
+    width: 100%;
+    height: 500px;
     animation: pulse 3s ease-in-out infinite;
 }
 
@@ -362,16 +321,17 @@ body {
     50% { transform: scale(1.02); }
 }
 
+/* RAISED AVATAR POSITIONS - Better alignment */
 .avatar-circle {
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary), var(--accent));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 36px;
     box-shadow:
         0 10px 30px rgba(255,105,180,0.5),
         inset 0 0 20px rgba(255,255,255,0.3);
@@ -389,15 +349,45 @@ body {
 
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-15px); }
 }
 
-.avatar-1 { top: 10%; left: 15%; animation-delay: 0s; }
-.avatar-2 { top: 15%; right: 20%; animation-delay: 0.2s; }
-.avatar-3 { top: 40%; left: 5%; animation-delay: 0.4s; }
-.avatar-4 { top: 45%; right: 10%; animation-delay: 0.6s; }
-.avatar-5 { bottom: 25%; left: 25%; animation-delay: 0.8s; }
-.avatar-6 { bottom: 20%; right: 15%; animation-delay: 1s; }
+/* IMPROVED AVATAR LAYOUT - More spread out, raised higher */
+.avatar-1 { 
+    top: 8%; 
+    left: 12%; 
+    animation-delay: 0s; 
+}
+
+.avatar-2 { 
+    top: 5%; 
+    right: 18%; 
+    animation-delay: 0.2s; 
+}
+
+.avatar-3 { 
+    top: 35%; 
+    left: 5%; 
+    animation-delay: 0.4s; 
+}
+
+.avatar-4 { 
+    top: 38%; 
+    right: 8%; 
+    animation-delay: 0.6s; 
+}
+
+.avatar-5 { 
+    bottom: 28%; 
+    left: 20%; 
+    animation-delay: 0.8s; 
+}
+
+.avatar-6 { 
+    bottom: 25%; 
+    right: 12%; 
+    animation-delay: 1s; 
+}
 
 .avatar-name {
     position: absolute;
@@ -406,9 +396,9 @@ body {
     transform: translateX(-50%);
     background: rgba(18, 0, 24, 0.9);
     color: white;
-    padding: 5px 12px;
+    padding: 6px 14px;
     border-radius: 15px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
     opacity: 0;
@@ -418,7 +408,7 @@ body {
 
 .avatar-circle:hover .avatar-name {
     opacity: 1;
-    bottom: -35px;
+    bottom: -38px;
 }
 
 /* GAME BACKGROUND EFFECTS */
@@ -650,70 +640,6 @@ body {
     box-shadow: 0 0 0 3px rgba(255,105,180,0.1);
 }
 
-/* Promo Section */
-.promo-section {
-    margin-bottom: 20px;
-}
-
-.promo-input-group {
-    display: flex;
-    gap: 8px;
-}
-
-.promo-input-group input {
-    flex: 1;
-    padding: 10px 14px;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    font-size: 14px;
-}
-
-.promo-btn {
-    padding: 10px 20px;
-    background: #8435DE;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s;
-    white-space: nowrap;
-}
-
-.promo-btn:hover {
-    background: #8e44ad;
-    transform: translateY(-1px);
-}
-
-/* Promo Messages */
-.promo-message {
-    margin-top: 8px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    text-align: center;
-}
-
-.promo-message.success {
-    background: rgba(76,175,80,0.1);
-    color: var(--success);
-    border: 1px solid var(--success);
-}
-
-.promo-message.error {
-    background: rgba(244,67,54,0.1);
-    color: var(--error);
-    border: 1px solid var(--error);
-}
-
-.promo-message.loading {
-    background: rgba(155,89,182,0.1);
-    color: var(--purple);
-    border: 1px solid var(--purple);
-}
-
 /* CTA Button */
 .cta-btn {
     width: 100%;
@@ -739,7 +665,6 @@ body {
     cursor: not-allowed;
     transform: none;
 }
-
 
 /* SUCCESS SCREEN */
 .success-screen {
@@ -846,7 +771,7 @@ body {
 
 .feature-list {
     margin-top: 18px;
-    padding-left: 20px;      /* space for bullets */
+    padding-left: 20px;
 }
 
 .feature-item {
@@ -865,40 +790,9 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    color: #8435DE;          /* brand purple */
+    color: #8435DE;
     font-size: 20px;
     line-height: 1;
-}
-
-
-.success-subtitle {
-    font-size: 20px;
-    color: var(--text);
-    margin-bottom: 20px;
-    font-weight: 700;
-}
-
-.admin-code-box {
-    background: var(--bg);
-    padding: 30px;
-    border-radius: 15px;
-    margin: 30px 0;
-    border: 3px dashed var(--primary);
-}
-
-.admin-code-label {
-    font-size: 18px;
-    color: var(--text-light);
-    margin-bottom: 10px;
-}
-
-.admin-code {
-    font-size: 48px;
-    font-weight: 900;
-    color: var(--accent);
-    letter-spacing: 3px;
-    font-family: 'Courier New', monospace;
-    margin-bottom: 15px;
 }
 
 .copy-btn {
@@ -914,306 +808,6 @@ body {
 
 .copy-btn:hover {
     background: var(--accent);
-}
-
-.dashboard-btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 18px 40px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
-    text-decoration: none;
-    border-radius: 25px;
-    font-weight: 700;
-    transition: all 0.3s;
-}
-
-.dashboard-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(255,105,180,0.4);
-}
-
-/* ==========================================
-   GAMIFIED FOOTER
-   ========================================== */
-.game-footer {
-    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
-    color: white;
-    padding: 40px 20px 20px;
-}
-
-.game-footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
-    margin-bottom: 30px;
-}
-
-.footer-section h3 {
-    color: var(--primary);
-    margin-bottom: 15px;
-    font-size: 20px;
-}
-
-.footer-section p,
-.footer-section a {
-    color: rgba(255,255,255,0.7);
-    text-decoration: none;
-    display: block;
-    margin-bottom: 10px;
-    transition: color 0.3s;
-}
-
-.footer-section a:hover {
-    color: var(--primary);
-}
-
-.footer-tagline {
-    font-size: 24px;
-    font-family: 'Brush Script MT', cursive;
-    color: var(--secondary);
-    margin-bottom: 10px;
-}
-
-.footer-bottom {
-    text-align: center;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.5);
-    font-size: 14px;
-}
-
-.social-links {
-    display: flex;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.social-icon {
-    width: 40px;
-    height: 40px;
-    background: rgba(255,105,180,0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    transition: all 0.3s;
-}
-
-.social-icon:hover {
-    background: var(--primary);
-    transform: translateY(-3px);
-}
-
-/* ==========================================
-   RESPONSIVE
-   ========================================== */
-
-/* Mobile viewport fit adjustments */
-@media (max-width: 768px) {
-    .hero-game {
-        height: 100vh;
-        min-height: unset;
-        overflow: hidden;
-    }
-    
-    .hero-game-container {
-        padding: 80px 20px 20px;
-        grid-template-columns: 1fr;
-        gap: 20px;
-        height: calc(100vh - 80px);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    
-    /* CHANGE ORDER: Image first, then content */
-    .hero-visual {
-        order: 1;  /* Changed from order: 2 */
-        flex-shrink: 1;
-    }
-    
-    .hero-content {
-        flex-shrink: 0;
-        order: 2;  /* Changed from order: 1 */
-        text-align: center;
-    }
-    
-    .hero-visual img {
-        max-width: 70%;
-        margin: 0 auto;
-        display: block;
-    }
-    
-    /* Rest of the mobile styles remain the same... */
-    .game-preview-card {
-        height: auto;
-        min-height: unset;
-        max-height: 30vh;
-        overflow: hidden;
-        order: 2;
-        flex-shrink: 1;
-    }
-    
-    .floating-avatars {
-        height: auto;
-        max-height: 28vh;
-        transform: scale(0.7);
-        margin-top: 0;
-    }
-    
-    .avatar-circle {
-        width: clamp(45px, 10vw, 60px);
-        height: clamp(45px, 10vw, 60px);
-    }
-    
-    .avatar-name {
-        font-size: clamp(9px, 2vw, 11px);
-        padding: 3px 7px;
-    }
-    
-    .hero-badge {
-        padding: 6px 16px;
-        font-size: 11px;
-        margin-bottom: 15px;
-    }
-    
-    .hero-title {
-        font-size: clamp(28px, 8vw, 42px);
-        line-height: 1.1;
-        margin-bottom: 15px;
-    }
-    
-    .hero-subtitle {
-        font-size: clamp(14px, 3.5vw, 16px);
-        margin-bottom: 20px;
-        line-height: 1.4;
-    }
-    
-    .hero-cta, .cta-btn {
-        padding: 14px 32px;
-        font-size: 15px;
-        margin-bottom: 10px;
-    }
-    
-    .game-header {
-        padding: 10px 15px;
-    }
-
-    .pricing-card {
-        padding: 30px 20px;
-    }
-
-    .price-tag {
-        font-size: 56px;
-    }
-
-    .game-nav {
-        gap: 10px;
-    }
-
-    .game-nav-btn {
-        padding: 8px 15px;
-        font-size: 12px;
-    }
-
-    .promo-input-group {
-        flex-direction: column;
-    }
-}
-
-/* Extra small screens */
-@media (max-width: 480px) {
-    .hero-game-container {
-        padding: 70px 15px 15px;
-        gap: 15px;
-    }
-    
-    .hero-title {
-        font-size: clamp(24px, 7vw, 32px);
-        margin-bottom: 10px;
-    }
-    
-    .hero-subtitle {
-        font-size: clamp(12px, 3vw, 14px);
-        margin-bottom: 15px;
-    }
-    
-    .hero-cta, .cta-btn {
-        padding: 12px 28px;
-        font-size: 14px;
-    }
-    
-    /* FURTHER REDUCE CHARACTER IMAGE */
-    .game-preview-card {
-        max-height: 25vh;
-    }
-    
-    .floating-avatars {
-        max-height: 23vh;
-        transform: scale(0.6);
-    }
-    
-    .avatar-circle {
-        width: clamp(40px, 9vw, 55px);
-        height: clamp(40px, 9vw, 55px);
-    }
-    
-    .hero-visual img {
-        max-width: 60%;
-    }
-}
-
-/* Landscape orientation on mobile */
-@media (max-height: 600px) and (orientation: landscape) {
-    .hero-game {
-        height: 100vh;
-    }
-    
-    .hero-game-container {
-        grid-template-columns: 1fr 1fr;
-        padding: 60px 20px 20px;
-        gap: 15px;
-    }
-    
-    .hero-title {
-        font-size: clamp(20px, 5vw, 28px);
-        margin-bottom: 8px;
-    }
-    
-    .hero-subtitle {
-        font-size: clamp(11px, 2.5vw, 13px);
-        margin-bottom: 12px;
-    }
-    
-    .hero-badge {
-        margin-bottom: 10px;
-        padding: 5px 14px;
-        font-size: 10px;
-    }
-    
-    .hero-cta, .cta-btn {
-        padding: 10px 24px;
-        font-size: 13px;
-    }
-    
-    /* CHARACTER IMAGE IN LANDSCAPE */
-    .game-preview-card {
-        max-height: 60vh;
-    }
-    
-    .floating-avatars {
-        max-height: 55vh;
-        transform: scale(0.6);
-    }
-    
-    .hero-visual img {
-        max-width: 80%;
-    }
 }
 
 /* Loading Spinner */
@@ -1232,132 +826,462 @@ body {
 }
 
 /* ==========================================
-   NEW GET GAME BUTTON
+   RESPONSIVE BREAKPOINTS - DYNAMIC SCALING
    ========================================== */
-.game-cta-button {
-    position: relative;
-    display: inline-flex;
+
+/* Large Desktop (1400px+) */
+@media (min-width: 1400px) {
+    .hero-game-container {
+        max-width: 1600px;
+        gap: 80px;
+    }
+    
+    .game-preview-card {
+        min-height: 650px;
+    }
+    
+    .floating-avatars {
+        height: 550px;
+    }
+    
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        font-size: 40px;
+    }
+}
+
+/* Medium Desktop (1024px - 1399px) */
+@media (min-width: 1024px) and (max-width: 1399px) {
+    .hero-game-container {
+        max-width: 1200px;
+        gap: 50px;
+        padding: 90px 30px 30px;
+    }
+    
+    .game-preview-card {
+        min-height: 550px;
+        padding: 40px 30px;
+    }
+    
+    .floating-avatars {
+        height: 480px;
+    }
+    
+    .avatar-circle {
+        width: 85px;
+        height: 85px;
+        font-size: 34px;
+    }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .hero-game-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: clamp(60px, 12vw, 80px) clamp(15px, 3vw, 30px) clamp(20px, 5vw, 30px);
+    }
+    
+    .hero-visual {
+        order: 1;
+        max-width: 100%;
+        min-height: 300px;
+    }
+    
+    .hero-content {
+        order: 2;
+        text-align: center;
+    }
+    
+    .game-preview-card {
+        min-height: 450px;
+        max-height: 500px;
+    }
+    
+    .floating-avatars {
+        height: 400px;
+        transform: scale(0.85);
+    }
+    
+    .avatar-circle {
+        width: 75px;
+        height: 75px;
+        font-size: 30px;
+    }
+    
+    .hero-visual img {
+        max-width: 100%;
+        width: clamp(150px, 80vw, 400px);
+    }
+
+    .game-nav {
+        gap: 8px;
+    }
+
+    .game-nav-btn {
+        padding: 7px 12px;
+        font-size: 11px;
+    }
+    
+    .hero-title {
+        font-size: clamp(40px, 10vw, 80px);
+    }
+}
+
+/* Mobile (481px - 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+    .hero-game {
+        height: auto;
+        min-height: auto;
+    }
+    
+    .hero-game-container {
+        grid-template-columns: 1fr;
+        padding: clamp(70px, 12vw, 80px) clamp(12px, 3vw, 20px) clamp(20px, 5vw, 30px);
+        gap: 20px;
+    }
+    
+    /* IMAGE FIRST on mobile */
+    .hero-visual {
+        order: 1;
+        min-height: 250px;
+    }
+    
+    .hero-content {
+        order: 2;
+        text-align: center;
+    }
+    
+    .hero-visual img {
+        max-width: 100%;
+        width: clamp(120px, 75vw, 350px);
+        margin: 0 auto;
+        display: block;
+    }
+    
+    .game-preview-card {
+        min-height: 350px;
+        max-height: 400px;
+        padding: 25px 15px;
+    }
+    
+    .floating-avatars {
+        height: 300px;
+        transform: scale(0.7);
+    }
+    
+    .avatar-circle {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    
+    .avatar-name {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+    
+    .hero-title {
+        font-size: clamp(32px, 8vw, 56px);
+        margin-bottom: 15px;
+    }
+    
+    .hero-subtitle {
+        font-size: clamp(12px, 3.5vw, 16px);
+    }
+
+    .pricing-card {
+        padding: 25px 15px;
+    }
+    
+    .game-nav-btn {
+        padding: 6px 10px;
+        font-size: 10px;
+    }
+}
+
+/* Small Mobile (320px - 480px) */
+@media (max-width: 480px) {
+    .hero-game {
+        height: auto;
+        min-height: auto;
+    }
+    
+    .hero-game-container {
+        padding: clamp(60px, 10vw, 70px) clamp(10px, 2vw, 15px) clamp(15px, 3vw, 20px);
+        gap: 15px;
+        grid-template-columns: 1fr;
+    }
+    
+    /* IMAGE FIRST on mobile */
+    .hero-visual {
+        order: 1;
+        min-height: 200px;
+    }
+    
+    .hero-content {
+        order: 2;
+        text-align: center;
+    }
+    
+    .hero-visual img {
+        max-width: 100%;
+        width: clamp(100px, 65vw, 280px);
+        margin: 0 auto;
+        display: block;
+    }
+    
+    .game-preview-card {
+        min-height: 280px;
+        max-height: 320px;
+        padding: 20px 12px;
+    }
+    
+    .floating-avatars {
+        height: 240px;
+        transform: scale(0.6);
+    }
+    
+    .avatar-circle {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .avatar-name {
+        font-size: 9px;
+        padding: 2px 6px;
+    }
+    
+    /* ADJUSTED POSITIONS FOR SMALL SCREENS */
+    .avatar-1 { top: 10%; left: 8%; }
+    .avatar-2 { top: 8%; right: 10%; }
+    .avatar-3 { top: 40%; left: 2%; }
+    .avatar-4 { top: 42%; right: 3%; }
+    .avatar-5 { bottom: 30%; left: 12%; }
+    .avatar-6 { bottom: 28%; right: 8%; }
+    
+    .hero-title {
+        font-size: clamp(28px, 7vw, 40px);
+        margin-bottom: 12px;
+    }
+    
+    .hero-subtitle {
+        font-size: clamp(11px, 2.8vw, 14px);
+        margin-bottom: 15px;
+    }
+    
+    .hero-cta {
+        padding: 12px 24px;
+        font-size: 13px;
+    }
+
+    .game-header {
+        padding: 8px 10px;
+    }
+    
+    .game-nav-btn {
+        padding: 5px 8px;
+        font-size: 9px;
+        border-radius: 18px;
+    }
+    
+    .modal-content {
+        width: 95%;
+    }
+}
+    
+    .avatar-name {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+    
+    /* ADJUSTED POSITIONS FOR SMALL SCREENS */
+    .avatar-1 { top: 10%; left: 10%; }
+    .avatar-2 { top: 8%; right: 12%; }
+    .avatar-3 { top: 40%; left: 3%; }
+    .avatar-4 { top: 42%; right: 5%; }
+    .avatar-5 { bottom: 30%; left: 15%; }
+    .avatar-6 { bottom: 28%; right: 10%; }
+    
+    .hero-title {
+        font-size: clamp(28px, 7vw, 38px);
+        margin-bottom: 15px;
+    }
+    
+    .hero-subtitle {
+        font-size: clamp(13px, 3vw, 16px);
+        margin-bottom: 20px;
+    }
+    
+    .hero-cta {
+        padding: 14px 30px;
+        font-size: 15px;
+    }
+
+    .game-header {
+        padding: 10px 15px;
+    }
+
+
+/* Landscape Mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+    .hero-game {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .hero-game-container {
+        grid-template-columns: 1fr 1fr;
+        padding: 70px 20px 20px;
+        gap: 30px;
+    }
+    
+    .hero-visual {
+        order: 1;
+    }
+    
+    .hero-content {
+        order: 2;
+    }
+    
+    .game-preview-card {
+        min-height: 400px;
+        max-height: 450px;
+    }
+    
+    .floating-avatars {
+        height: 360px;
+        transform: scale(0.7);
+    }
+    
+    .avatar-circle {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    
+    .hero-visual img {
+        max-width: 90%;
+    }
+    
+    .hero-title {
+        font-size: clamp(24px, 5vw, 36px);
+    }
+}
+
+/* Ultra-wide screens (1920px+) */
+@media (min-width: 1920px) {
+    .hero-game-container {
+        max-width: 1800px;
+        gap: 100px;
+    }
+    
+    .game-preview-card {
+        min-height: 700px;
+    }
+    
+    .floating-avatars {
+        height: 600px;
+    }
+    
+    .avatar-circle {
+        width: 110px;
+        height: 110px;
+        font-size: 44px;
+    }
+    
+    /* SPREAD AVATARS MORE ON ULTRA-WIDE */
+    .avatar-1 { top: 6%; left: 10%; }
+    .avatar-2 { top: 3%; right: 15%; }
+    .avatar-3 { top: 32%; left: 3%; }
+    .avatar-4 { top: 35%; right: 5%; }
+    .avatar-5 { bottom: 26%; left: 18%; }
+    .avatar-6 { bottom: 23%; right: 10%; }
+}
+
+/* Container queries for dynamic scaling (if supported) */
+@supports (container-type: inline-size) {
+    .hero-game-container {
+        container-type: inline-size;
+        container-name: hero;
+    }
+    
+    @container hero (max-width: 768px) {
+        .floating-avatars {
+            transform: scale(0.7);
+        }
+    }
+    
+    @container hero (min-width: 1400px) {
+        .floating-avatars {
+            transform: scale(1.1);
+        }
+    }
+}
+
+/* ==========================================
+   PAGE TRANSITION OVERLAY
+   ========================================== */
+.page-transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ff4fd8, #7b2cff);
+    z-index: 9998;
+    display: none;
     align-items: center;
     justify-content: center;
-    padding: 20px 50px;
-    background: linear-gradient(135deg, #ff4fd8 0%, #7b2cff 100%);
-    border: none;
-    border-radius: 50px;
-    color: white;
-    font-size: 20px;
-    font-weight: 700;
-    font-family: 'Poppins', sans-serif;
-    cursor: pointer;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 
-        0 10px 30px rgba(255, 79, 216, 0.4),
-        0 0 40px rgba(123, 44, 255, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    z-index: 1;
-}
-
-.game-cta-button::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #7b2cff 0%, #ff4fd8 100%);
     opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: -1;
-}
-
-.button-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-    z-index: 2;
-}
-
-.button-text {
-    font-size: 20px;
-    letter-spacing: 0.5px;
-}
-
-.game-cta-button:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 
-        0 20px 50px rgba(255, 79, 216, 0.6),
-        0 0 60px rgba(123, 44, 255, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
-.game-cta-button:hover::before {
-    opacity: 1;
-}
-
-.game-cta-button:hover .button-glow {
-    opacity: 1;
-    animation: glowSweep 1.5s ease-in-out infinite;
-}
-
-@keyframes glowSweep {
-    0% { transform: translateX(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) rotate(45deg); }
-}
-
-.game-cta-button:active {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 
-        0 15px 40px rgba(255, 79, 216, 0.5),
-        0 0 50px rgba(123, 44, 255, 0.4);
-}
-
-.game-cta-button:hover .button-icon {
-    animation: heartBeatFast 0.6s ease-in-out infinite;
-}
-
-@keyframes heartBeatFast {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-}
-
-/* Ripple effect on click */
-.game-cta-button::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
-    opacity: 0;
-    transform: scale(0);
-    transition: all 0.6s ease-out;
+    animation: pageTransitionZoom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     pointer-events: none;
 }
 
-.game-cta-button:active::after {
-    opacity: 1;
-    transform: scale(1.5);
+.page-transition-overlay.active {
+    display: flex;
+    animation: pageTransitionZoom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* Mobile adjustments for new button */
-@media (max-width: 768px) {
-    .game-cta-button {
-        padding: 16px 40px;
-        font-size: 18px;
+.page-transition-content {
+    width: 120%;
+    height: 120%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff4fd8, #7b2cff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: transitionContentZoom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes pageTransitionZoom {
+    0% {
+        opacity: 0;
     }
-    
-    .button-text {
-        font-size: 18px;
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 1;
     }
 }
 
-@media (max-width: 480px) {
-    .game-cta-button {
-        padding: 14px 35px;
-        font-size: 16px;
+@keyframes transitionContentZoom {
+    0% {
+        transform: scale(0);
+        opacity: 0;
     }
-    
-    .button-text {
-        font-size: 16px;
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
     }
-    
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
 }
     </style>
 </head>
@@ -1366,7 +1290,6 @@ body {
   <div class="game-bg">
    <div class="game-particles"></div>
     <header class="game-header">
-        
         <div class="game-header-content">
             <nav class="game-nav">
                 <a href="index.html" class="game-nav-btn"> Back to Home</a>
@@ -1380,115 +1303,106 @@ body {
     <section class="hero-game">
         <div class="game-particles"></div>
         <div class="hero-game-container">
-                    <!-- LEFT: HERO VISUAL -->
+            <!-- LEFT: HERO VISUAL -->
             <div class="hero-visual">
                 <img src="assets/Hero Section Character.png" alt="Galentines Game Visual">
+                <img src="assets/Baby Pink Standing Character.png" alt="Galentines Game Visual">
+                <img src="assets/Black_Standing_Character.png" alt="Galentines Game Visual">
             </div>
 
             <!-- RIGHT: HERO TEXT -->
             <div class="hero-content">
-                <span class="hero-badge"> Galentine’s, but make it iconic </span>
-                <h1 class="hero-title"> 2 amazing games in one magical experience!</h1>
+                <h1 class="hero-title">
+                    <span style="font-size: 200px; font-family: 'Dancing Script', cursive; color:#ff69b4; margin-bottom: auto; margin-left: auto;">Piksi</span>
+                </h1>
                 <button type="button" class="hero-cta" id="newGetGameBtn">Get Game</button>
-
             </div>
         </div>
 
         <!-- Pricing Modal -->
-<div id="pricingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="pricingTitle">
-    <div class="modal-overlay" onclick="closePricingModal()"></div>
-    <div class="modal-content">
-        <button class="modal-close" onclick="closePricingModal()">×</button>
-        
-        <div class="pricing-card modal-card">
-            <div class="card-shimmer"></div>
-            <div class="pricing-badge">MOST POPULAR</div>
-            <h3 id="pricingTitle">Galentine's Game Night</h3>
-            <div class="pricing-amount">
-        <div style="display:flex; align-items:center; gap:10px; justify-content:center;">
-            <div class="price" style="font-size:45px; color:#8435DE;">
-            <span id="mainPrice">KES 199</span> 
-            <span style="font-size:28px; font-weight:500; color:#A1A4A6;">/month</span>
-            </div>
-
-            <!-- Currency conversion control -->
-            <div style="display:flex; gap:10px; align-items:center;">
-            <label for="currencySelect" style="color:#6b0f66; font-weight:700;">Show price in</label>
-            <select id="currencySelect" style="padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); background:white; color:#2b0036;"></select>
-            </div>
-        </div>
-        </div>
-
-            
-            <form id="paymentForm" onsubmit="handlePayment(event); return false;">
-                <div class="form-group">
-                    <label>Your Email </label>
-                    <input type="email" id="emailInput" placeholder="bestie@example.com" required>
-                </div>
+        <div id="pricingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="pricingTitle">
+            <div class="modal-overlay" onclick="closePricingModal()"></div>
+            <div class="modal-content">
+                <button class="modal-close" onclick="closePricingModal()">×</button>
                 
-                <div class="promo-section">
-                    <div class="promo-input-group">
-                        <input type="text" id="promoInput" placeholder="Got a promo code? ">
-                        <button type="button" class="promo-btn" onclick="applyPromoCode(event); return false;">Apply</button>
+                <div class="pricing-card modal-card">
+                    <div class="card-shimmer"></div>
+                    <div class="pricing-badge">MOST POPULAR</div>
+                    
+                    <!-- Currency conversion control -->
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <label for="currencySelect" style="color:#6b0f66; font-weight:700;">Show price in</label>
+                        <select id="currencySelect" style="padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); background:white; color:#2b0036;"></select>
                     </div>
-                    <div id="promoMessage" class="promo-message"></div>
-                </div>
+                    
+                    <div class="pricing-amount">
+                        <div style="display:flex; align-items:center; gap:10px; justify-content:center;">
+                            <div class="price" style="font-size:45px; color:#8435DE; padding-top: 20px; margin-right: auto;">
+                                <span id="mainPrice">KES 199</span> 
+                                <span style="font-size:28px; font-weight:500; color:#A1A4A6;">/month</span>
+                            </div>
+                        </div>
+                    </div>
 
-                <button type="submit" id="submitBtn" class="cta-btn">
-                    Start Now
-                </button>
-            </form>
+                    <form id="paymentForm" onsubmit="handlePayment(event); return false;">
+                        <div class="form-group">
+                            <label>Your Email</label>
+                            <input type="email" id="emailInput" placeholder="bestie@example.com" required>
+                        </div>
 
-            <div id="successScreen" class="success-screen">
-                <div class="success-icon"></div>
-                <h3>Welcome to the Squad! </h3>
-                <p>Your game is ready to rock!</p>
-                
-                <div class="admin-code-display">
-                    <label>Your Admin Code:</label>
-                    <div class="code-box">
-                        <code id="displayAdminCode">GLH-XXXX</code>
-                        <button onclick="copyAdminCode()" class="copy-btn"> Copy</button>
+                        <button type="submit" id="submitBtn" class="cta-btn">
+                            Start Now
+                        </button>
+                    </form>
+
+                    <div id="successScreen" class="success-screen">
+                        <div class="success-icon"></div>
+                        <h3>Welcome to the Squad!</h3>
+                        <p>Your game is ready to rock!</p>
+                        
+                        <div class="admin-code-display">
+                            <label>Your Admin Code:</label>
+                            <div class="code-box">
+                                <code id="displayAdminCode">GLH-XXXX</code>
+                                <button onclick="copyAdminCode()" class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                        
+                        <div class="success-info">
+                            <p>Confirmation sent to: <strong id="displayEmail"></strong></p>
+                            <p>Use your admin code to create and manage your game!</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-list">
+                        <div class="feature-item">Custom questions</div>
+                        <div class="feature-item">Pick your avatar</div>
+                        <div class="feature-item">Up to 15 players</div>
+                        <div class="feature-item">Live leaderboard</div>
+                        <div class="feature-item">Save Progress</div>
                     </div>
                 </div>
-                
-                <div class="success-info">
-                    <p> Confirmation sent to: <strong id="displayEmail"></strong></p>
-                    <p> Use your admin code to create and manage your game!</p>
-                </div>
-                
-                <a href="/admin-login.html" class="cta-btn">Start Creating </a>
-            </div>
-
-            <div class="feature-list">
-                <div class="feature-item"> Unlimited questions</div>
-                <div class="feature-item"> Up to 50 players</div>
-                <div class="feature-item"> Customizable themes</div>
-                <div class="feature-item"> Live leaderboard</div>
-                <div class="feature-item"> Save progress</div>
-                <div class="feature-item"> Bonus content pack</div>
             </div>
         </div>
-    </div>
-</div>
     </section>
-    
-    
-
 
     <!-- SUPABASE SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
 
-    <script>
-    // ================================
-    // SUPABASE CLIENT (SAFE SINGLE INIT)
-    // ================================
+    <!-- Page Transition Overlay -->
+    <div class="page-transition-overlay" id="pageTransitionOverlay">
+        <div class="page-transition-content"></div>
+    </div>
 
+    <script>
+        // ================================
+        // SUPABASE CLIENT (SAFE SINGLE INIT)
+        // ================================
         const sb = window.supabaseClient;
 
         if (!sb) {
-        console.error('❌ Supabase client not found. Check supabase.js');
+            console.error('❌ Supabase client not found. Check supabase.js');
         }
 
         /* ================================
@@ -1502,132 +1416,90 @@ body {
         MODAL CONTROLS
         ================================ */
         function openGameModal() {
-        const modal = document.getElementById('pricingModal');
-        if (!modal) return console.error('❌ Modal not found');
+            const modal = document.getElementById('pricingModal');
+            if (!modal) return console.error('❌ Modal not found');
 
-        modal.classList.add('active');
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+            modal.classList.add('active');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
         function closePricingModal() {
-        const modal = document.getElementById('pricingModal');
-        if (!modal) return;
+            const modal = document.getElementById('pricingModal');
+            if (!modal) return;
 
-        modal.classList.remove('active');
-        setTimeout(() => (modal.style.display = 'none'), 300);
-        document.body.style.overflow = 'auto';
+            modal.classList.remove('active');
+            setTimeout(() => (modal.style.display = 'none'), 300);
+            document.body.style.overflow = 'auto';
         }
 
         document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closePricingModal();
+            if (e.key === 'Escape') closePricingModal();
         });
 
         /* ================================
         ADMIN CODE
         ================================ */
         function generateAdminCode() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        return 'GLH-' + Array.from({ length: 4 }, () =>
-            chars[Math.floor(Math.random() * chars.length)]
-        ).join('');
-        }
-
-        /* ================================
-        PROMO CODE
-        ================================ */
-        async function applyPromoCode(e) {
-        e?.preventDefault();
-
-        const input = document.getElementById('promoInput');
-        const code = input.value.trim().toUpperCase();
-        const originalPrice = document.getElementById('originalPrice');
-        const finalPrice = document.getElementById('finalPrice');
-
-        if (!code) return showPromoMessage('Enter a promo code', 'error');
-
-        showPromoMessage('Checking code...', 'loading');
-
-        const { data, error } = await sb
-            .from('promo_codes')
-            .select('*')
-            .eq('code', code)
-            .eq('is_active', true)
-            .single();
-
-        if (error || !data) {
-            return showPromoMessage('Invalid promo code', 'error');
-        }
-
-        discountAmount = Math.round((basePrice * data.discount_percentage) / 100);
-        finalPrice.textContent = basePrice - discountAmount;
-        originalPrice.classList.add('show');
-
-        appliedPromoCode = data;
-        input.disabled = true;
-
-        showPromoMessage(`You saved KES ${discountAmount}`, 'success');
-        }
-
-        function showPromoMessage(text, type) {
-        const msg = document.getElementById('promoMessage');
-        msg.textContent = text;
-        msg.className = `promo-message ${type}`;
-        }
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            return 'GLH-' + Array.from({ length: 4 }, () =>
+                chars[Math.floor(Math.random() * chars.length)]
+            ).join('');
+        } 
 
         /* ================================
         PAYMENT
         ================================ */
         async function handlePayment(e) {
-        e?.preventDefault();
+            e?.preventDefault();
 
-        const email = document.getElementById('emailInput').value.trim();
-        const submitBtn = document.getElementById('submitBtn');
+            const email = document.getElementById('emailInput').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Processing...';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
 
-        const adminCode = generateAdminCode();
+            const adminCode = generateAdminCode();
 
-        await sb.from('clients').insert({
-            email,
-            admin_code: adminCode
-        });
+            await sb.from('clients').insert({
+                email,
+                admin_code: adminCode
+            });
 
-        sessionStorage.setItem('adminCode', adminCode);
-        sessionStorage.setItem('adminEmail', email);
+            sessionStorage.setItem('adminCode', adminCode);
+            sessionStorage.setItem('adminEmail', email);
 
-        showSuccessScreen(adminCode, email);
+            showSuccessScreen(adminCode, email);
         }
 
         function showSuccessScreen(code, email) {
-        document.getElementById('paymentForm').style.display = 'none';
-        document.getElementById('successScreen').classList.add('show');
-        document.getElementById('displayAdminCode').textContent = code;
-        document.getElementById('displayEmail').textContent = email;
+            document.getElementById('paymentForm').style.display = 'none';
+            document.getElementById('successScreen').classList.add('show');
+            document.getElementById('displayAdminCode').textContent = code;
+            document.getElementById('displayEmail').textContent = email;
         }
 
         function copyAdminCode() {
-        navigator.clipboard.writeText(
-            document.getElementById('displayAdminCode').textContent
-        );
+            navigator.clipboard.writeText(
+                document.getElementById('displayAdminCode').textContent
+            );
         }
 
         /* ================================
         BUTTON WIRING
         ================================ */
         document.addEventListener('DOMContentLoaded', () => {
-        const btn = document.getElementById('newGetGameBtn');
-        if (btn) btn.addEventListener('click', openGameModal);
-        
-        // Load currency list and initialize conversion
-        if (sb) {
-            try {
-                loadCurrencies();
-            } catch (e) {
-                console.warn('Currency init failed', e);
+            const btn = document.getElementById('newGetGameBtn');
+            if (btn) btn.addEventListener('click', openGameModal);
+            
+            // Load currency list and initialize conversion
+            if (sb) {
+                try {
+                    loadCurrencies();
+                } catch (e) {
+                    console.warn('Currency init failed', e);
+                }
             }
-        }
         });
         
         // ===== Currency conversion logic =====
@@ -1681,7 +1553,6 @@ body {
             const formatted = amount === 0 ? '--' : `${currency.symbol} ${Number(amount).toFixed(2)}`;
             if (mainPriceEl) mainPriceEl.textContent = formatted;
         }
-        </script>
-
+    </script>
 </body>
 </html>

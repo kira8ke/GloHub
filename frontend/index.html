@@ -125,7 +125,7 @@
                             <span>Live Leaderboards & Scores</span>
                         </div>
                     </div>
-                    <button class="btn-flagship" onclick="window.location.href='galentines.html'">
+                    <button class="btn-flagship" onclick="navigateWithZoomTransition('galentines.html')">
                         Play Now
                         
                     </button>
@@ -203,7 +203,7 @@
                     <div class="game-info">
                         <h3>Piksi</h3>
                         <a href="galentines.html">
-                         <button class="game-btn">Play</button>
+                         <button class="game-btn" type="button" onclick="event.preventDefault(); navigateWithZoomTransition('galentines.html');">Play</button>
                         </a>
 
                     </div>
@@ -348,6 +348,11 @@
     <button class="scroll-to-top" id="scrollToTop" onclick="scrollToTop()">
         <span>↑</span>
     </button>
+
+    <!-- Page Transition Overlay -->
+    <div class="page-transition-overlay" id="pageTransitionOverlay">
+        <div class="page-transition-content"></div>
+    </div>
 
     <script src="supabase.js"></script>
     <script src="client.js"></script>

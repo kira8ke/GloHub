@@ -1,6 +1,25 @@
 // GloHub - Main JavaScript
 
 // ==========================================
+// PAGE TRANSITION WITH ZOOM EFFECT
+// ==========================================
+function navigateWithZoomTransition(url) {
+    const overlay = document.getElementById('pageTransitionOverlay');
+    if (!overlay) {
+        // Fallback if overlay not found
+        window.location.href = url;
+        return;
+    }
+
+    overlay.classList.add('active');
+    
+    // Navigate after animation completes
+    setTimeout(() => {
+        window.location.href = url;
+    }, 600);
+}
+
+// ==========================================
 // PULSATING HEARTS (SVG)
 // ==========================================
 function createPulsatingHearts() {
