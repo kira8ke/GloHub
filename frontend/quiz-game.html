@@ -385,82 +385,128 @@
             line-height: 1.5;
         }
 
-        /* Podium Styles */
-        #podiumScreen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #8435DE;
+              /* Podium Styles */
+                #podiumScreen {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: #8435DE;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 500;
+                    animation: fadeIn 0.3s ease;
+                }
+
+                .podium-container {
+                    display: flex;
+                    align-items: flex-end;
+                    justify-content: center;
+                    gap: 30px;
+                      max-width: 600px;
+                }
+
+                .podium-position {
+                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: flex-end;
+                }
+
+        .podium-rank {
+            position: relative;
+            width: 130px;
+            height: 180px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 500;
-            animation: fadeIn 0.3s ease;
+            font-weight: bold;
+            font-size: 22px;
+            color: white;
+            text-align: center;
+            border-radius: 0 0 60px 60px; /* round bottom */
+            transform-style: preserve-3d;
+            transform: perspective(800px) rotateX(8deg);
         }
 
-        .podium-container {
+        /* Top circle (cylinder top) */
+        .podium-rank::before {
+            content: "";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        /* Bottom shadow for depth */
+        .podium-rank::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 15%;
+            width: 70%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            filter: blur(6px);
+        }
+        /* 🥇 First Place - Tallest */
+        .rank-1 {
+            height: 220px;
+            background: linear-gradient(to right, #d4af37, #f7e27d, #d4af37);
+        }
+
+        .rank-1::before {
+            background: radial-gradient(circle, #f7e27d 0%, #d4af37 70%);
+        }
+
+        /* 🥈 Second Place */
+        .rank-2 {
+            height: 180px;
+            background: linear-gradient(to right, #9ea7ad, #e5e8ea, #9ea7ad);
+        }
+
+        .rank-2::before {
+            background: radial-gradient(circle, #e5e8ea 0%, #9ea7ad 70%);
+        }
+
+        /* 🥉 Third Place */
+        .rank-3 {
+            height: 150px;
+            background: linear-gradient(to right, #b87333, #e0a96d, #b87333);
+        }
+
+        .rank-3::before {
+            background: radial-gradient(circle, #e0a96d 0%, #b87333 70%);
+        }
+
+
+        .podium-avatar {
+            position: absolute;
+            bottom: 100%;          /* places avatar above podium block */
+            margin-bottom: -10px;  /* slight overlap for standing effect */
+            width: 150px;
+            height: 150px;
+            background: none;
+            border: none;
+            border-radius: 0;
+            overflow: visible;
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            gap: 30px;
-            max-width: 600px;
         }
 
-        .podium-position {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .podium-rank {
-            background: linear-gradient(135deg, #ffd700, #fff4cc);
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-weight: bold;
-            color: #000;
-            min-width: 80px;
-        }
-
-        .podium-rank.rank-1 {
-            order: 2;
-            height: 200px;
-            background: linear-gradient(135deg, #ffd700, #fff4cc);
-        }
-
-        .podium-rank.rank-2 {
-            order: 1;
-            height: 150px;
-            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
-        }
-
-        .podium-rank.rank-3 {
-            order: 3;
-            height: 120px;
-            background: linear-gradient(135deg, #cd7f32, #e6b8a2);
-        }
-
-        .podium-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff69b4, #7b2cff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
-            border: 3px solid #fff;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
+        /* Full avatar image (not cropped circle) */
         .podium-avatar img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 0;   /* 🔥 removes circular shape */
         }
 
         .podium-avatar svg {
@@ -634,6 +680,87 @@
             width: 70px;
             height: 70px;
             font-size: 35px;
+        }
+    }
+
+    /* =====================================================
+       NEW CSS ANIMATIONS FOR IMPROVED FEATURES
+    ===================================================== */
+
+    /* Answer button selected state (visual feedback without reveal) */
+    .answer-btn.selected {
+        background: rgba(255, 102, 196, 0.3) !important;
+        border: 2px solid #ff69b4 !important;
+        transform: scale(1.02);
+    }
+
+    /* Podium rise animation - smooth upward movement with fade */
+    @keyframes podiumRise {
+        from {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Animation for podium position classes */
+    .podium-position-1,
+    .podium-position-2,
+    .podium-position-3 {
+        will-change: opacity, transform;
+    }
+
+    /* Character pulse effect for result screen */
+    @keyframes characterPulse {
+        0%, 100% {
+            box-shadow: 0 0 40px rgba(255, 102, 196, 0.4);
+            transform: scale(1);
+        }
+        50% {
+            box-shadow: 0 0 60px rgba(255, 102, 196, 0.7);
+            transform: scale(1.02);
+        }
+    }
+
+    /* Expression emoji bounce animation */
+    @keyframes expressionBounce {
+        0% {
+            transform: scale(0) rotate(-15deg);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.2) rotate(5deg);
+        }
+        100% {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+        }
+    }
+
+    /* Slide up animation for character result screen */
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Fade in text with delay */
+    @keyframes fadeInText {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
     }
 

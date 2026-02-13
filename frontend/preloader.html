@@ -3,86 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#ff69b4">
-    <title>GloHub Kiss Transition</title>
+    <meta name="theme-color" content="#ffd4e8">
+    <title>GloHub Transition</title>
 
     <style>
-        body {
+        * {
             margin: 0;
-            font-family: 'Poppins', sans-serif;
-            overflow: hidden;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        #kissTransition {
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #fef5f9;
+        }
+
+        #transition {
             position: fixed;
             inset: 0;
-            background: linear-gradient(135deg, #ff1493, #ff69b4, #ffb6d9);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            animation: kiss-reveal 1.5s ease forwards;
         }
 
-        /* Exit state */
-        #kissTransition.exit {
-            animation: kiss-hide 1.5s ease forwards;
+        /* Animated wave background */
+        .wave-background {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #fef5f9 0%, #ffe6f2 50%, #ffd9ed 100%);
+            overflow: hidden;
         }
 
-        .kiss-emoji {
-            font-size: clamp(100px, 30vw, 300px);
-            animation: kiss-pop-in 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            opacity: 0.15;
         }
 
-        /* Exit animation for emoji */
-        .kiss-emoji.exit {
-            animation: kiss-pop-out 1.2s ease forwards;
+        .wave path {
+            fill: none;
+            stroke-width: 2;
         }
 
-        /* ENTRY */
-        @keyframes kiss-reveal {
-            from {
-                clip-path: circle(0% at 50% 50%);
+        .wave:nth-child(1) {
+            animation: wave-drift 12s ease-in-out infinite;
+        }
+
+        .wave:nth-child(2) {
+            animation: wave-drift 16s ease-in-out infinite reverse;
+            opacity: 0.12;
+        }
+
+        .wave:nth-child(3) {
+            animation: wave-drift 14s ease-in-out infinite;
+            opacity: 0.1;
+        }
+
+        .wave:nth-child(4) {
+            animation: wave-drift 18s ease-in-out infinite reverse;
+            opacity: 0.08;
+        }
+
+        @keyframes wave-drift {
+            0%, 100% {
+                transform: translateX(-25%) translateY(0);
             }
+            50% {
+                transform: translateX(-50%) translateY(-30px);
+            }
+        }
+
+        /* Logo container */
+        .logo-container {
+            position: relative;
+            z-index: 10;
+            width: clamp(400px, 60vw, 800px);
+            height: clamp(300px, 45vw, 600px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* SVG Logo */
+        #logoSvg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 30px rgba(253, 183, 249, 0.4));
+        }
+
+        /* Letter G paths - exact recreation from logo */
+        .letter-g {
+            stroke: url(#glohubGradient);
+            stroke-width: 28;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0;
+            filter: drop-shadow(0 0 8px rgba(253, 183, 249, 0.6));
+        }
+
+        .letter-g.first {
+            stroke-dasharray: 2200;
+            stroke-dashoffset: 2200;
+            animation: draw-letter 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.5s, 
+                       fade-in 0.3s ease forwards 0.5s,
+                       fill-letter 0.8s ease forwards 2.8s;
+        }
+
+        .letter-g.second {
+            stroke-dasharray: 2200;
+            stroke-dashoffset: 2200;
+            animation: draw-letter 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards 3.2s, 
+                       fade-in 0.3s ease forwards 3.2s,
+                       fill-letter 0.8s ease forwards 5.5s;
+        }
+
+        @keyframes draw-letter {
             to {
-                clip-path: circle(150% at 50% 50%);
+                stroke-dashoffset: 0;
             }
         }
 
-        @keyframes kiss-pop-in {
+        @keyframes fade-in {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fill-letter {
+            to {
+                fill: url(#glohubGradient);
+                fill-opacity: 1;
+            }
+        }
+
+        /* Sparkle particles that follow the drawing */
+        .sparkle-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, #fff, #fdb7f9);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            box-shadow: 0 0 8px #fdb7f9, 0 0 12px #fff;
+        }
+
+        @keyframes sparkle-trail {
             0% {
-                transform: scale(0);
                 opacity: 0;
-            }
-            60% {
-                transform: scale(1.2) rotate(15deg);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-            }
-        }
-
-        /* EXIT (reverse feel) */
-        @keyframes kiss-hide {
-            from {
-                clip-path: circle(150% at 50% 50%);
-            }
-            to {
-                clip-path: circle(0% at 50% 50%);
-            }
-        }
-
-        @keyframes kiss-pop-out {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            40% {
-                transform: scale(1.2) rotate(-10deg);
-            }
-            100% {
                 transform: scale(0);
+            }
+            20% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5) translateY(-20px);
+            }
+        }
+
+        /* Glow effect after drawing completes */
+        .glow-effect {
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(253, 183, 249, 0.3), transparent 70%);
+            opacity: 0;
+            animation: soft-glow 2s ease-in-out forwards 6s;
+        }
+
+        @keyframes soft-glow {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+        }
+
+        /* Shimmer effect on the stroke */
+        @keyframes shimmer {
+            0%, 100% {
+                filter: drop-shadow(0 0 8px rgba(253, 183, 249, 0.6)) 
+                        drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+            }
+            50% {
+                filter: drop-shadow(0 0 15px rgba(253, 183, 249, 0.9)) 
+                        drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+            }
+        }
+
+        .letter-g.first {
+            animation: draw-letter 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.5s, 
+                       fade-in 0.3s ease forwards 0.5s,
+                       fill-letter 0.8s ease forwards 2.8s,
+                       shimmer 0.6s ease-in-out infinite 0.5s;
+        }
+
+        .letter-g.second {
+            animation: draw-letter 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards 3.2s, 
+                       fade-in 0.3s ease forwards 3.2s,
+                       fill-letter 0.8s ease forwards 5.5s,
+                       shimmer 0.6s ease-in-out infinite 3.2s;
+        }
+
+        /* Exit animation */
+        #transition.exit {
+            animation: zoom-out 1.5s ease forwards;
+        }
+
+        @keyframes zoom-out {
+            0% {
+                clip-path: circle(150% at 50% 50%);
+                opacity: 1;
+            }
+            100% {
+                clip-path: circle(0% at 50% 50%);
                 opacity: 0;
             }
         }
@@ -90,24 +237,173 @@
 </head>
 <body>
 
-    <div id="kissTransition">
-        <div class="kiss-emoji" id="kiss">💋</div>
+    <div id="transition">
+        <!-- Animated wave background -->
+        <div class="wave-background">
+            <svg class="wave" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                <path stroke="#fdb7f9" d="M0,160 Q360,120 720,160 T1440,160 L1440,320 L0,320 Z"></path>
+            </svg>
+            <svg class="wave" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                <path stroke="#e6a8f0" d="M0,200 Q360,160 720,200 T1440,200 L1440,320 L0,320 Z"></path>
+            </svg>
+            <svg class="wave" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                <path stroke="#d99ae8" d="M0,240 Q360,200 720,240 T1440,240 L1440,320 L0,320 Z"></path>
+            </svg>
+            <svg class="wave" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                <path stroke="#cc8bdf" d="M0,280 Q360,240 720,280 T1440,280 L1440,320 L0,320 Z"></path>
+            </svg>
+        </div>
+
+        <!-- Logo -->
+        <div class="logo-container">
+            <div class="glow-effect"></div>
+            
+            <svg id="logoSvg" viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- Exact gradient from the logo -->
+                    <linearGradient id="glohubGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#fdc9f9;stop-opacity:1" />
+                        <stop offset="30%" style="stop-color:#fdb7f9;stop-opacity:1" />
+                        <stop offset="70%" style="stop-color:#f9a8f7;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#f5a0f5;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+
+                <!-- First G - Traced from exact logo shape -->
+                <path class="letter-g first" d="
+                    M 180,150
+                    C 165,145 145,143 128,150
+                    C 95,162 75,195 68,230
+                    C 62,260 65,295 78,322
+                    C 95,358 128,382 168,390
+                    C 208,398 248,388 275,365
+                    C 295,348 305,322 308,295
+                    C 310,278 310,258 310,240
+                    L 310,235
+                    C 310,228 305,220 298,218
+                    L 230,218
+                    C 222,218 215,212 215,205
+                    C 215,198 222,192 230,192
+                    L 315,192
+                    C 330,192 342,205 342,220
+                    L 342,250
+                    C 342,285 338,320 320,348
+                    C 295,388 250,415 200,418
+                    C 145,422 90,400 58,360
+                    C 32,328 22,285 25,242
+                    C 28,185 55,132 102,100
+                    C 135,78 178,70 218,80
+                    C 240,85 258,95 272,108
+                    C 280,116 285,126 288,138
+                    C 290,145 288,152 282,156
+                    C 276,160 268,158 263,152
+                    C 252,138 238,128 220,122
+                    C 205,117 188,116 172,120
+                " />
+
+                <!-- Second G - Traced from exact logo shape -->
+                <path class="letter-g second" d="
+                    M 590,150
+                    C 575,145 555,143 538,150
+                    C 505,162 485,195 478,230
+                    C 472,260 475,295 488,322
+                    C 505,358 538,382 578,390
+                    C 618,398 658,388 685,365
+                    C 705,348 715,322 718,295
+                    C 720,278 720,258 720,240
+                    L 720,235
+                    C 720,228 715,220 708,218
+                    L 640,218
+                    C 632,218 625,212 625,205
+                    C 625,198 632,192 640,192
+                    L 725,192
+                    C 740,192 752,205 752,220
+                    L 752,250
+                    C 752,285 748,320 730,348
+                    C 705,388 660,415 610,418
+                    C 555,422 500,400 468,360
+                    C 442,328 432,285 435,242
+                    C 438,185 465,132 512,100
+                    C 545,78 588,70 628,80
+                    C 650,85 668,95 682,108
+                    C 690,116 695,126 698,138
+                    C 700,145 698,152 692,156
+                    C 686,160 678,158 673,152
+                    C 662,138 648,128 630,122
+                    C 615,117 598,116 582,120
+                " />
+            </svg>
+
+            <!-- Sparkle particles container -->
+            <div id="sparklesContainer"></div>
+        </div>
     </div>
 
     <script>
-        const transition = document.getElementById("kissTransition");
-        const kiss = document.getElementById("kiss");
+        const transition = document.getElementById('transition');
+        const sparklesContainer = document.getElementById('sparklesContainer');
+        const logoContainer = document.querySelector('.logo-container');
 
-        // Start exit animation after entry completes
+        // Create sparkle particles that follow the drawing path
+        function createSparkleTrail(x, y, delay) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle-particle';
+            sparkle.style.left = x + '%';
+            sparkle.style.top = y + '%';
+            sparkle.style.animation = `sparkle-trail 1s ease-out forwards ${delay}s`;
+            sparklesContainer.appendChild(sparkle);
+            
+            // Remove after animation
+            setTimeout(() => sparkle.remove(), 1000 + delay * 1000);
+        }
+
+        // Generate sparkles along the first G path (0.5s to 3s)
+        for (let i = 0; i < 80; i++) {
+            const progress = i / 80;
+            const delay = 0.5 + (progress * 2.5);
+            
+            // Approximate path points for first G
+            const angle = progress * Math.PI * 2.2;
+            const x = 28 + Math.cos(angle) * 12 + Math.sin(angle * 3) * 5;
+            const y = 50 + Math.sin(angle) * 15 + Math.cos(angle * 2) * 8;
+            
+            createSparkleTrail(x, y, delay);
+        }
+
+        // Generate sparkles along the second G path (3.2s to 5.7s)
+        for (let i = 0; i < 80; i++) {
+            const progress = i / 80;
+            const delay = 3.2 + (progress * 2.5);
+            
+            // Approximate path points for second G (offset to the right)
+            const angle = progress * Math.PI * 2.2;
+            const x = 72 + Math.cos(angle) * 12 + Math.sin(angle * 3) * 5;
+            const y = 50 + Math.sin(angle) * 15 + Math.cos(angle * 2) * 8;
+            
+            createSparkleTrail(x, y, delay);
+        }
+
+        // Add random ambient sparkles
+        function createAmbientSparkle() {
+            const x = 20 + Math.random() * 60;
+            const y = 30 + Math.random() * 40;
+            const delay = Math.random() * 6;
+            createSparkleTrail(x, y, delay);
+        }
+
+        for (let i = 0; i < 40; i++) {
+            createAmbientSparkle();
+        }
+
+        // Start exit animation after logo completes
         setTimeout(() => {
-            transition.classList.add("exit");
-            kiss.classList.add("exit");
-        }, 1800);
+            transition.classList.add('exit');
+        }, 7500);
 
         // Redirect after exit animation
         setTimeout(() => {
             window.location.href = "index.html";
-        }, 3200);
+        }, 9000);
     </script>
 
 </body>

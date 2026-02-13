@@ -12,6 +12,13 @@ let allPlayers = [];
 let gameStarted = false;
 let currentPlayerAvatarConfig = null;
 
+// Between-questions leaderboard timer
+let betweenTimeLeft = 10;
+let betweenInterval = null;
+
+// NEW: Score tracking to prevent duplicate updates
+let scoreUpdated = false;
+
 // Create Bratz Doll SVG with variations
 function createBratzDollSVG(dollId, avatarCfg, isMain) {
     const size = isMain ? 280 : 100;
@@ -544,7 +551,8 @@ function loadQuestion() {
     }
     
     hasAnswered = false;
-    timeLeft = 10;
+    scoreUpdated = false; // Reset score tracking for new question
+    timeLeft = 5;
     
     const question = questions[currentQuestionIndex];
     
@@ -580,50 +588,115 @@ function startTimer() {
         
         if (timeLeft <= 0) {
             clearInterval(timer);
-            if (!hasAnswered) {
-                showCorrectAnswer();
-                setTimeout(() => {
-                    currentQuestionIndex++;
-                    showFeedback(false, false);
-                }, 2000);
+            
+            // IMPROVED: Reveal answer and update score when timer hits 0
+            if (!scoreUpdated) {
+                revealCorrectAnswer();
             }
         }
     }, 1000);
 }
 
+// =====================================================
+// IMPROVED: Answer Selection with Visual Feedback
+// =====================================================
+// - Immediately locks answer selection
+// - Shows visual highlight without revealing correct/wrong
+// - Only reveals correct answer when timer hits 0
+// - Score updates automatically at timer end
+// =====================================================
 async function selectAnswer(selectedIndex) {
     if (hasAnswered) return;
     
     hasAnswered = true;
-    clearInterval(timer);
+    scoreUpdated = false; // Reset score tracking for this question
     
     const question = questions[currentQuestionIndex];
-    const isCorrect = selectedIndex === question.correct_answer;
     
-    if (isCorrect) {
-        playerScore += 100;
-        // Update current player's score in allPlayers
-        allPlayers[0].score = playerScore;
-    }
+    // ===== PHASE 1: Visual Feedback (no right/wrong reveal) =====
+    handleAnswerSelection(selectedIndex);
     
-    // Visual feedback
+    // ===== PHASE 2: Wait for timer to complete =====
+    // The timer will call revealCorrectAnswer() when it hits 0
+}
+
+// NEW FUNCTION: Handle immediate answer selection UI
+function handleAnswerSelection(selectedIndex) {
     const buttons = document.querySelectorAll('.answer-btn');
+    
+    // Lock all buttons immediately
+    buttons.forEach((btn, index) => {
+        btn.disabled = true;
+        if (index === selectedIndex) {
+            // Highlight selected option (not yet showing correct/wrong)
+            btn.classList.add('selected');
+        }
+    });
+    
+    // Pause timer but keep it running
+    // Don't clear it - let it continue to completion
+}
+
+// NEW FUNCTION: Reveal correct answer and update score
+async function revealCorrectAnswer() {
+    if (scoreUpdated) return; // Prevent duplicate updates
+    scoreUpdated = true;
+    
+    const question = questions[currentQuestionIndex];
+    const buttons = document.querySelectorAll('.answer-btn');
+    
+    // Find which button was selected
+    let selectedIndex = -1;
+    let isCorrect = false;
+    
+    buttons.forEach((btn, index) => {
+        if (btn.classList.contains('selected')) {
+            selectedIndex = index;
+            isCorrect = index === question.correct_answer;
+        }
+    });
+    
+    // ===== REVEAL Phase =====
+    // Show correct answer in green
     buttons.forEach((btn, index) => {
         btn.disabled = true;
         if (index === question.correct_answer) {
             btn.classList.add('correct');
-        } else if (index === selectedIndex && !isCorrect) {
+        }
+        // If selected answer was wrong, show it in red
+        if (index === selectedIndex && !isCorrect) {
             btn.classList.add('incorrect');
         }
     });
     
-    // Show answer feedback
+    // ===== UPDATE SCORE =====
+    if (isCorrect && !hasAnswered) {
+        // Only add points if answered correctly (no answer = no points)
+        playerScore += 100;
+    } else if (!hasAnswered) {
+        // Time ran out without answering - lose points
+        playerScore = Math.max(0, playerScore - 50);
+    }
+    
+    // Update Score Display immediately
+    updateScoreDisplay();
+    
+    // Update current player's score in allPlayers
+    allPlayers[0].score = playerScore;
+    
+    // Show answer feedback text
     const feedback = document.getElementById('answerFeedback');
     feedback.style.display = 'block';
-    feedback.textContent = isCorrect ? 
-        'Correct! +100 points!' : 
-        'Oops! Better luck next time!';
-    feedback.style.background = isCorrect ? '#4caf50' : '#f44336';
+    
+    if (!hasAnswered) {
+        feedback.textContent = "Time's up! No answer selected.";
+        feedback.style.background = '#ff9800';
+    } else {
+        feedback.textContent = isCorrect ? 
+            'Correct! +100 points!' : 
+            'Incorrect! Better luck next time!';
+        feedback.style.background = isCorrect ? '#4caf50' : '#f44336';
+    }
     
     // Save response
     try {
@@ -631,7 +704,7 @@ async function selectAnswer(selectedIndex) {
         const userId = sessionStorage.getItem('userId');
         const question_id = question.id;
         
-        if (sessionId && userId) {
+        if (sessionId && userId && hasAnswered) {
             await supabase
                 .from('responses')
                 .insert([
@@ -648,28 +721,41 @@ async function selectAnswer(selectedIndex) {
         console.error('Error saving response:', error);
     }
     
-    // Move to next question with feedback
+    // Short delay to let players see the revealed answer, then show standings
     setTimeout(() => {
         currentQuestionIndex++;
-        showFeedback(isCorrect, true);
-    }, 2000);
+
+        if (currentQuestionIndex >= questions.length) {
+            // Game over - show podium
+            showPodium();
+        } else {
+            // More questions - show between-questions leaderboard where a 10s timer will run
+            showBetweenQuestionsLeaderboard();
+        }
+    }, 1000);
 }
 
-function showCorrectAnswer() {
-    const question = questions[currentQuestionIndex];
-    const buttons = document.querySelectorAll('.answer-btn');
-    
-    buttons.forEach((btn, index) => {
-        btn.disabled = true;
-        if (index === question.correct_answer) {
-            btn.classList.add('correct');
+// NEW FUNCTION: Update score display dynamically
+function updateScoreDisplay() {
+    // Find score display element (depends on your HTML structure)
+    const scoreElements = document.querySelectorAll('[id*="score"], [class*="score"]');
+    scoreElements.forEach(el => {
+        if (el.textContent.match(/\d+/)) {
+            el.textContent = `Score: ${playerScore}`;
         }
     });
     
-    const feedback = document.getElementById('answerFeedback');
-    feedback.style.display = 'block';
-    feedback.textContent = "Time's up!";
-    feedback.style.background = '#ff9800';
+    // Also update in quiz header if it exists
+    const quizHeader = document.querySelector('.game-info');
+    if (quizHeader) {
+        let scoreSpan = quizHeader.querySelector('.player-score');
+        if (!scoreSpan) {
+            scoreSpan = document.createElement('span');
+            scoreSpan.className = 'player-score';
+            quizHeader.appendChild(scoreSpan);
+        }
+        scoreSpan.textContent = `Score: ${playerScore}`;
+    }
 }
 
 // Show feedback screen with avatar expression
@@ -757,77 +843,340 @@ function showBetweenQuestionsLeaderboard() {
         </div>
     `;
     }).join('');
+
+    // Add timer and Next button UI below the leaderboard
+    const controlsHtml = `
+        <div style="display:flex; gap:12px; align-items:center; justify-content:center; margin-top:18px;">
+            <div id="betweenTimerDisplay" style="font-weight:bold; color:#fff; font-size:18px;">Next in ${betweenTimeLeft}s</div>
+            <button id="betweenNextBtn" style="padding:10px 20px; border-radius:30px; background:linear-gradient(135deg,#ff69b4,#7b2cff); color:#fff; border:none; cursor:pointer;">Next</button>
+        </div>
+    `;
+
+    leaderboardContainer.insertAdjacentHTML('beforeend', controlsHtml);
+
+    // Clear any existing interval
+    if (betweenInterval) clearInterval(betweenInterval);
+    betweenTimeLeft = 10;
+    const displayEl = document.getElementById('betweenTimerDisplay');
+    const nextBtn = document.getElementById('betweenNextBtn');
+
+    betweenInterval = setInterval(() => {
+        betweenTimeLeft--;
+        if (displayEl) displayEl.textContent = `Next in ${betweenTimeLeft}s`;
+
+        if (betweenTimeLeft <= 0) {
+            clearInterval(betweenInterval);
+            betweenInterval = null;
+            nextQuestion();
+        }
+    }, 1000);
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (betweenInterval) clearInterval(betweenInterval);
+            betweenInterval = null;
+            nextQuestion();
+        });
+    }
 }
 
 // Move to next question
 function nextQuestion() {
     document.getElementById('leaderboard').style.display = 'none';
     document.getElementById('quizGame').style.display = 'flex';
+    document.getElementById('answerFeedback').style.display = 'none'; // Reset feedback  
     loadQuestion();
 }
 
-// Show top 3 podium before full results
+// =====================================================
+// IMPROVED PODIUM: Animated appearance one-by-one
+// =====================================================
+// Order: 3rd → 2nd → 1st (each with 2 second delay)
+// =====================================================
 function showPodium() {
     document.getElementById('quizGame').style.display = 'none';
     document.getElementById('leaderboard').style.display = 'none';
     document.getElementById('finalResults').style.display = 'none';
     document.getElementById('podiumScreen').style.display = 'flex';
-    
+
     // Simulate other players' final scores
     allPlayers.forEach((player, index) => {
         if (index > 0) {
             player.score = Math.floor(Math.random() * playerScore);
         }
     });
-    
+
     // Sort players by score
-    const rankedPlayers = [...allPlayers].sort((a, b) => b.score - a.score).slice(0, 3);
-    
+    const rankedPlayers = [...allPlayers]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3);
+
     const podium = document.getElementById('podiumContainer');
-    
-    // Ensure we have 3 positions even if fewer players
-    const pos1 = rankedPlayers[0] || { name: 'Player 1', score: 0, avatarImage: null };
-    const pos2 = rankedPlayers[1] || { name: 'Player 2', score: 0, avatarImage: null };
-    const pos3 = rankedPlayers[2] || { name: 'Player 3', score: 0, avatarImage: null };
-    
-    // Create avatar HTML for each position
+    podium.innerHTML = ''; // Clear previous content
+
+    // Ensure we always have 3 positions
+    const pos1 = rankedPlayers[0] || { name: 'Player 1', score: 0 };
+    const pos2 = rankedPlayers[1] || { name: 'Player 2', score: 0 };
+    const pos3 = rankedPlayers[2] || { name: 'Player 3', score: 0 };
+
+    // Create avatar HTML (FULL IMAGE, NO CIRCLE)
     const createAvatarHtml = (player) => {
         if (player.avatarImage) {
-            return `<img src="${player.avatarImage}" alt="${player.name}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-        } else if (player.avatarConfig) {
-            return createBratzDollSVG(player.avatarConfig.dollId, player.avatarConfig, false);
-        } else {
-            return player.name?.charAt(0).toUpperCase() || '?';
+            return `
+                <img 
+                    src="${player.avatarImage}" 
+                    alt="${player.name}"
+                    style="
+                        width:100%;
+                        height:auto;
+                        object-fit:contain;
+                        border-radius:0;
+                    "
+                >
+            `;
+        } 
+        else if (player.avatarConfig) {
+            return createBratzDollSVG(
+                player.avatarConfig.dollId, 
+                player.avatarConfig, 
+                false
+            );
+        } 
+        else {
+            return `
+                <div style="
+                    font-size:40px;
+                    font-weight:bold;
+                ">
+                    ${player.name?.charAt(0).toUpperCase() || '?'}
+                </div>
+            `;
         }
     };
-    
+
     const pos1Avatar = createAvatarHtml(pos1);
     const pos2Avatar = createAvatarHtml(pos2);
     const pos3Avatar = createAvatarHtml(pos3);
-    
+
+    // Build podium layout with initial hidden state
     podium.innerHTML = `
-        <div class="podium-position">
+        <div class="podium-position podium-position-2" id="podiumPos2" style="opacity: 0;">
             <div class="podium-avatar">${pos2Avatar}</div>
             <div class="podium-name">${pos2.name}</div>
             <div class="podium-rank rank-2">2nd</div>
         </div>
-        <div class="podium-position">
+
+        <div class="podium-position podium-position-1" id="podiumPos1" style="opacity: 0;">
             <div class="podium-avatar">${pos1Avatar}</div>
             <div class="podium-name">${pos1.name}</div>
             <div class="podium-rank rank-1">🏆 1st</div>
         </div>
-        <div class="podium-position">
+
+        <div class="podium-position podium-position-3" id="podiumPos3" style="opacity: 0;">
             <div class="podium-avatar">${pos3Avatar}</div>
             <div class="podium-name">${pos3.name}</div>
             <div class="podium-rank rank-3">3rd</div>
         </div>
     `;
+
+    // ===== ANIMATE PODIUM APPEARANCES =====
+    animatePodium();
+}
+
+// NEW FUNCTION: Animate podium appearing in sequence
+function animatePodium() {
+    // Order: 3rd place → 2nd place → 1st place
+    // Each appears with 2-second delay
     
-    // Show podium for 5 seconds then show full results
+    const pos3 = document.getElementById('podiumPos3');
+    const pos2 = document.getElementById('podiumPos2');
+    const pos1 = document.getElementById('podiumPos1');
+    
+    // 3rd place appears first (at t=0)
     setTimeout(() => {
-        document.getElementById('podiumScreen').style.display = 'none';
+        animatePodiumRise(pos3);
+    }, 0);
+    
+    // 2nd place appears (at t=2000ms)
+    setTimeout(() => {
+        animatePodiumRise(pos2);
+    }, 2000);
+    
+    // 1st place appears (at t=4000ms)
+    setTimeout(() => {
+        animatePodiumRise(pos1);
+    }, 4000);
+    
+    // After all animations complete (at t=6000ms), show the final leaderboard first
+    setTimeout(() => {
         showFinalResults();
-    }, 5000);
+    }, 6000);
+}
+
+// NEW FUNCTION: Animate single podium rise
+function animatePodiumRise(element) {
+    // Apply rise animation
+    element.style.animation = 'podiumRise 1s ease-out forwards';
+}
+
+// =====================================================
+// NEW: Final Dynamic Character Result Screen
+// =====================================================
+// Shows player their character with appropriate expression
+// Message depends on their rank
+// =====================================================
+function showFinalCharacterScreen() {
+    document.getElementById('podiumScreen').style.display = 'none';
+    document.getElementById('finalResults').style.display = 'none';
+    
+    // Create result screen if it doesn't exist
+    let resultScreen = document.getElementById('characterResultScreen');
+    if (!resultScreen) {
+        resultScreen = document.createElement('div');
+        resultScreen.id = 'characterResultScreen';
+        resultScreen.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #120018, #2b0036, #3a004d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            animation: fadeIn 0.8s ease;
+        `;
+        document.body.appendChild(resultScreen);
+    }
+    
+    // Get final rankings
+    const finalRanking = [...allPlayers].sort((a, b) => b.score - a.score);
+    const currentPlayer = allPlayers[0];
+    const playerRank = finalRanking.findIndex(p => p.name === currentPlayer.name) + 1;
+    const totalPlayers = finalRanking.length;
+    
+    // Get character expression and message based on rank
+    const { emoji, message, characterClass } = getCharacterResultData(playerRank, totalPlayers);
+    
+    // Build character display
+    const avatarHtml = currentPlayer.avatarImage 
+        ? `<img src="${currentPlayer.avatarImage}" alt="${currentPlayer.name}" style="width:100%; height:100%; object-fit:contain;">`
+        : (currentPlayer.avatarConfig 
+            ? createBratzDollSVG(currentPlayer.avatarConfig.dollId, currentPlayer.avatarConfig, true)
+            : `<div style="font-size:120px;">${emoji}</div>`);
+    
+    resultScreen.innerHTML = `
+        <div style="
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            animation: slideUp 0.8s ease;
+        ">
+            <!-- Character Avatar -->
+            <div style="
+                width: 220px;
+                height: 220px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #ff69b4, #7b2cff);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                box-shadow: 0 0 40px rgba(255, 102, 196, 0.4);
+                animation: characterPulse 1s ease infinite;
+            ">
+                ${avatarHtml}
+                <div style="
+                    position: absolute;
+                    bottom: -20px;
+                    font-size: 80px;
+                    animation: expressionBounce 0.6s ease;
+                ">
+                    ${emoji}
+                </div>
+            </div>
+            
+            <!-- Character Expression Text -->
+            <div style="
+                font-size: 18px;
+                color: rgba(255, 255, 255, 0.8);
+                font-weight: bold;
+                letter-spacing: 1px;
+            ">
+                Rank #${playerRank} of ${totalPlayers}
+            </div>
+            
+            <!-- Result Message -->
+            <div style="
+                font-size: 28px;
+                color: #fff;
+                max-width: 400px;
+                font-weight: bold;
+                line-height: 1.4;
+                animation: fadeInText 1s ease 0.3s both;
+            ">
+                ${message}
+            </div>
+            
+            <!-- Final Score Display -->
+            <div style="
+                font-size: 24px;
+                color: #ffd700;
+                font-weight: bold;
+                animation: fadeInText 1s ease 0.5s both;
+            ">
+                Final Score: ${currentPlayer.score}
+            </div>
+            
+            <!-- Continue Button -->
+            <button id="characterViewLeaderboardBtn" onclick="showFinalResults()" style="
+                margin-top: 20px;
+                padding: 15px 40px;
+                font-size: 18px;
+                background: linear-gradient(135deg, #ff69b4, #7b2cff);
+                color: white;
+                border: none;
+                border-radius: 50px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: all 0.3s ease;
+                animation: fadeInText 1s ease 0.7s both;
+            " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 30px rgba(255, 102, 196, 0.8)'" 
+               onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                View Leaderboard
+            </button>
+            
+            <!-- Start New / Leave Buttons -->
+            <div style="display:flex; gap:12px; margin-top:12px;">
+                <button onclick="startNewGame()" style="padding:12px 20px; border-radius:24px; background:#4caf50; color:#fff; border:none; cursor:pointer;">Start New Game</button>
+                <button onclick="leaveGame()" style="padding:12px 20px; border-radius:24px; background:#f44336; color:#fff; border:none; cursor:pointer;">Leave Game</button>
+            </div>
+        </div>
+    `;
+}
+
+// NEW FUNCTION: Get character expression and message based on rank
+function getCharacterResultData(rank, totalPlayers) {
+    let emoji, message;
+    
+    if (rank === 1) {
+        emoji = '🏆';
+        message = "Champion! Outstanding performance!";
+    } else if (rank === 2) {
+        emoji = '😊';
+        message = "Great job! Almost there!";
+    } else if (rank === 3) {
+        emoji = '👌';
+        message = "Nice effort! Keep pushing!";
+    } else {
+        emoji = '💪';
+        message = "We'll get them next time!";
+    }
+    
+    return { emoji, message, characterClass: 'character-' + rank };
 }
 
 // Show full leaderboard
@@ -868,6 +1217,25 @@ function showFinalResults() {
         </div>
     `;
     }).join('');
+
+    // Add Next button to go to individual character result screen
+    const nextHtml = `
+        <div style="display:flex; justify-content:center; margin-top:18px;">
+            <button id="finalResultsNextBtn" style="padding:12px 28px; border-radius:30px; background:linear-gradient(135deg,#ff69b4,#7b2cff); color:#fff; border:none; cursor:pointer; font-weight:bold;">Next</button>
+        </div>
+    `;
+
+    finalLeaderboard.insertAdjacentHTML('beforeend', nextHtml);
+
+    // Wire up Next button
+    const finalNextBtn = document.getElementById('finalResultsNextBtn');
+    if (finalNextBtn) {
+        finalNextBtn.addEventListener('click', () => {
+            // Hide final results and show the character result for current player
+            document.getElementById('finalResults').style.display = 'none';
+            showFinalCharacterScreen();
+        });
+    }
 }
 
 // Leave game and go back to join page
@@ -878,6 +1246,15 @@ function leaveGame() {
     sessionStorage.removeItem('username');
     sessionStorage.removeItem('avatarConfig');
     
-    // Redirect to join game
+    // Redirect to galentines page when leaving the game
+    window.location.href = 'galentines.html';
+}
+
+// Start a new game: clear session and go to join page
+function startNewGame() {
+    sessionStorage.removeItem('sessionId');
+    sessionStorage.removeItem('joinCode');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('avatarConfig');
     window.location.href = 'join-game.html';
 }

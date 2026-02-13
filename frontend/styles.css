@@ -139,11 +139,15 @@ nav a {
 }
 
 nav a:hover {
+    color: #ff69b4;
+}
+
+.header.scrolled nav a {
     color: #8A2BE2;
 }
 
-.header.scrolled .nav-a{
-    color: #8A2BE2;
+.header.scrolled nav a:hover {
+    color: #ff69b4;
 }
 
 .menu-toggle {
@@ -604,7 +608,7 @@ nav a:hover {
    ========================================== */
 .games-section {
     padding: 100px 0;
-    background: url(assets/Untitled\ design\ \(4\).gif);
+    background: #FEFDFE;
     background-size: cover;
 }
 
@@ -1018,7 +1022,7 @@ nav a:hover {
    FOOTER
    ========================================== */
 .footer {
-    background-image: url('assets/Untitled\ design\ \(11\).png');
+    background-image: url('assets/footer-bg.gif');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -2414,7 +2418,7 @@ a.btn-large {
     }
 
     .logo {
-        font-size: clamp(2rem, 4vw, 3rem);
+        font-size: 45px;
     }
 
     /* Hero Section */
@@ -3030,7 +3034,7 @@ a.btn-large {
     }
 
     .logo {
-        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-size: 45px;
     }
 
     nav {
