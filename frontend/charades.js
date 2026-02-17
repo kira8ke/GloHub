@@ -108,15 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
  * Initialize WebSocket connection to backend
  */
 function initializeWebSocket() {
-    // Auto-detect protocol and host from current URL
+    // Use BACKEND_URL from config.js
+    const backendUrl = window.BACKEND_URL || 'https://glohub.onrender.com';
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     
-    // For development: use localhost:4000
-    // For production: use same host as frontend
-    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const host = isDev ? 'localhost:4000' : window.location.host;
-    
-    const wsUrl = `${protocol}//${host}`;
+    // Convert https:// to wss:// and http:// to ws://
+    let wsUrl = backendUrl.replace('https://', 'wss://').replace('http://', 'ws://');
     
     console.log(`Connecting to WebSocket at ${wsUrl}`);
     
@@ -277,7 +274,7 @@ async function requestDevicePermissions() {
  */
 async function togglePlayerReady() {
     try {
-        const response = await fetch(`/charades/player/${gameState.playerId}/ready`, {
+        const response = await fetch(`${window.BACKEND_URL}/charades/player/${gameState.playerId}/ready`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -343,7 +340,7 @@ async function startCharadesGame() {
         startBtn.disabled = true;
         startBtn.textContent = 'Starting...';
 
-        const response = await fetch(`/charades/game/${gameState.gameCode}/start`, {
+        const response = await fetch(`${window.BACKEND_URL}/charades/game/${gameState.gameCode}/start`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -372,7 +369,7 @@ async function startCharadesGame() {
  */
 async function spinTheWheel() {
     try {
-        const response = await fetch(`/charades/game/${gameState.gameCode}/spin`, {
+        const response = await fetch(`${window.BACKEND_URL}/charades/game/${gameState.gameCode}/spin`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -755,7 +752,7 @@ function confirmPreparationReady() {
 
 async function submitPreparationReady() {
     try {
-        const response = await fetch(`/charades/player/${gameState.playerId}/preparation-ready`, {
+        const response = await fetch(`${window.BACKEND_URL}/charades/player/${gameState.playerId}/preparation-ready`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ game_code: gameState.gameCode })
@@ -841,7 +838,7 @@ document.addEventListener('DOMContentLoaded', initGame);
  ****************************/
 async function loadPlayersList() {
     try {
-        const response = await fetch(`/charades/player/${gameState.playerId}/action`, {
+        const response = await fetch(`${window.BACKEND_URL}/charades/player/${gameState.playerId}/action`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1025,7 +1022,7 @@ function showEmotionScreen() {
 
 async function fetchFinalResults() {
     try {
-        const response = await fetch(`/charades/game/${gameState.gameCode}/final-results`);
+        const response = await fetch(`${window.BACKEND_URL}/charades/game/${gameState.gameCode}/final-results`);
         const data = await response.json();
 
         if (!data.success) {
@@ -1089,7 +1086,7 @@ function getAvatarEmoji(avatarId) {
 
 async function endRound() {
     try {
-        const response = await fetch(`/charades/game/${gameState.gameCode}/round-end`, {
+        const response = await fetch(`${window.BACKEND_URL}/charades/game/${gameState.gameCode}/round-end`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ admin_id: gameState.playerId })

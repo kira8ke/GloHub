@@ -10,7 +10,31 @@ const charadesRouter = require('./charades/game-manager');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+// =====================================================
+// CORS Configuration for Production
+// =====================================================
+const corsOptions = {
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      'https://glohub.space',
+      'http://localhost:3000',
+      'http://localhost:8000',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:8000'
+    ];
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Register charades game router
@@ -72,7 +96,9 @@ app.post('/admin/revoke-access', require('./admin/revoke-access'));
 app.post('/admin/delete', require('./admin/delete'));
 
 app.listen(PORT, () => {
-  console.log(`Backend listening on http://localhost:${PORT}`);
+  console.log(`Backend listening on port ${PORT}`);
+  console.log('Production frontend: https://glohub.space');
+  console.log('This server should be running at: https://glohub.onrender.com');
 
   // Try to initialize Supabase service client and report status (do not log keys)
   try {

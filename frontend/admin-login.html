@@ -153,6 +153,7 @@
     </div>
 
             <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+            <script src="config.js"></script>
             <script src="supabase.js"></script>
 
             <script>
@@ -165,35 +166,9 @@
             const code = document.getElementById('adminCode').value.trim().toUpperCase();
 
             try {
-                // Discover backend endpoint (try configured BACKEND_URL then common localhost addresses)
-                async function findBackend() {
-                    const candidates = [];
-                    if (window.BACKEND_URL) candidates.push(window.BACKEND_URL.replace(/\/$/, ''));
-                    // try host-specific localhost variants
-                    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-                        candidates.push(`http://${location.hostname}:4000`);
-                    }
-                    // common local backends
-                    candidates.push('http://localhost:4000', 'http://127.0.0.1:4000');
-
-                    for (const c of candidates) {
-                        try {
-                            const h = await fetch(c + '/health', { method: 'GET', mode: 'cors' });
-                            if (h && h.ok) return c;
-                        } catch (e) {
-                            // ignore
-                        }
-                    }
-                    return '';
-                }
-
-                let base = '';
-                if (window.BACKEND_URL) base = window.BACKEND_URL.replace(/\/$/, '');
-                if (!base) base = await findBackend();
-
-                if (!base) {
-                    throw new Error('Cannot reach backend. Start the backend (cd backend && npm start) or set window.BACKEND_URL to your backend URL.');
-                }
+                // Use configured BACKEND_URL from config.js
+                let base = window.BACKEND_URL || 'https://glohub.onrender.com';
+                base = base.replace(/\/$/, ''); // Remove trailing slash
 
                 const resp = await fetch(base + '/auth/verify-admin', {
                     method: 'POST',
@@ -203,7 +178,7 @@
 
                 if (resp.status === 405) {
                     const text = await resp.text().catch(() => '');
-                    throw new Error(`405 Method Not Allowed. Likely the request reached a static server (Live Server). Ensure your backend is running at ${base} and accessible, or set window.BACKEND_URL to your backend URL. Server responded: ${text}`);
+                    throw new Error(`405 Method Not Allowed. Issue with backend at ${base}. Server responded: ${text}`);
                 }
 
                 if (!resp.ok) {

@@ -123,6 +123,7 @@
     <div class="error" id="errorMessage" style="display:none;"></div>
   </div>
 
+  <script src="config.js"></script>
   <script type="module">
     // Session validation
     const sessionId = sessionStorage.getItem('sessionId');
@@ -213,7 +214,7 @@
       
       try {
         // Call backend to start game
-        const response = await fetch(`/charades/game/${gameCode}/start`, {
+        const response = await fetch(`${window.BACKEND_URL}/charades/game/${gameCode}/start`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ admin_id: adminId })
@@ -222,7 +223,7 @@
         const data = await response.json();
         if (data.success) {
           // Trigger wheel spin
-          const spinResponse = await fetch(`/charades/game/${gameCode}/spin`, {
+          const spinResponse = await fetch(`${window.BACKEND_URL}/charades/game/${gameCode}/spin`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ admin_id: adminId })
